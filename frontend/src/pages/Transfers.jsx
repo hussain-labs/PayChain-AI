@@ -1,10 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useTheme } from '../context/ThemeContext';
 
 const Transfers = () => {
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -53,7 +51,6 @@ const Transfers = () => {
               <p>Send and receive funds globally with low fees.</p>
             </div>
             <div className="header-actions">
-              <button onClick={toggleTheme} className="icon-btn"><i className={`bx ${theme === 'light' ? 'bx-moon' : 'bx-sun'}`}></i></button>
               <button className="icon-btn"><i className='bx bx-bell'></i></button>
               <div className="user-profile">
                 <img src={`https://ui-avatars.com/api/?name=${user ? user.name.replace(' ', '+') : 'User'}&background=4B1D8F&color=fff`} alt="User" />
@@ -62,7 +59,7 @@ const Transfers = () => {
           </header>
 
           <div className="dashboard-grid">
-            
+
             {/* Transfer Form */}
             <div className="glass-panel" style={{ gridColumn: 'span 1' }}>
               <div className="section-header">
@@ -78,7 +75,7 @@ const Transfers = () => {
                     <option value="solana">Solana</option>
                   </select>
                 </div>
-                
+
                 <div className="form-group" style={{ marginTop: '1rem' }}>
                   <label>Recipient Address / Email</label>
                   <input type="text" placeholder="0x... or name@email.com" style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'transparent' }} required />
@@ -111,7 +108,7 @@ const Transfers = () => {
 
             {/* Recent Contacts & Saved */}
             <div style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-              
+
               <div className="glass-panel">
                 <div className="section-header">
                   <h3>Recent Contacts</h3>

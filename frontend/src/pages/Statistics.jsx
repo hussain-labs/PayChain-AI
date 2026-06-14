@@ -1,10 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useTheme } from '../context/ThemeContext';
 
 const Statistics = () => {
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -53,7 +51,6 @@ const Statistics = () => {
               <p>Analyze your transaction history and portfolio growth.</p>
             </div>
             <div className="header-actions">
-              <button onClick={toggleTheme} className="icon-btn"><i className={`bx ${theme === 'light' ? 'bx-moon' : 'bx-sun'}`}></i></button>
               <button className="icon-btn"><i className='bx bx-bell'></i></button>
               <div className="user-profile">
                 <img src={`https://ui-avatars.com/api/?name=${user ? user.name.replace(' ', '+') : 'User'}&background=4B1D8F&color=fff`} alt="User" />
@@ -63,9 +60,9 @@ const Statistics = () => {
 
           {/* Statistics Grid */}
           <div className="dashboard-grid">
-            
+
             {/* KPI Cards */}
-            <div className="quick-actions glass-panel" style={{gridColumn: '1 / -1'}}>
+            <div className="quick-actions glass-panel" style={{ gridColumn: '1 / -1' }}>
               <div className="action-buttons" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', width: '100%' }}>
                 <div className="action-btn" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '1.5rem', background: 'rgba(255,255,255,0.5)' }}>
                   <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Total Volume</span>
@@ -91,7 +88,7 @@ const Statistics = () => {
             </div>
 
             {/* Main Chart Placeholder */}
-            <div className="connected-accounts glass-panel" style={{gridColumn: '1 / -1', minHeight: '400px', display: 'flex', flexDirection: 'column'}}>
+            <div className="connected-accounts glass-panel" style={{ gridColumn: '1 / -1', minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
               <div className="section-header">
                 <h3>Portfolio Growth</h3>
                 <select style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', background: 'transparent' }}>
@@ -119,7 +116,7 @@ const Statistics = () => {
             </div>
 
             {/* Asset Allocation */}
-            <div className="recent-activity glass-panel" style={{gridColumn: '1 / -1'}}>
+            <div className="recent-activity glass-panel" style={{ gridColumn: '1 / -1' }}>
               <div className="section-header">
                 <h3>Asset Allocation</h3>
               </div>

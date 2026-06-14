@@ -41,7 +41,7 @@ const About = () => {
       email: "zurich@paychain.inc",
       phone: "+41 44 234 5678",
       time: "CET (UTC +1)",
-      image: "https://images.unsplash.com/photo-1515488042361-404e9250afef?q=80&w=400&auto=format&fit=crop"
+      image: "https://images.unsplash.com/photo-1527866512907-a35a62a0f6c5?q=80&w=400&auto=format&fit=crop"
     },
     {
       city: "Singapore",
@@ -115,28 +115,28 @@ const About = () => {
       name: "Sarah Jenkins",
       role: "CEO & Co-Founder",
       bio: "Former Fintech Executive with 12+ years building cross-border routing infrastructure.",
-      image: "https://ui-avatars.com/api/?name=Sarah+Jenkins&background=4B1D8F&color=fff",
+      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop",
       socials: { linkedin: "#", twitter: "#" }
     },
     {
       name: "David Chen",
       role: "CTO & Co-Founder",
       bio: "Decentralized protocol developer, creator of open-source settlement layers.",
-      image: "https://ui-avatars.com/api/?name=David+Chen&background=F5C77A&color=2b2b2b",
+      image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=400&auto=format&fit=crop",
       socials: { linkedin: "#", github: "#" }
     },
     {
       name: "Elena Rostova",
       role: "Head of Compliance",
       bio: "Ex-regulator specializing in crypto compliance frameworks and global anti-money laundering rails.",
-      image: "https://ui-avatars.com/api/?name=Elena+Rostova&background=C7B6E2&color=2b2b2b",
+      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=400&auto=format&fit=crop",
       socials: { linkedin: "#", twitter: "#" }
     },
     {
       name: "Marcus Aurelius",
       role: "VP of Product Engineering",
       bio: "Loves crafting micro-animations and highly responsive systems. Leading our frontend engineering teams.",
-      image: "https://ui-avatars.com/api/?name=Marcus+Aurelius&background=321166&color=fff",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
       socials: { linkedin: "#", github: "#" }
     }
   ];
@@ -160,7 +160,7 @@ const About = () => {
               <p>Founded in 2026, PayChain was built on a simple premise: the legacy financial system is too slow, too expensive, and too exclusive. We set out to build a platform that leverages cutting-edge technology to give everyone access to instantaneous, zero-fee global transfers.</p>
               <p>Today, millions of users trust PayChain to handle their personal and business finances securely and efficiently.</p>
             </div>
-            
+
             <div className="about-mission glass-panel">
               <div className="mission-icon"><i className="bx bx-target-lock"></i></div>
               <div className="mission-text">
@@ -174,7 +174,7 @@ const About = () => {
           <div className="about-graphics-wrapper">
             <div className="about-globe-container">
               <img src={aboutGlobe} className="about-globe-img" alt="PayChain Global Network" />
-              
+
               <div className="floating-stat-badge stat-badge-1">
                 <div className="badge-icon"><i className="bx bx-line-chart"></i></div>
                 <div className="badge-info">
@@ -303,8 +303,8 @@ const About = () => {
           <div className="offices-grid">
             {offices.map((office, idx) => (
               <div className="office-card glass-panel" key={idx}>
-                <div 
-                  className="office-img" 
+                <div
+                  className="office-img"
                   style={{ backgroundImage: `url(${office.image})` }}
                   alt={office.city}
                 />

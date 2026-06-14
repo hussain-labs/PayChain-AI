@@ -1,12 +1,10 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useTheme } from '../context/ThemeContext';
 
 const Cards = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isFrozen, setIsFrozen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -54,7 +52,6 @@ const Cards = () => {
               <p>Manage your crypto debit cards and spending limits.</p>
             </div>
             <div className="header-actions">
-              <button onClick={toggleTheme} className="icon-btn"><i className={`bx ${theme === 'light' ? 'bx-moon' : 'bx-sun'}`}></i></button>
               <button className="icon-btn"><i className='bx bx-bell'></i></button>
               <div className="user-profile">
                 <img src={`https://ui-avatars.com/api/?name=${user ? user.name.replace(' ', '+') : 'User'}&background=4B1D8F&color=fff`} alt="User" />

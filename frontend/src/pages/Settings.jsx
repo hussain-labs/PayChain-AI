@@ -1,10 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useTheme } from '../context/ThemeContext';
 
 const Settings = () => {
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -53,7 +51,6 @@ const Settings = () => {
               <p>Manage your account preferences and security.</p>
             </div>
             <div className="header-actions">
-              <button onClick={toggleTheme} className="icon-btn"><i className={`bx ${theme === 'light' ? 'bx-moon' : 'bx-sun'}`}></i></button>
               <button className="icon-btn"><i className='bx bx-bell'></i></button>
               <div className="user-profile">
                 <img src={`https://ui-avatars.com/api/?name=${user ? user.name.replace(' ', '+') : 'User'}&background=4B1D8F&color=fff`} alt="User" />
@@ -62,7 +59,7 @@ const Settings = () => {
           </header>
 
           <div className="dashboard-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
-            
+
             {/* Profile Settings */}
             <div className="glass-panel" style={{ gridColumn: 'span 1' }}>
               <div className="section-header">
@@ -75,7 +72,7 @@ const Settings = () => {
                     <button className="btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>Change Avatar</button>
                   </div>
                 </div>
-                
+
                 <form className="modal-form" onSubmit={(e) => e.preventDefault()}>
                   <div className="form-group">
                     <label>Full Name</label>
@@ -95,7 +92,7 @@ const Settings = () => {
             </div>
 
             <div style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-              
+
               {/* Security */}
               <div className="glass-panel">
                 <div className="section-header">
@@ -153,7 +150,8 @@ const Settings = () => {
         </div>
       </main>
 
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .switch input:checked + span {
           background-color: var(--primary);
         }
