@@ -2626,15 +2626,15 @@ ul {
 
 /* Navbar text modes for transparent/scrolled states (scoped to home page hero background) */
 .home-navbar:not(.scrolled) .logo {
-  color: #ffffff;
+  color: var(--primary);
 }
 
 .home-navbar:not(.scrolled) .logo span {
-  color: rgba(255, 255, 255, 0.9);
+  color: #ffffff;
 }
 
 .home-navbar:not(.scrolled) .nav-menu a {
-  color: rgba(255, 255, 255, 0.85);
+  color: #ffffff;
 }
 
 .home-navbar:not(.scrolled) .nav-menu a:hover {
@@ -5471,11 +5471,9 @@ footer {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(75, 29, 143, 0.8) 0%,
-    transparent 80%
-  );
+  background: linear-gradient(to top,
+      rgba(75, 29, 143, 0.8) 0%,
+      transparent 80%);
 }
 
 .office-card .office-img::after {
@@ -6914,29 +6912,37 @@ body.menu-open .theme-switcher {
 /* ═══════════════════════════════════════ */
 
 @media (max-width: 768px) {
+
   /* Dashboard Preview Mockup Fixes */
   .preview-wrapper {
     padding: 1.5rem 1rem !important;
   }
+
   .mockup-body {
     padding: 1rem !important;
   }
+
   .m-card {
     padding: 1.25rem 1rem !important;
     margin-bottom: 1.25rem !important;
   }
+
   .t-item {
     padding: 0.75rem 0.5rem !important;
   }
+
   .t-info {
     gap: 0.5rem !important;
   }
+
   .t-info h5 {
     font-size: 0.9rem !important;
   }
+
   .t-info p {
     font-size: 0.7rem !important;
   }
+
   .t-amount {
     font-size: 0.9rem !important;
     white-space: nowrap !important;
@@ -6946,31 +6952,36 @@ body.menu-open .theme-switcher {
   .converter-widget {
     padding: 1.5rem 1rem !important;
   }
+
   .input-field-wrapper input {
     padding: 0.75rem 1rem !important;
     font-size: 1.1rem !important;
     width: 60% !important;
     min-width: 0 !important;
   }
+
   .currency-select {
     padding: 0 0.5rem !important;
     font-size: 0.95rem !important;
     max-width: 100px !important;
   }
+
   .comparison-item {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 0.75rem !important;
     padding: 1.25rem 1.5rem !important;
   }
+
   .comp-details {
     text-align: left !important;
   }
-  
+
   /* CTA Box Mobile Padding Fixes */
   .cta-box {
     padding: 3rem 1.5rem !important;
   }
+
   .cta-form input {
     width: 100% !important;
   }
@@ -6979,31 +6990,40 @@ body.menu-open .theme-switcher {
   .region-card {
     padding: 2rem 1.25rem !important;
   }
+
   .value-card {
     padding: 2rem 1.25rem !important;
   }
+
   .pricing-card {
     padding: 2.5rem 1.5rem !important;
   }
+
   .features-grid {
     grid-template-columns: 1fr !important;
   }
+
   .feature-card {
     padding: 2rem 1.25rem !important;
   }
+
   .partner-logos {
     gap: 2rem !important;
   }
+
   .section-header {
     margin-bottom: 2.5rem !important;
   }
+
   .section-header h2 {
     font-size: 1.75rem !important;
   }
+
   .faq-question {
     padding: 1.25rem 1.25rem !important;
     font-size: 1rem !important;
   }
+
   .faq-answer {
     padding: 0 1.25rem 1.25rem !important;
   }
@@ -7012,11 +7032,22 @@ body.menu-open .theme-switcher {
   footer {
     padding-bottom: 2rem !important;
   }
+
+  .legal-links {
+    display: none !important;
+  }
+
   .footer-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     text-align: center !important;
     gap: 2.5rem 1.5rem !important;
+    margin-bottom: 1.5rem !important;
   }
+
+  .footer-bottom {
+    padding-top: 1.5rem !important;
+  }
+
   .footer-brand {
     grid-column: span 2 !important;
     display: flex !important;
@@ -7024,16 +7055,20 @@ body.menu-open .theme-switcher {
     align-items: center !important;
     text-align: center !important;
   }
+
   .footer-brand p {
     margin: 1rem auto !important;
     max-width: 320px !important;
   }
+
   .social-links {
     justify-content: center !important;
   }
+
   .footer-links {
     text-align: center !important;
   }
+
   .footer-links ul {
     display: inline-block !important;
     text-align: center !important;
@@ -7044,12 +7079,14 @@ body.menu-open .theme-switcher {
   .footer-grid {
     grid-template-columns: repeat(3, 1fr) !important;
   }
+
   .footer-brand {
     grid-column: span 3 !important;
   }
 }
 
 @media (max-width: 480px) {
+
   /* Currency Converter stats layout */
   .converter-stats-list {
     flex-direction: column !important;
@@ -7080,7 +7117,7 @@ body.menu-open .theme-switcher {
     text-align: center !important;
   }
 
-  .auth-form-side > p {
+  .auth-form-side>p {
     text-align: center !important;
     font-size: 0.95rem !important;
     margin-bottom: 1.5rem !important;
