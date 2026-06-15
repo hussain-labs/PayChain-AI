@@ -5,6 +5,8 @@ const Settings = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -22,17 +24,28 @@ const Settings = () => {
 
   return (
     <div className="dashboard-layout">
+      {/* Sidebar Overlay */}
+      <div 
+        className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`}
+        onClick={() => setIsSidebarOpen(false)}
+      ></div>
+
       {/* Sidebar */}
-      <aside className="sidebar">
-        <div className="sidebar-logo">
-          <i className='bx bx-link'></i> Pay<span>Chain</span>
+      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', width: '100%' }}>
+          <div className="sidebar-logo" style={{ marginBottom: 0 }}>
+            <i className='bx bx-link'></i> Pay<span>Chain</span>
+          </div>
+          <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)} aria-label="Close sidebar">
+            <i className='bx bx-x'></i>
+          </button>
         </div>
         <nav className="sidebar-nav">
-          <Link to="/dashboard"><i className='bx bx-grid-alt'></i> Overview</Link>
-          <Link to="/transfers"><i className='bx bx-transfer'></i> Transfers</Link>
-          <Link to="/cards"><i className='bx bx-credit-card'></i> Cards</Link>
-          <Link to="/statistics"><i className='bx bx-line-chart'></i> Statistics</Link>
-          <Link to="/settings" className="active"><i className='bx bx-cog'></i> Settings</Link>
+          <Link to="/dashboard" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-grid-alt'></i> Overview</Link>
+          <Link to="/transfers" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-transfer'></i> Transfers</Link>
+          <Link to="/cards" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-credit-card'></i> Cards</Link>
+          <Link to="/statistics" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-line-chart'></i> Statistics</Link>
+          <Link to="/settings" className="active" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-cog'></i> Settings</Link>
         </nav>
         <div className="sidebar-bottom">
           <button className="logout-btn" onClick={handleLogout}>
@@ -46,6 +59,9 @@ const Settings = () => {
         <div className="dashboard-content-wrapper">
           {/* Header */}
           <header className="dashboard-header">
+            <div className="header-toggle" onClick={() => setIsSidebarOpen(true)} aria-label="Open sidebar">
+              <i className='bx bx-menu'></i>
+            </div>
             <div className="header-greeting">
               <h1>Settings ⚙️</h1>
               <p>Manage your account preferences and security.</p>

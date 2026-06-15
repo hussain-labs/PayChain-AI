@@ -38,11 +38,12 @@ Keep all answers concise, informative, friendly, and formatted in clean markdown
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: 'Hello! I am your PayChain Assistant. Ask me anything about our global payment network, fees, compliance, offices, or feel free to ask any general question!'
+      content: 'Hello! I am your PayChain AI Assistant. Ask me anything about our global payment network, fees, compliance, offices, or feel free to ask any general question!'
     }
   ]);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,6 +71,7 @@ const Chatbot = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      if (isFullscreen) return;
       if (chatbotRef.current && !chatbotRef.current.contains(event.target)) {
         setIsOpen(false);
       }
@@ -84,7 +86,7 @@ const Chatbot = () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
     };
-  }, [isOpen]);
+  }, [isOpen, isFullscreen]);
 
   const handleSendMessage = async (textToSend) => {
     const text = textToSend || input;
@@ -100,21 +102,17 @@ const Chatbot = () => {
     setIsLoading(true);
 
     try {
-      const apiKey = import.meta.env.GROK_API_KEY;
-      if (!apiKey) {
-        throw new Error("Grok API key is missing. Please set GROK_API_KEY in your .env file.");
-      }
+      // Request goes to backend
 
       const history = [...messages, userMessage].map((msg) => ({
         role: msg.role === 'assistant' ? 'assistant' : 'user',
         content: msg.content
       }));
 
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const response = await fetch('http://localhost:5000/api/chat', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           model: 'llama-3.3-70b-versatile',
@@ -163,7 +161,7 @@ const Chatbot = () => {
 
       {/* Chat Window Panel */}
       {isOpen && (
-        <div className="chatbot-panel glass-panel">
+        <div className={`chatbot-panel glass-panel ${isFullscreen ? 'fullscreen' : ''}`}>
           {/* Header */}
           <div className="chatbot-header">
             <div className="chatbot-info">
@@ -172,13 +170,24 @@ const Chatbot = () => {
                 <span className="status-dot online"></span>
               </div>
               <div>
-                <h3>PayChain Assistant</h3>
-                <p>Powered by Groq AI</p>
+                <h3>PayChain AI Assistant</h3>
+                <p>Powered by Muzamil Hussain</p>
               </div>
             </div>
-            <button className="chatbot-close-btn" onClick={() => setIsOpen(false)} aria-label="Close Chat">
-              <i className="bx bx-x"></i>
-            </button>
+            <div className="chatbot-header-actions">
+              <button 
+                type="button" 
+                className="chatbot-fullscreen-btn" 
+                onClick={() => setIsFullscreen(!isFullscreen)} 
+                title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+              >
+                <i className={isFullscreen ? "bx bx-exit-fullscreen" : "bx bx-fullscreen"}></i>
+              </button>
+              <button type="button" className="chatbot-close-btn" onClick={() => setIsOpen(false)} aria-label="Close Chat">
+                <i className="bx bx-x"></i>
+              </button>
+            </div>
           </div>
 
           {/* Messages Logs */}

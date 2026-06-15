@@ -60,12 +60,14 @@ const AnimationObserver = () => {
 const MainLayout = () => {
   const location = useLocation();
   const isDashboardLayout = ['/dashboard', '/statistics', '/transfers', '/cards', '/settings'].includes(location.pathname);
+  const isAuthPage = ['/login', '/register'].includes(location.pathname);
 
   return (
     <>
       {!isDashboardLayout && <Navbar />}
 
-      <Routes>
+      <div className="main-content-wrapper">
+        <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
@@ -78,9 +80,10 @@ const MainLayout = () => {
         <Route path="/cards" element={<Cards />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
+      </div>
 
-      <Chatbot />
-      <ThemeSwitcher />
+      {!isAuthPage && <Chatbot />}
+      {!isAuthPage && <ThemeSwitcher />}
 
       {!isDashboardLayout && <Footer />}
     </>

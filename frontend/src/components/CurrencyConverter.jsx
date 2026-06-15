@@ -78,11 +78,11 @@ const CurrencyConverter = () => {
                   value={cryptoCurrency}
                   onChange={(e) => setCryptoCurrency(e.target.value)}
                 >
-                  <option value="USDC">USDC (Stablecoin)</option>
-                  <option value="USDT">USDT (Stablecoin)</option>
-                  <option value="SOL">SOL (Solana)</option>
-                  <option value="ETH">ETH (Ethereum)</option>
-                  <option value="BTC">BTC (Bitcoin)</option>
+                  <option value="USDC">USDC</option>
+                  <option value="USDT">USDT</option>
+                  <option value="SOL">SOL</option>
+                  <option value="ETH">ETH</option>
+                  <option value="BTC">BTC</option>
                 </select>
               </div>
             </div>

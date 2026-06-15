@@ -20,7 +20,7 @@ const Hero = () => {
         muted
         playsInline
       >
-        <source src="/crypto_bg1.mp4" type="video/mp4" />
+        <source src="/crypto_bg6.mp4" type="video/mp4" />
       </video>
       <div className="hero-overlay"></div>
 

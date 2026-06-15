@@ -7,6 +7,7 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -63,7 +64,20 @@ const Login = () => {
             </div>
             <div className="form-group">
               <label>Password</label>
-              <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" required />
+              <div className="password-wrapper">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  name="password" 
+                  value={formData.password} 
+                  onChange={handleChange} 
+                  placeholder="••••••••" 
+                  required 
+                />
+                <i 
+                  className={`bx ${showPassword ? 'bx-hide' : 'bx-show'} password-toggle-icon`} 
+                  onClick={() => setShowPassword(!showPassword)}
+                ></i>
+              </div>
             </div>
             <div className="auth-options">
               <label className="checkbox-container">

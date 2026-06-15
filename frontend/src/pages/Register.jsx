@@ -7,6 +7,7 @@ const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -60,7 +61,20 @@ const Register = () => {
             </div>
             <div className="form-group">
               <label>Password</label>
-              <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Create a strong password" required />
+              <div className="password-wrapper">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  name="password" 
+                  value={formData.password} 
+                  onChange={handleChange} 
+                  placeholder="Create a strong password" 
+                  required 
+                />
+                <i 
+                  className={`bx ${showPassword ? 'bx-hide' : 'bx-show'} password-toggle-icon`} 
+                  onClick={() => setShowPassword(!showPassword)}
+                ></i>
+              </div>
             </div>
             <button type="submit" className="btn-primary" style={{width: '100%', marginTop: '1rem'}} disabled={loading}>
               {loading ? 'Signing Up...' : 'Sign Up'}

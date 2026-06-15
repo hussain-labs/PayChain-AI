@@ -1,15 +1,20 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useWeb3Auth } from '../hooks/useWeb3Auth';
+import { useBalance } from 'wagmi';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const [accounts, setAccounts] = useState([
-    { id: 1, name: 'Binance', type: 'bitcoin', wallets: 2, balance: '$45,200.00', bgColor: '#FCD535', color: '#000' },
-    { id: 2, name: 'OKX', type: 'wallet', wallets: 1, balance: '$12,850.50', bgColor: '#000000', color: '#fff' }
-  ]);
+  const [accounts, setAccounts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newAccountName, setNewAccountName] = useState('');
+
+  const { address, isConnected, connect, disconnect } = useWeb3Auth();
+  const { data: balanceData } = useBalance({
+    address: address,
+  });
 
   const [user, setUser] = useState(null);
 
@@ -49,17 +54,28 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-layout">
+      {/* Sidebar Overlay */}
+      <div
+        className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`}
+        onClick={() => setIsSidebarOpen(false)}
+      ></div>
+
       {/* Sidebar */}
-      <aside className="sidebar">
-        <div className="sidebar-logo">
-          <i className='bx bx-link'></i> Pay<span>Chain</span>
+      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', width: '100%' }}>
+          <div className="sidebar-logo" style={{ marginBottom: 0 }}>
+            <i className='bx bx-link'></i> Pay<span>Chain</span>
+          </div>
+          <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)} aria-label="Close sidebar">
+            <i className='bx bx-x'></i>
+          </button>
         </div>
         <nav className="sidebar-nav">
-          <Link to="/dashboard" className="active"><i className='bx bx-grid-alt'></i> Overview</Link>
-          <Link to="/transfers"><i className='bx bx-transfer'></i> Transfers</Link>
-          <Link to="/cards"><i className='bx bx-credit-card'></i> Cards</Link>
-          <Link to="/statistics"><i className='bx bx-line-chart'></i> Statistics</Link>
-          <Link to="/settings"><i className='bx bx-cog'></i> Settings</Link>
+          <Link to="/dashboard" className="active" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-grid-alt'></i> Overview</Link>
+          <Link to="/transfers" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-transfer'></i> Transfers</Link>
+          <Link to="/cards" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-credit-card'></i> Cards</Link>
+          <Link to="/statistics" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-line-chart'></i> Statistics</Link>
+          <Link to="/settings" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-cog'></i> Settings</Link>
         </nav>
         <div className="sidebar-bottom">
           <button className="logout-btn" onClick={handleLogout}>
@@ -73,6 +89,9 @@ const Dashboard = () => {
         <div className="dashboard-content-wrapper">
           {/* Header */}
           <header className="dashboard-header">
+            <div className="header-toggle" onClick={() => setIsSidebarOpen(true)} aria-label="Open sidebar">
+              <i className='bx bx-menu'></i>
+            </div>
             <div className="header-greeting">
               <h1>Hello, {user ? user.name.split(' ')[0] : 'User'}! 👋</h1>
               <p>Here's your financial overview for today.</p>
@@ -127,7 +146,9 @@ const Dashboard = () => {
             <div className="connected-accounts glass-panel" style={{ gridColumn: '1 / -1' }}>
               <div className="section-header">
                 <h3>Connected Accounts</h3>
-                <button className="btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }} onClick={() => setIsModalOpen(true)}><i className='bx bx-plus'></i> Connect</button>
+                <button className="btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }} onClick={isConnected ? disconnect : connect}>
+                  <i className={`bx ${isConnected ? 'bx-unlink' : 'bx-plus'}`}></i> {isConnected ? 'Disconnect' : 'Connect Wallet'}
+                </button>
               </div>
               <div className="accounts-list">
 
@@ -146,10 +167,27 @@ const Dashboard = () => {
                   </div>
                 ))}
 
-                <div className="account-card connect-new" onClick={() => setIsModalOpen(true)}>
-                  <i className='bx bx-link-alt'></i>
-                  <span>Connect Exchange / Wallet</span>
-                </div>
+                {isConnected && (
+                  <div className="account-card" style={{ borderColor: 'var(--primary)' }}>
+                    <div className="account-icon" style={{ background: '#4B1D8F', color: '#fff' }}>
+                      <i className='bx bx-wallet-alt'></i>
+                    </div>
+                    <div className="account-info">
+                      <h4>Web3 Wallet</h4>
+                      <p>{address?.slice(0, 6)}...{address?.slice(-4)}</p>
+                    </div>
+                    <div className="account-balance" style={{ color: 'var(--primary-light)' }}>
+                      {balanceData ? `${Number(balanceData.formatted).toFixed(4)} ${balanceData.symbol}` : '0.0000 ETH'}
+                    </div>
+                  </div>
+                )}
+
+                {!isConnected && (
+                  <div className="account-card connect-new" onClick={connect}>
+                    <i className='bx bx-link-alt'></i>
+                    <span>Connect Web3 Wallet</span>
+                  </div>
+                )}
 
               </div>
             </div>

@@ -9,6 +9,15 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.classList.add('menu-open');
+    } else {
+      document.body.classList.remove('menu-open');
+    }
+    return () => document.body.classList.remove('menu-open');
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
     const handleScroll = () => {
       const navbar = document.getElementById('navbar');
       if (navbar) {
@@ -23,9 +32,11 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     // Initial check
     handleScroll();
-    
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const isAuthPage = ['/login', '/register'].includes(location.pathname);
 
   return (
     <>
@@ -50,7 +61,7 @@ const Navbar = () => {
               </li>
             </ul>
           </nav>
-          <div className="nav-actions" style={{ display: 'flex', alignItems: 'center' }}>
+          <div className="nav-actions">
             {localStorage.getItem('token') ? (
               <Link to="/dashboard" className="btn-primary">Dashboard</Link>
             ) : (
@@ -67,8 +78,8 @@ const Navbar = () => {
       </header>
 
       {/* Mobile Navigation Drawer */}
-      <div 
-        className={`mobile-nav-overlay ${isMobileMenuOpen ? 'open' : ''}`} 
+      <div
+        className={`mobile-nav-overlay ${isMobileMenuOpen ? 'open' : ''}`}
         onClick={() => setIsMobileMenuOpen(false)}
       ></div>
       <div className={`mobile-nav-drawer ${isMobileMenuOpen ? 'open' : ''}`}>
@@ -81,29 +92,29 @@ const Navbar = () => {
           </button>
         </div>
         <nav className="mobile-nav-links">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className={location.pathname === '/' ? 'active-link' : ''}
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <i className='bx bx-home-alt'></i> Home
           </Link>
-          <Link 
-            to="/about" 
+          <Link
+            to="/about"
             className={location.pathname === '/about' ? 'active-link' : ''}
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <i className='bx bx-info-circle'></i> About
           </Link>
-          <Link 
-            to="/pricing" 
+          <Link
+            to="/pricing"
             className={location.pathname === '/pricing' ? 'active-link' : ''}
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <i className='bx bx-purchase-tag'></i> Pricing
           </Link>
-          <Link 
-            to="/contact" 
+          <Link
+            to="/contact"
             className={location.pathname === '/contact' ? 'active-link' : ''}
             onClick={() => setIsMobileMenuOpen(false)}
           >
@@ -112,13 +123,13 @@ const Navbar = () => {
         </nav>
         <div className="mobile-drawer-actions">
           {localStorage.getItem('token') ? (
-              <Link to="/dashboard" className="btn-primary" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
-            ) : (
-              <>
-                <Link to="/login" className="btn-text" onClick={() => setIsMobileMenuOpen(false)}>Log In</Link>
-                <Link to="/login" className="btn-primary" onClick={() => setIsMobileMenuOpen(false)}>Get Started</Link>
-              </>
-            )}
+            <Link to="/dashboard" className="btn-primary" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
+          ) : (
+            <>
+              <Link to="/login" className="btn-text" onClick={() => setIsMobileMenuOpen(false)}>Log In</Link>
+              <Link to="/login" className="btn-primary" onClick={() => setIsMobileMenuOpen(false)}>Get Started</Link>
+            </>
+          )}
         </div>
       </div>
     </>

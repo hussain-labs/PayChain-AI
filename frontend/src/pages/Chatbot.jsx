@@ -100,21 +100,17 @@ const Chatbot = () => {
     setIsLoading(true);
 
     try {
-      const apiKey = import.meta.env.GROK_API_KEY;
-      if (!apiKey) {
-        throw new Error("Grok API key is missing. Please set GROK_API_KEY in your .env file.");
-      }
+      // Request goes to backend
 
       const history = [...messages, userMessage].map((msg) => ({
         role: msg.role === 'assistant' ? 'assistant' : 'user',
         content: msg.content
       }));
 
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      const response = await fetch('http://localhost:5000/api/chat', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           model: 'llama-3.3-70b-versatile',
