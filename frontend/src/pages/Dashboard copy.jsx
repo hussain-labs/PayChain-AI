@@ -55,7 +55,7 @@ const Dashboard = () => {
               <i className='bx bx-menu'></i>
             </div>
             <div className="header-greeting">
-              <h1>Hello, Alex! 👋</h1>
+              <h1>Hello, Alex!</h1>
               <p>Here's your financial overview for today.</p>
             </div>
             <div className="header-actions">

@@ -46,6 +46,15 @@ const Statistics = () => {
           <Link to="/cards" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-credit-card'></i> Cards</Link>
           <Link to="/statistics" className="active" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-line-chart'></i> Statistics</Link>
           <Link to="/settings" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-cog'></i> Settings</Link>
+          <Link to="/support" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-help-circle'></i> Support</Link>
+
+          {user?.isAdmin && (
+            <>
+              <div style={{ padding: '1rem 1rem 0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Admin</div>
+              <Link to="/admin/users" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-user-circle'></i> Users</Link>
+              <Link to="/admin/support" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-message-square-detail'></i> Tickets</Link>
+            </>
+          )}
         </nav>
         <div className="sidebar-bottom">
           <button className="logout-btn" onClick={handleLogout}>
@@ -63,13 +72,13 @@ const Statistics = () => {
               <i className='bx bx-menu'></i>
             </div>
             <div className="header-greeting">
-              <h1>Financial Statistics 📊</h1>
+              <h1>Financial Statistics</h1>
               <p>Analyze your transaction history and portfolio growth.</p>
             </div>
             <div className="header-actions">
               <button className="icon-btn"><i className='bx bx-bell'></i></button>
               <div className="user-profile">
-                <img src={`https://ui-avatars.com/api/?name=${user ? user.name.replace(' ', '+') : 'User'}&background=4B1D8F&color=fff`} alt="User" />
+                <img src={user?.avatar || `https://ui-avatars.com/api/?name=${user ? user.name.replace(' ', '+') : 'User'}&background=4B1D8F&color=fff`} alt="User" />
               </div>
             </div>
           </header>

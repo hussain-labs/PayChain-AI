@@ -12,6 +12,9 @@ import Statistics from './pages/Statistics';
 import Transfers from './pages/Transfers';
 import Cards from './pages/Cards';
 import Settings from './pages/Settings';
+import Support from './pages/Support';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminSupport from './pages/admin/AdminSupport';
 import { ThemeProvider } from './context/ThemeContext';
 import PricingPage from './pages/PricingPage';
 import Chatbot from './components/Chatbot';
@@ -59,7 +62,7 @@ const AnimationObserver = () => {
 
 const MainLayout = () => {
   const location = useLocation();
-  const isDashboardLayout = ['/dashboard', '/statistics', '/transfers', '/cards', '/settings'].includes(location.pathname);
+  const isDashboardLayout = ['/dashboard', '/statistics', '/transfers', '/cards', '/settings', '/support', '/admin/users', '/admin/support'].includes(location.pathname);
   const isAuthPage = ['/login', '/register'].includes(location.pathname);
 
   return (
@@ -79,11 +82,14 @@ const MainLayout = () => {
         <Route path="/transfers" element={<Transfers />} />
         <Route path="/cards" element={<Cards />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/support" element={<Support />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/support" element={<AdminSupport />} />
       </Routes>
       </div>
 
       {!isAuthPage && <Chatbot />}
-      {!isAuthPage && <ThemeSwitcher />}
+      {!isAuthPage && !isDashboardLayout && <ThemeSwitcher />}
 
       {!isDashboardLayout && <Footer />}
     </>

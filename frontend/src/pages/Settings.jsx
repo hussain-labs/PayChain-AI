@@ -1,20 +1,155 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 const Settings = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-
+  const { theme, toggleTheme } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // Profile state
+  const [profile, setProfile] = useState({ name: '', email: '', phone: '', avatar: '', currency: 'USD', language: 'EN' });
+  const [profileMsg, setProfileMsg] = useState({ text: '', type: '' });
+  const [profileLoading, setProfileLoading] = useState(false);
+
+  // Password state
+  const [passwords, setPasswords] = useState({ newPassword: '', confirmPassword: '' });
+  const [passwordMsg, setPasswordMsg] = useState({ text: '', type: '' });
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  const getToken = () => localStorage.getItem('token');
+
+  const autoLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else {
-      navigate('/login');
-    }
+    const token = getToken();
+    if (!token) { navigate('/login'); return; }
+
+    fetch('http://localhost:5000/api/user/profile', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => { if (res.status === 401) { autoLogout(); return null; } return res.json(); })
+      .then(data => {
+        if (data) {
+          setProfile({ name: data.name || '', email: data.email || '', phone: data.phone || '', avatar: data.avatar || '', currency: data.currency || 'USD', language: data.language || 'EN' });
+          localStorage.setItem('user', JSON.stringify(data));
+        }
+      })
+      .catch(err => console.error('Error loading profile:', err));
   }, [navigate]);
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      setProfileMsg({ text: '❌ Image must be under 2MB.', type: 'error' }); return;
+    }
+
+    setProfileMsg({ text: '⏳ Uploading image...', type: 'success' });
+
+    try {
+      // Upload directly from browser to Cloudinary (unsigned preset)
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'aychain_unsigned');
+      formData.append('folder', 'paychain/avatars');
+
+      const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dczt7cqfd';
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setProfileMsg({ text: `❌ ${data.error?.message || 'Upload failed.'}`, type: 'error' }); return;
+      }
+
+      const avatarUrl = data.secure_url;
+      // Save the URL to our backend
+      const token = getToken();
+      if (!token) { autoLogout(); return; }
+      await fetch('http://localhost:5000/api/user/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ avatar: avatarUrl })
+      });
+
+      setProfile(p => ({ ...p, avatar: avatarUrl }));
+      const stored = JSON.parse(localStorage.getItem('user') || '{}');
+      localStorage.setItem('user', JSON.stringify({ ...stored, avatar: avatarUrl }));
+      setProfileMsg({ text: '✅ Photo updated!', type: 'success' });
+    } catch (err) {
+      console.error('Upload error:', err);
+      setProfileMsg({ text: '❌ Upload failed. Check console for details.', type: 'error' });
+    }
+  };
+
+  const handleProfileSubmit = async (e) => {
+    e.preventDefault();
+    setProfileMsg({ text: '', type: '' });
+    setProfileLoading(true);
+    const token = getToken();
+    if (!token) { autoLogout(); return; }
+    try {
+      const res = await fetch('http://localhost:5000/api/user/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(profile)
+      });
+      if (res.status === 401) { autoLogout(); return; }
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem('user', JSON.stringify(data));
+        setProfileMsg({ text: '✅ Profile updated successfully!', type: 'success' });
+      } else {
+        setProfileMsg({ text: `❌ ${data.error}`, type: 'error' });
+      }
+    } catch {
+      setProfileMsg({ text: '❌ Could not reach the server.', type: 'error' });
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    setPasswordMsg({ text: '', type: '' });
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      setPasswordMsg({ text: '❌ Passwords do not match.', type: 'error' }); return;
+    }
+    if (passwords.newPassword.length < 6) {
+      setPasswordMsg({ text: '❌ Password must be at least 6 characters.', type: 'error' }); return;
+    }
+    setPasswordLoading(true);
+    const token = getToken();
+    if (!token) { autoLogout(); return; }
+    try {
+      const res = await fetch('http://localhost:5000/api/user/password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ newPassword: passwords.newPassword })
+      });
+      if (res.status === 401) { autoLogout(); return; }
+      const data = await res.json();
+      if (res.ok) {
+        setPasswordMsg({ text: '✅ Password changed successfully!', type: 'success' });
+        setPasswords({ newPassword: '', confirmPassword: '' });
+        setTimeout(() => setShowPasswordModal(false), 1500);
+      } else {
+        setPasswordMsg({ text: `❌ ${data.error}`, type: 'error' });
+      }
+    } catch {
+      setPasswordMsg({ text: '❌ Could not reach the server.', type: 'error' });
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -22,13 +157,21 @@ const Settings = () => {
     navigate('/');
   };
 
+  const avatarSrc = profile.avatar || `https://ui-avatars.com/api/?name=${profile.name.replace(' ', '+') || 'User'}&background=4B1D8F&color=fff`;
+
+  const msgStyle = (type) => ({
+    padding: '0.75rem 1rem',
+    borderRadius: '8px',
+    fontSize: '0.875rem',
+    marginTop: '0.75rem',
+    background: type === 'success' ? 'rgba(74,222,128,0.1)' : 'rgba(255,77,79,0.1)',
+    border: `1px solid ${type === 'success' ? 'rgba(74,222,128,0.4)' : 'rgba(255,77,79,0.4)'}`,
+    color: type === 'success' ? '#4ade80' : '#ff4d4f',
+  });
+
   return (
     <div className="dashboard-layout">
-      {/* Sidebar Overlay */}
-      <div 
-        className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`}
-        onClick={() => setIsSidebarOpen(false)}
-      ></div>
+      <div className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
 
       {/* Sidebar */}
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
@@ -46,149 +189,190 @@ const Settings = () => {
           <Link to="/cards" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-credit-card'></i> Cards</Link>
           <Link to="/statistics" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-line-chart'></i> Statistics</Link>
           <Link to="/settings" className="active" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-cog'></i> Settings</Link>
+          <Link to="/support" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-help-circle'></i> Support</Link>
+
+          {JSON.parse(localStorage.getItem('user') || '{}')?.isAdmin && (
+            <>
+              <div style={{ padding: '1rem 1rem 0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Admin</div>
+              <Link to="/admin/users" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-user-circle'></i> Users</Link>
+              <Link to="/admin/support" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-message-square-detail'></i> Tickets</Link>
+            </>
+          )}
         </nav>
         <div className="sidebar-bottom">
-          <button className="logout-btn" onClick={handleLogout}>
-            <i className='bx bx-log-out'></i> Log Out
-          </button>
+          <button className="logout-btn" onClick={handleLogout}><i className='bx bx-log-out'></i> Log Out</button>
         </div>
       </aside>
 
       {/* Main Content */}
       <main className="dashboard-main fade-in">
         <div className="dashboard-content-wrapper">
-          {/* Header */}
           <header className="dashboard-header">
             <div className="header-toggle" onClick={() => setIsSidebarOpen(true)} aria-label="Open sidebar">
               <i className='bx bx-menu'></i>
             </div>
             <div className="header-greeting">
-              <h1>Settings ⚙️</h1>
+              <h1>Settings</h1>
               <p>Manage your account preferences and security.</p>
             </div>
             <div className="header-actions">
+              <button className="icon-btn" onClick={toggleTheme} title="Toggle theme">
+                <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`}></i>
+              </button>
               <button className="icon-btn"><i className='bx bx-bell'></i></button>
               <div className="user-profile">
-                <img src={`https://ui-avatars.com/api/?name=${user ? user.name.replace(' ', '+') : 'User'}&background=4B1D8F&color=fff`} alt="User" />
+                <img src={avatarSrc} alt="User" />
               </div>
             </div>
           </header>
 
-          <div className="dashboard-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="dashboard-grid" style={{ gridTemplateColumns: '1fr 1fr', padding: '1rem' }}>
 
-            {/* Profile Settings */}
+            {/* Profile Information */}
             <div className="glass-panel" style={{ gridColumn: 'span 1' }}>
-              <div className="section-header">
-                <h3>Profile Information</h3>
+              <div className="section-header"><h3>Profile Information</h3></div>
+
+              {/* Avatar Upload */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', margin: '1.5rem 0' }}>
+                <div style={{ position: 'relative' }}>
+                  <img src={avatarSrc} alt="Avatar" style={{ width: '80px', height: '80px', borderRadius: '50%', border: '3px solid var(--primary)', objectFit: 'cover' }} />
+                  <label htmlFor="avatarUpload" style={{ position: 'absolute', bottom: 0, right: 0, width: '26px', height: '26px', background: 'var(--primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '2px solid var(--surface)' }}>
+                    <i className='bx bx-camera' style={{ color: '#fff', fontSize: '0.85rem' }}></i>
+                  </label>
+                  <input id="avatarUpload" type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} />
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 0.25rem', fontWeight: 600, fontSize: '0.9rem' }}>Profile Photo</p>
+                  <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-muted)' }}>Click the camera icon to upload.<br/>Max size: 2MB</p>
+                </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <img src={`https://ui-avatars.com/api/?name=${user ? user.name.replace(' ', '+') : 'User'}&background=4B1D8F&color=fff`} alt="User" style={{ width: '80px', height: '80px', borderRadius: '50%', border: '2px solid var(--primary)' }} />
-                  <div>
-                    <button className="btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>Change Avatar</button>
+
+              <form onSubmit={handleProfileSubmit} className="modal-form">
+                <div className="form-group">
+                  <label>Full Name</label>
+                  <input type="text" value={profile.name} onChange={e => setProfile({ ...profile, name: e.target.value })} required placeholder="Your full name" />
+                </div>
+                <div className="form-group">
+                  <label>Email Address</label>
+                  <input type="email" value={profile.email} onChange={e => setProfile({ ...profile, email: e.target.value })} required placeholder="you@example.com" />
+                </div>
+                <div className="form-group">
+                  <label>Phone Number</label>
+                  <input type="tel" value={profile.phone} onChange={e => setProfile({ ...profile, phone: e.target.value })} placeholder="+1 (555) 000-0000" />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="form-group">
+                    <label>Currency</label>
+                    <select value={profile.currency} onChange={e => setProfile({ ...profile, currency: e.target.value })}>
+                      <option value="USD">USD - US Dollar</option>
+                      <option value="EUR">EUR - Euro</option>
+                      <option value="GBP">GBP - British Pound</option>
+                      <option value="PKR">PKR - Pakistani Rupee</option>
+                      <option value="INR">INR - Indian Rupee</option>
+                      <option value="AED">AED - UAE Dirham</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Language</label>
+                    <select value={profile.language} onChange={e => setProfile({ ...profile, language: e.target.value })}>
+                      <option value="EN">English</option>
+                      <option value="ES">Spanish</option>
+                      <option value="FR">French</option>
+                      <option value="AR">Arabic</option>
+                      <option value="UR">Urdu</option>
+                    </select>
                   </div>
                 </div>
-
-                <form className="modal-form" onSubmit={(e) => e.preventDefault()}>
-                  <div className="form-group">
-                    <label>Full Name</label>
-                    <input type="text" defaultValue={user ? user.name : ''} />
-                  </div>
-                  <div className="form-group">
-                    <label>Email Address</label>
-                    <input type="email" defaultValue={user ? user.email : ''} />
-                  </div>
-                  <div className="form-group">
-                    <label>Phone Number</label>
-                    <input type="tel" placeholder="+1 (555) 000-0000" />
-                  </div>
-                  <button type="submit" className="btn-primary" style={{ marginTop: '1rem' }}>Save Changes</button>
-                </form>
-              </div>
+                {profileMsg.text && <div style={msgStyle(profileMsg.type)}>{profileMsg.text}</div>}
+                <button type="submit" className="btn-primary" style={{ marginTop: '1rem', width: '100%' }} disabled={profileLoading}>
+                  {profileLoading ? 'Saving...' : 'Save Changes'}
+                </button>
+              </form>
             </div>
 
-            <div style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {/* Right column */}
+            <div style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
               {/* Security */}
               <div className="glass-panel">
-                <div className="section-header">
-                  <h3>Security</h3>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div className="section-header"><h3>Security</h3></div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0', borderBottom: '1px solid var(--border)' }}>
                     <div>
-                      <h4 style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Two-Factor Authentication</h4>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Secure your account with 2FA.</p>
+                      <h4 style={{ fontSize: '0.9rem', margin: '0 0 0.2rem' }}>Two-Factor Authentication</h4>
+                      <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0 }}>Secure your account with 2FA.</p>
                     </div>
-                    <label className="switch" style={{ position: 'relative', display: 'inline-block', width: '40px', height: '24px' }}>
+                    <label style={{ position: 'relative', display: 'inline-block', width: '40px', height: '24px', cursor: 'pointer' }}>
                       <input type="checkbox" style={{ opacity: 0, width: 0, height: 0 }} />
                       <span style={{ position: 'absolute', cursor: 'pointer', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#ccc', transition: '.4s', borderRadius: '34px' }}></span>
                     </label>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 0' }}>
                     <div>
-                      <h4 style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>Change Password</h4>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Update your password regularly.</p>
+                      <h4 style={{ fontSize: '0.9rem', margin: '0 0 0.2rem' }}>Change Password</h4>
+                      <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0 }}>Update your password regularly.</p>
                     </div>
-                    <button className="btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.75rem' }}>Update</button>
+                    <button className="btn-secondary" style={{ padding: '0.4rem 0.9rem', fontSize: '0.8rem' }} onClick={() => { setShowPasswordModal(true); setPasswordMsg({ text: '', type: '' }); }}>
+                      Update
+                    </button>
                   </div>
                 </div>
               </div>
 
-              {/* Preferences */}
-              <div className="glass-panel" style={{ flex: 1 }}>
-                <div className="section-header">
-                  <h3>Preferences</h3>
+              {/* Account Info */}
+              <div className="glass-panel">
+                <div className="section-header"><h3>Account Info</h3></div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  {[
+                    { label: 'Account Status', value: '✅ Active', color: '#4ade80' },
+                    { label: 'Member Since', value: 'June 2026' },
+                    { label: 'Account Type', value: 'Standard' },
+                  ].map(item => (
+                    <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.6rem 0', borderBottom: '1px solid var(--border)' }}>
+                      <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{item.label}</span>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: item.color || 'inherit' }}>{item.value}</span>
+                    </div>
+                  ))}
                 </div>
-                <form className="modal-form" style={{ marginTop: '1rem' }}>
-                  <div className="form-group">
-                    <label>Default Currency</label>
-                    <select defaultValue="USD">
-                      <option value="USD">USD - US Dollar</option>
-                      <option value="EUR">EUR - Euro</option>
-                      <option value="GBP">GBP - British Pound</option>
-                    </select>
-                  </div>
-                  <div className="form-group" style={{ marginTop: '1rem' }}>
-                    <label>Language</label>
-                    <select defaultValue="EN">
-                      <option value="EN">English</option>
-                      <option value="ES">Spanish</option>
-                      <option value="FR">French</option>
-                    </select>
-                  </div>
-                </form>
+                <button
+                  onClick={handleLogout}
+                  style={{ marginTop: '1.5rem', width: '100%', padding: '0.7rem', background: 'rgba(255,77,79,0.1)', border: '1px solid rgba(255,77,79,0.4)', color: '#ff4d4f', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
+                >
+                  <i className='bx bx-log-out'></i> Log Out
+                </button>
               </div>
 
             </div>
-
           </div>
         </div>
       </main>
 
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        .switch input:checked + span {
-          background-color: var(--primary);
-        }
-        .switch input:focus + span {
-          box-shadow: 0 0 1px var(--primary);
-        }
-        .switch input:checked + span:before {
-          transform: translateX(16px);
-        }
-        .switch span:before {
-          position: absolute;
-          content: "";
-          height: 16px;
-          width: 16px;
-          left: 4px;
-          bottom: 4px;
-          background-color: white;
-          transition: .4s;
-          border-radius: 50%;
-        }
-      `}} />
+      {/* Change Password Modal */}
+      {showPasswordModal && (
+        <div className="modal-overlay" onClick={() => setShowPasswordModal(false)}>
+          <div className="modal-content glass-panel" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Change Password</h3>
+              <button className="close-btn" onClick={() => setShowPasswordModal(false)}><i className='bx bx-x'></i></button>
+            </div>
+            <form onSubmit={handlePasswordSubmit} className="modal-form">
+              <div className="form-group">
+                <label>New Password</label>
+                <input type="password" placeholder="Min. 6 characters" value={passwords.newPassword} onChange={e => setPasswords({ ...passwords, newPassword: e.target.value })} required />
+              </div>
+              <div className="form-group">
+                <label>Confirm New Password</label>
+                <input type="password" placeholder="Repeat new password" value={passwords.confirmPassword} onChange={e => setPasswords({ ...passwords, confirmPassword: e.target.value })} required />
+              </div>
+              {passwordMsg.text && <div style={msgStyle(passwordMsg.type)}>{passwordMsg.text}</div>}
+              <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem' }} disabled={passwordLoading}>
+                {passwordLoading ? 'Updating...' : 'Update Password'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

@@ -1,6 +1,9 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretpaychainkey_replace_me_in_production';
 
@@ -66,7 +69,7 @@ export const loginUser = async (req, res) => {
     const token = jwt.sign(
       { userId: user._id, email: user.email },
       JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '7d' }
     );
 
     res.status(200).json({
@@ -76,7 +79,8 @@ export const loginUser = async (req, res) => {
         id: user._id,
         _id: user._id,
         name: user.name,
-        email: user.email
+        email: user.email,
+        isAdmin: user.isAdmin || false
       }
     });
 

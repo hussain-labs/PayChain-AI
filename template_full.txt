@@ -1,0 +1,742 @@
+Final Year Project Report
+
+TITLE OF THE FINAL YEAR PROJECT
+ BS(CS/IT/SE) (Session: 2021-25)
+
+Project Supervisor
+Name
+Designation University of Sahiwal
+
+Submitted by 
+Student Name 								Roll No.
+
+
+
+
+ SHAPE  \* MERGEFORMAT 
+
+	
+DEPARTMENT OF COMPUTER SCIENCE 
+
+UNIVERISTY OF SAHIWAL, SAHIWAL
+	
+PREFACE
+(Preface is an introduction of your Report, what it is about? what does it signify in general, and what kind of knowledge does it hold in general. By reading the preface one should be able to understand the concept of this report. You may choose to write in 1st person singular or plural language i.e. you may use I or We in this section. You may also share your over all experience of FYP in this section. You must select this paragraph and write your own preface. Make sure to follow the indentations i.e. font style).  Ensure that the name you have selected for your project is consistent with your Report/Presentation/ and source-code CD.  Also ensure before you come for your final presentation that your Presentation/Source-code, are all Functional.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ACKNOWLEDGMENT
+(Comments: Use the below layout and write your own acknowledgment. Remove the comments in original. This is just a sample. Make sure to acknowledge in same order as given)
+
+First of all, we thank Almighty Allah who gives us the strength and ability to think, work and deliver what we are assigned to do. Secondly, we must be grateful to our internal supervisor Dr./Mr./Ms ________________ who guided us in this project. We also acknowledge our teachers who guided, taught and helped us during our study period. We would also like to thank all departmental staff and university staff, who had assisted us during our stay at the university.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DEPARTMENT OF COMPUTER SCIENCE
+PROJECT APPROVAL FORM
+
+
+
+CERTIFICATE OF COMPLETION
+This is to certify that the following student 
+Student Name							Roll Number
+
+have successfully completed their final year project titled
+
+Project Title
+
+in the partial fulfillment for the requirements of the Degree of Bachelor of Computer Science & Information Technology during the academic session 20xx-20xx.  Signatures:                                   				Signatures: 
+_____________________                       _____________________
+Name of Supervisor				Name of Chairman
+Designation						Chairman Department of Computer Science			Department of Computer Science
+University of Sahiwal				University of Sahiwal
+
+
+
+ABSTRACT
+ (An abstract is an outline/brief summary of your whole project. It should briefly describe the main ideas of your project. It should have an intro, body and conclusion. It is a well-developed paragraph, must be understandable to a wide audience. It should be self-explanatory, and it should not say anything not mentioned in the rest of the report.)
+
+
+
+REPORT PLAN
+
+SUMMARY OF REPORT TEMPLATE 
+Headings as you can see in report consist of many levels. When writing the report any heading at any level, if consist of sub heading, then you have to write the overview of what will be discussed in those sub headings. 
+The report must refer the project in past tense and not continuous tense as the project is complete.
+Please see that the headings should be specific to your project. E.g. 4.1 heading is general, replace the subsystem ‘n’ by the name of your specific sub system
+Chapter 1. Introduction: under this heading you have to give overview of what will be discussed in 1.1, 1.2, 1.3 so on. it will be introduction to report
+If you omit any section, you have to update the number accordingly  
+The subsequent sub headings of chapter 1 must contain introduction to project. In 1.1 you have to write the aim of your project and what objectives you mentioned in your proposal. In 1.2 give an overview of your project describing the inputs and outputs of your system. You should target general computer oriented audience and therefore must not contain any low level detail. In 1.3 discuss what the domains this system is target for are and what its market prospect is. In 1.4 you have to discuss history of your project. Any prior work done on the subject. The work that you got inspiration from so on. 1.5 consists of the tools and technology used to build your project.
+Chapter 2 is all about User end, you have to discuss who are the intend users of the system, use cases (description as well as diagrams). How users are going to use the project and usage specifications of your system. E.g. any particular Operating System this system will run on. It also consists of limitations of your project e.g. any particular setup of environment needed to run the system
+Chapter 3 main heading will only discuss the main theme of this section. The heading should mention what each underlying subsection will contain. This chapter is all about functionality of the system and type of information that flows through the system starting right from the input information leading up to output information. All the main transformation of input data will be mentioned in this section. 3.1.1 Will actually discuss the architecture of your system. 3.1 will only refer to the up coming sub sections. The Architecture of system must be represented in system diagram along with the description. The architecture must clearly mention both in writing and diagram, the subsystem /modules of your system. Note that subsystems are presented in this section as black box. Discuss inputs, outputs and processing of system in general and interconnectivity between different sub systems. 3.3.1 and 3.3.2 contains details of system interfaces to other systems if any and other machines if any.
+Chapter 4 discusses the subsystems presented in 3.1.2 in detail. Chapter 4 main heading will again discuss what sub sections this chapter contains. 4.1 will again discuss what 4.1.1, 4.1.2 so on contains. 4.1 must be written for every sub system i.e. if there are 2 sub systems A and B then 4.1 will discuss A and 4.2 discusses B. Numbering should be altered accordingly. 4.1.2 discusses both in description and suitable diagram the flow of information of sub system/ modules under discussion. E.g. DFD level 1. 4.1.3 will present only the components of sub system under discussion. 4.1.4 is like 4.1 just that it discusses components of each module in detail and repeated for every component. Please note that components are the core level details, do not mix it with sub system.
+Chapter 5 discusses behavior of the system. Depicted by event diagram. The different states the system can be found, and which important events shifts the state of system e.g. system is in idle state and on certain kind of event the system changes its state to running
+Chapter 6 is applicable if you built a prototype of your actual system or you simulated your system before you actually implemented it  
+Chapter 7 discusses your estimations that you proposed earlier and the actual out comes after completion of projects. You have to give details of the estimation models you used and if you have used more then one model you have to give details for every model.
+Chapter 8 is all about testing you performed, test plan you developed, test cases you developed, testing methods you applied. Certain kind of testing is mandatory for certain projects. You have to analyze which best suits your requirement
+
+
+
+
+PREFACE
+ACKNOWLEDGEMENT
+INTRODUCTION TO GROUP MEMBERS
+CERTIFICATE OF COMPLETION BY PROJECT ADVISOR
+ABSTRACT
+TABLE OF CONTENTS 
+LIST OF FIGURES
+LIST OF TABLES
+
+
+
+All the headings above must be included in Table of Contents (TOC) according to correct page numbers. Provided below is an exemplary TOC.
+Provided After TOC is MAIN-BODY of Report. Select the heading or text and write your material in place of it. Don’t change the style and format
+Some headings are generic and can be molded according to your heading name
+Try to begin the chapter with new page. See that all chapters get mentioned in the header   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TABLE OF CONTENTS
+
+PREFACE											I
+ACKNOWLEDGEMENT									II
+INTRODUCTION TO GROUP MEMBERS							III
+CERTIFICATE OF COMPLETION								IV
+ABSTRACT											V
+TABLE OF CONTENTS 									VI
+LIST OF FIGURES   									           VII
+LIST OF TABLES									          VIII
+
+Chapter 1	Introduction                							1
+				
+Goals and objectives							1
+System statement of scope						1
+System context							1
+Theoretical Background (of project)					1
+Technology & Tools/hardware components 				1
+
+Chapter 2	Usage Scenario / User Interaction						2
+		
+2.1	User profiles								2
+2.2	Use-cases								2
+2.3	Special usage considerations						2
+
+Chapter 3	Functional and Data Description						3
+		
+3.1	System Architecture							3
+3.1.1	Architecture model						3
+3.1.2	Subsystem/modules overview					3
+3.2	Data Description							3
+	3.2.1	Major data objects						3
+	3.2.2	System level data model					3
+3.3	System Interface Description						3
+	3.3.1	External machine interfaces					3
+	3.3.2	External system interfaces					3
+
+Chapter 4	Subsystem/module Description						4
+		
+4.1	Description for Subsystem ‘n’					4
+4.1.1	Subsystem scope						4
+4.1.2	Subsystem flow diagram/desired UML diagram		4
+4.1.3	Subsystem ‘n’ components					4
+4.1.4	Description for sub system ‘n’ Component ‘k’		4
+	4.1.4.1	Component ‘k’ interface description			4
+	4.1.4.2	Restrictions/limitations				4
+4.1.4.3	Performance issues					4
+4.1.4.4	Design constraints					4
+
+Chapter 5	Behavioral Module Description						5
+		
+5.1	Description for system behavior					5
+	5.1.1	Events/interrupts						5
+5.1.2	States								5
+ 5.2	State Transition Diagrams						5
+ 5.3	Control specification							5
+
+Chapter 6	System Prototype Modeling and Simulation Results			6
+		
+6.1	Description of system modeling approach (if used)			6
+6.2	Simulation results        						6
+6.3	Special performance issues						6
+6.4	Prototyping requirements						6
+
+Chapter 7	System Estimates and Actual Outcome		             		7
+		
+7.1	Historical data used for estimates					7
+7.2	Estimation techniques applied and results				7
+	7.2.1	Estimation technique ‘m’					7
+7.2.2	Estimate for technique ‘m’					7
+7.3	Actual Results and Deviation from Estimates			7
+7.4	System Resources (Required and Used)				7
+	7.4.1	System Resources Required					7
+7.4.2	System Resources Used 					7
+
+Chapter 8	Test Plan						             		8
+		
+8.1	System Test and Procedure	                  				8
+8.2	Testing strategy							8
+	8.2.1	Unit Testing							8
+8.2.2	Integration Testing 						8
+8.2.3	Validation testing						8
+8.2.4	High-order testing (a.k.a. System Testing)			8
+	8.2.4.1	Security testing					8
+	8.2.4.2	Stress testing						8
+8.3	Testing resources and staffing	          				8
+8.4	Test metrics								8
+8.5	Testing tools and environment	          				8
+8.6	Test record keeping and test log					8
+
+Chapter 9	Future Enhancements and Recommendations	             		9
+
+Chapter 10	Conclusion / Summary				             		10
+
+REFRENCE	 										11
+APPENDICES										12
+GLOSSARY											13
+
+
+
+
+
+
+
+
+
+
+LIST OF FIGURES
+
+Figure 1.1: Caption	 									11
+Figure 1.2: Caption	 									11
+Figure 1.3: Caption	 									11
+
+Figure 2.1: Caption	 									11
+Figure 2.2: Caption	 									11
+
+Figure 3.1: Caption	 									11
+Figure 3.2: Caption	 									11
+Figure 3.3: Caption	 									11
+
+
+
+LIST OF TABLES
+
+Table 1.1: Table Title	 									11
+Table 1.2: Table Title										11
+Table 1.3: Table Title										11
+
+Table 2.1: Table Title										11
+Table 2.2: Table Title										11
+
+Table 3.1: Table Title										11
+Table 3.2: Table Title										11
+Table 3.3: Table Title										11
+
+
+Chapter # 1 Introduction
+
+Introduction
+This section provides overview of the entire system which includes objective, scope, context of the system. The reader should get a clear picture of your project by reading this section
+Goals and objectives
+Over all business goals and project objectives are described
+System statement of scope
+A description of the entire system is presented. Major inputs, processing functionality and outputs are described without regard to implementation detail. System is represented as black box
+System context
+The system is placed in a business or product line context. Strategic issues relevant to context are discussed. The intent is for the reader to understand the "big picture”. In this section discuss what are the prospects of system in market? In which domain it is best suited  
+Theoretical Background (of project)
+A review of background material that you found, or was provided for the problem. It should contain full citations of articles, books, software packages, www and other media. It should also include the necessary details or prerequisites to understand the underlying project details. 
+Technology & Tools/hardware components (used in the 			Project)
+Description of the technology & tools been used, and the reason for choosing it. In case of hardware, provide data sheet of the components used. Data sheet must be incorporated in Appendices 
+
+
+
+
+
+Chapter # 2 Usage Scenario / User Interaction
+
+Usage Scenario / User Interaction
+This section provides a usage scenario for the system. It organized information collected during requirements elicitation into use-cases.
+User profiles
+The profiles of all user categories are described here.
+Use-cases
+All use-cases for the system are presented and descriptions of each use cases and diagram (if applicable). 
+Special usage considerations
+Special requirements associated with the use of the System are presented.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chapter # 3 Functional and Data Description
+Functional and Data Description
+This section will provide an overview of the system model, its constituent’s parts and major data objects and their relation ship that flows in the system. Data object is any data that is being transformed by our system. It can be different forms of image or signal or software data or electronic signal etc.  Only brief overview of what this section will contain should be mentioned in this heading 
+System Architecture
+A context-level model of the system architecture is presented in this section. Overview is presented here and details in sub sections. Only brief overview of what this section will contain should be mentioned in this heading 
+Architecture model
+Architecture of system is presented here. This includes detail description of system and system diagram 
+Subsystem/modules overview
+Each subsystem noted in the architecture model is described briefly
+Data Description
+Top-level data objects that will be managed/manipulated by the system or product are described below. In case of hardware you have to describe the input and output signals and its different forms at different processing levels. Only a brief overview of what this section will contain should be mentioned in this heading 
+
+Major data objects
+Data objects and their major attributes are described.
+System level data model
+Relationships among data objects are described using for e.g.an ERD- like form or DFD (or any form suitable). No attempt is made to provide detail at this stage. 
+A relation ship model for the system is developed (this section may be omitted if not required)
+System Interface Description
+The System’s interface(s) to the outside world are described.
+External machine interfaces
+Interfaces to other machines (computers or devices) are described. This section can be omitted if not required. 
+External system interfaces
+Interfaces to other systems, products, or networks are described.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chapter # 4 Subsystem/module Description
+Subsystem/module Description
+A description of each subsystem is presented.
+Description for Subsystem ‘n’
+A detailed description of each subsystem is presented. Section 4.1 is repeated for each of ‘n’ subsystems i.e. this section is repeated for all subsystems.
+Subsystem scope
+A statement of scope for subsystem ‘n’ is presented.
+Subsystem flow diagram/ desired UML diagram
+A diagram showing the flow of information through the subsystem and the transformation that it undergoes is presented. Block diagrams of specific subsystem can be put here. 
+Subsystem ‘n’ components
+An overview for each component of subsystem ‘n’ is presented. omit the section if not applicable 
+Description for sub system ‘n’ Component ‘k’
+A detailed description and diagram (if applicable) of each sub system component contained within the architecture is presented. Section 4.2 is repeated for each of (k) components.
+Component ‘k’ interface description.
+A detailed description of the input and output interfaces for the component is presented.
+    Restrictions/limitations
+Performance issues
+Design constraints
+
+
+
+
+
+
+Chapter # 5
+Behavioral Model and Description
+Behavioral Model and Description
+A description of the behavior of the System is presented.
+Description for system behavior
+A detailed description of major events and states is presented in this section.
+Events/interrupts
+A listing of events (control, items) that will cause behavioral change within the system is presented.
+States
+A listing of states (modes of behavior) that will result as a consequence of events is presented.
+State Transition Diagrams
+Depict the overall behavior of the system.
+Control specification 
+Depict the manner in which control is managed by the system 
+
+
+
+
+
+
+
+
+
+
+
+Chapter # 6
+System Prototype Modeling and Simulation Results
+System Prototype Modeling and Simulation Results
+If system modeling and simulation and/or prototyping is conducted, these are specified here.
+Description of system modeling approach (if used)
+The system modeling approach (including tools and/or mathematical models) is described.
+Simulation results
+The results of any system simulation are presented with specific emphasis on data throughput, timing, performance, and/or system behavior.
+Special performance issues
+Special performance issues are identified.
+Prototyping requirements
+If a system prototyping is built, its specification and implementation environment are described here.
+
+
+
+
+
+
+
+
+
+
+
+Chapter # 7
+System Estimates and Actual Outcome
+System Estimates and Actual Outcome
+This section provides cost estimates for the project
+Historical data used for estimates
+Describes the historical data that is relevant to the estimates is presented. Historical data includes legacy data or data from past experience or reference to some authentic research etc e.g LOC estimation uses such kind of data. For OOD based system refer to COCOMO 2
+Estimation techniques applied and results
+A description of each cost estimation technique and the resultant estimates are presented here.
+Estimation technique ‘m’
+Tables or equations associated with estimation technique m are presented. Section 7.2.1 is repeated for each of ‘m’ techniques.
+Estimate for technique ‘m’
+Estimate generated for technique ‘m’.
+Actual Results and Deviation from Estimates  
+The final cost for the project (at this point in time) is presented here. A deviation chart should be presented to illustrate the comparison between actual cost of system and estimated cost. 
+System Resources (Required and Used)
+People, hardware, software, tools, and other resources proposed to build the software are noted here. On the bases of which cost estimations were performed
+System Resources Required 
+System Resources Used  
+
+
+
+
+
+
+
+
+Chapter # 8
+Test Plan
+
+Test Plan
+This section describes the overall testing strategy and issues that are required to properly execute effective tests. At least one of the testing strategy should be followed.
+System Test and Procedure
+The System tested is identified by name. Exclusions are noted explicitly.
+Testing strategy
+The overall strategy for software testing is described.
+Unit testing
+The strategy and brief procedure for unit tested is described. This includes an indication of the components that went under unit tests.
+Integration testing
+The integration testing strategy and procedure is specified. This section includes a discussion of the order of integration by System function. 
+Validation testing
+The validation testing strategy and procedure is specified. This section includes a discussion of the order of validation by system.
+High-order testing (a.k.a. System Testing)
+Over all system testing strategy and procedure is described
+Security testing
+Stress testing 
+Testing resources and staffing
+Specialized testing resources are described and staffing is defined.
+Test metrics
+A description of all test metrics to be used during the testing activity is noted here.
+Testing tools and environment
+A description of the test environment, including tools, simulators, specialized hardware, and test files, and other resources is presented here.
+Test record keeping and test log
+Mechanisms for storing and evaluating test results are specified. The test log is used to maintain a chronological record of all tests and their results.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chapter # 9
+Future Enhancements and Recommendations
+Future Enhancements and Recommendations
+This section contains description about the deviation observed from the proposed system that can be recommended as future work.
+Any feature up gradation can also be mentioned here
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chapter # 10 Conclusion / Summary
+Conclusion / Summary
+This section includes the end results achieved and various observations which were monitored while deploying the system
+REFERENCE
+List and number all bibliographical references at the end of your proposal. When referenced in the text, enclose the citation number in square brackets, for example [1]. Where appropriate, include the name(s) of editors of referenced books.
+[1] A.B. Smith, C.D. Jones, and E.F. Roberts, “Article Title”, Journal, Publisher, Location, Date, pp. 1-10.
+[2] Jones, C.D., A.B. Smith, and E.F. Roberts, Book Title, Publisher, Location, Date.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+APPENDICES 
+Project Schedule 
+This section presents an overview of project tasks and the output of a project scheduling tool.
+Timeline chart / Gantt Chart
+A project timeline chart is presented. This may include a time line for the entire project or for each staff member.
+ Project Group Organization / Work Load Distribution
+The manner in which group is organized and the mechanisms for reporting are noted. 
+Working Session / Snap shots of deployed system 
+Labeled Graphical User Interface (GUI) snapshots of any one work session is presented If no GUI exist than this section can be omitted or if exist, provide actual snap shots of deployed system.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+GLOSSARY  (SMALL DEFINITIONS OF TERMINOLOGY USED IN YOUR REPORT IN ALPHABETICAL ORDER)
+
+
+
+AODV
+Ad-Hoc On-Demand Distance Vector Protocol
+BID
+Broadcast ID
+CBR
+Continuous Bit Rate 
+CMMBCR
+Conditional Max-Min Battery Capacity Routing
+DCE
+Data Communication Equipment
+DIP
+Destination IP Address
+DREAM 
+Distance Routing Effect Algorithm for Mobility
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(CD COVER LAYOUT AND CONTENT LIST INCLUDING FOLDER HIRARCHY)
+
+
+
+NOTE: The following must be submitted at the time of final presentation:
+a) Complete Software of the project (source code and an installable version of software along the readme.txt file)
+b) A User Manual of the software
+c) 3 bound Project Reports (1 master copy with color diagrams and two photocopies)
+d) project demonstration Video. 
+e) PowerPoint Presentation
+f) A project website is optional.     
+
+
+
+
+
+
+
+
+
+NOTES:
+3 PROPERLY PRINTED AND BOUND REPORTS ARE TO BE SUBMITTED, 1 ORIGINAL AND 2 COPIES (2 FOR UNIVERSITY AND 1 FOR INTERNAL EXAMINER)
+This is only template…modify main body contents as per your project requirements.
+The report can have minimum 10000 and max 15000 words or 80-100 pages
+Preface, Synopsis, Introduction to group members should be brief not more than 2 pages each 
+Sequence of chapters must be followed
+“Figures” and “Tables” must be shown as Figure 1.1, Figure 1.2, Figure 2.1 and Table 1.1, Table 2.1 so on. Use these figure numbers [page number] where ever you want to reference it. Avoid redundancy in figures
+Level 3 headings can be increased as per requirement (single tab)
+Ensure that the Formatting style given is followed.
+You can Highlight important features if you like but don’t over do it  
+Please ensure that page numbering must be correct.
+The students should follow the appropriate format as provided by the department. 
+Throughout this report template you may find comments for your guidance. These guidelines should not be included in your final year report.
+One blank page should be left at the end of the bound report for remarks
+CD cover and layout is also provided at the end of this document. This CD will also be submitted on the day of your project submission  
+Every single page from MAIN BODY and onwards should have the following Header/Footer format:
+Header:
+Chapter #									Chapter Name 
+Footer:
+________________________________________________________________________
+University of Sahiwal					Page #.
+
+
+
