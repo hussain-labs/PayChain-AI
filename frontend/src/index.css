@@ -2208,8 +2208,9 @@ footer {
 }
 
 [data-theme="dark"] .map-tab {
-  color: var(--text-muted);
-  border-color: var(--border);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 [data-theme="dark"] .map-tab.active {
@@ -2556,17 +2557,7 @@ ul {
   color: #321166;
 }
 
-[data-theme="dark"] .btn-primary {
-  background-color: var(--secondary);
-  color: #321166;
-  box-shadow: 0 4px 14px rgba(245, 199, 122, 0.4);
-}
 
-[data-theme="dark"] .btn-primary:hover {
-  background-color: var(--secondary-hover);
-  color: #321166;
-  box-shadow: 0 6px 20px rgba(245, 199, 122, 0.5);
-}
 
 .btn-secondary:hover {
   background-color: var(--secondary-hover);
@@ -5065,12 +5056,25 @@ footer {
 
 @media (max-width: 768px) {
   .team-grid {
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
     gap: 1rem;
+    padding-bottom: 1rem;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .team-grid::-webkit-scrollbar {
+    display: none;
   }
 
   .team-card {
-    padding: 1.25rem 1rem;
+    flex: 0 0 220px;
+    scroll-snap-align: center;
+    padding: 1.5rem 1.25rem;
   }
 
   .team-avatar {
@@ -7130,8 +7134,42 @@ body.menu-open .theme-switcher {
     padding: 2rem 1.25rem !important;
   }
 
+  .office-card {
+    padding: 1.5rem 1.25rem !important;
+  }
+
+  .step-card {
+    padding: 1.5rem 1.25rem !important;
+  }
+
+  .step-card h3 {
+    font-size: 1.25rem !important;
+  }
+
+  .step-card p {
+    font-size: 0.875rem !important;
+  }
+
+  .partners {
+    overflow: hidden;
+  }
+
   .partner-logos {
-    gap: 2rem !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    gap: 3rem !important;
+    width: max-content;
+    animation: marquee 15s linear infinite;
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(100vw);
+    }
+
+    100% {
+      transform: translateX(-100%);
+    }
   }
 
   .section-header {
@@ -7148,6 +7186,10 @@ body.menu-open .theme-switcher {
   }
 
   .faq-answer {
+    padding: 0 1.25rem !important;
+  }
+
+  .faq-item.active .faq-answer {
     padding: 0 1.25rem 1.25rem !important;
   }
 
@@ -7294,6 +7336,14 @@ body.menu-open .theme-switcher {
 
   .journey-section {
     padding: 1rem 0 3rem;
+  }
+
+  .team-section {
+    padding: 3rem 0 1rem;
+  }
+
+  .careers-section {
+    padding: 1rem 0 4rem;
   }
 
   /* Dashboard Responsiveness Fixes */
