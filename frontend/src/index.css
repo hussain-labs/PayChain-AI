@@ -4994,6 +4994,8 @@ footer {
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .team-card:hover {
@@ -5017,6 +5019,12 @@ footer {
   object-fit: cover;
 }
 
+.team-info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
 .team-info h3 {
   font-size: 1.25rem;
   margin-bottom: 0.25rem;
@@ -5033,6 +5041,7 @@ footer {
   display: flex;
   justify-content: center;
   gap: 1rem;
+  margin-top: auto;
 }
 
 .team-socials a {
@@ -5051,6 +5060,38 @@ footer {
 .team-socials a:hover {
   background: var(--primary);
   color: white;
+}
+
+@media (max-width: 768px) {
+  .team-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+
+  .team-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .team-avatar {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1rem;
+  }
+
+  .team-info h3 {
+    font-size: 1rem;
+  }
+
+  .team-info p {
+    font-size: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .team-socials a {
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+  }
 }
 
 /* Redesigned About Us Top Section */
@@ -5430,6 +5471,31 @@ footer {
   margin: 0;
 }
 
+@media (max-width: 768px) {
+  .metrics-grid {
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  .metric-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .metric-card h3 {
+    font-size: 1.5rem;
+  }
+
+  .metric-card p {
+    font-size: 0.75rem;
+  }
+
+  .metric-card .metric-icon {
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
 /* Global Footprint Section */
 .global-footprint-section {
   padding: 2rem 0 6rem;
@@ -5768,6 +5834,43 @@ footer {
 .careers-cta-box {
   margin-top: 4rem;
   text-align: center;
+}
+
+@media (max-width: 768px) {
+  .jobs-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .job-card {
+    padding: 1.25rem;
+  }
+  .job-card .job-tags {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .job-card .job-tag {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.7rem;
+  }
+  .job-card h3 {
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+  }
+  .job-card p {
+    font-size: 0.8125rem;
+    margin-bottom: 1rem;
+  }
+  .job-footer {
+    padding-top: 1rem;
+  }
+  .job-footer span, .job-link {
+    font-size: 0.8125rem;
+  }
+  .careers-cta-box {
+    margin-top: 2.5rem;
+  }
 }
 
 /* Timeline Custom Glowing Overlay */
@@ -6807,12 +6910,22 @@ body.menu-open .theme-switcher {
     font-size: 0.85rem;
   }
 
+  .pricing {
+    padding-bottom: 3rem;
+  }
+
   .pricing-grid {
     grid-template-columns: 1fr !important;
+    gap: 1.5rem;
   }
 
   .jobs-grid {
     grid-template-columns: 1fr !important;
+  }
+
+  .community-card {
+    width: 220px;
+    justify-content: center;
   }
 }
 
@@ -7136,5 +7249,40 @@ body.menu-open .theme-switcher {
     width: 16px !important;
     height: 16px !important;
     accent-color: var(--primary) !important;
+  }
+}
+
+/* Reduced spacing for various sections on mobile screens only */
+@media (max-width: 768px) {
+  .partners {
+    padding: 1.5rem 0;
+  }
+
+  .features {
+    padding: 2rem 0 0;
+  }
+
+  .dashboard-preview {
+    padding: 2rem 0 0;
+  }
+
+  .preview-wrapper {
+    padding: 2rem;
+  }
+
+  .faq {
+    padding: 2rem 0 1.5rem;
+  }
+
+  .cta-section {
+    padding: 2.5rem 0 3rem;
+  }
+
+  .about-metrics-section {
+    padding: 2rem 0 1rem;
+  }
+
+  .journey-section {
+    padding: 1rem 0 3rem;
   }
 }
