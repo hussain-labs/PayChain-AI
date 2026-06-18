@@ -7,6 +7,7 @@ import checkoutRoutes from './routes/checkout.js';
 import userRoutes from './routes/user.js';
 import adminRoutes from './routes/adminRoutes.js';
 import supportRoutes from './routes/supportRoutes.js';
+import walletRoutes from './routes/walletRoutes.js';
 import { connectDb } from './database.js';
 
 // Load env variables
@@ -26,6 +27,7 @@ app.use('/api/v1/checkout', checkoutRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/support', supportRoutes);
+app.use('/api/wallets', walletRoutes);
 
 // Connect to MongoDB and start server
 async function startServer() {

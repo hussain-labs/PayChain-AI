@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+import AppSidebar from '../components/AppSidebar';
 
 const Support = () => {
   const navigate = useNavigate();
@@ -62,40 +62,13 @@ const Support = () => {
 
   return (
     <div className="dashboard-layout">
-      <div className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
-
-      {/* Sidebar */}
-      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', width: '100%' }}>
-          <div className="sidebar-logo" style={{ marginBottom: 0 }}>
-            <i className='bx bx-link'></i> Pay<span>Chain</span>
-          </div>
-          <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)} aria-label="Close sidebar">
-            <i className='bx bx-x'></i>
-          </button>
-        </div>
-        <nav className="sidebar-nav">
-          <Link to="/dashboard" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-grid-alt'></i> Overview</Link>
-          <Link to="/transfers" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-transfer'></i> Transfers</Link>
-          <Link to="/cards" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-credit-card'></i> Cards</Link>
-          <Link to="/statistics" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-line-chart'></i> Statistics</Link>
-          <Link to="/settings" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-cog'></i> Settings</Link>
-          <Link to="/support" className="active" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-help-circle'></i> Support</Link>
-
-          {user?.isAdmin && (
-            <>
-              <div style={{ padding: '1rem 1rem 0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Admin</div>
-              <Link to="/admin/users" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-user-circle'></i> Users</Link>
-              <Link to="/admin/support" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-message-square-detail'></i> Tickets</Link>
-            </>
-          )}
-        </nav>
-        <div className="sidebar-bottom">
-          <button className="logout-btn" onClick={handleLogout}>
-            <i className='bx bx-log-out'></i> Log Out
-          </button>
-        </div>
-      </aside>
+      <AppSidebar
+        activeRoute="/support"
+        user={user}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        onLogout={handleLogout}
+      />
 
       {/* Main Content */}
       <main className="dashboard-main fade-in">

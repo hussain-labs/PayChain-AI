@@ -36,6 +36,13 @@ const userSchema = new mongoose.Schema({
       balance: { type: String, default: '$0.00' },
       wallets: { type: Number, default: 1 }
     }
+  ],
+  savedWallets: [
+    {
+      nickname: { type: String, required: true, trim: true },
+      address:  { type: String, required: true, trim: true },
+      addedAt:  { type: Date, default: Date.now }
+    }
   ]
 });
 

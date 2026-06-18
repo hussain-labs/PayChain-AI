@@ -15,6 +15,7 @@ import Settings from './pages/Settings';
 import Support from './pages/Support';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminSupport from './pages/admin/AdminSupport';
+import WalletOverview from './pages/WalletOverview';
 import { ThemeProvider } from './context/ThemeContext';
 import PricingPage from './pages/PricingPage';
 import Chatbot from './components/Chatbot';
@@ -62,7 +63,7 @@ const AnimationObserver = () => {
 
 const MainLayout = () => {
   const location = useLocation();
-  const isDashboardLayout = ['/dashboard', '/statistics', '/transfers', '/cards', '/settings', '/support', '/admin/users', '/admin/support'].includes(location.pathname);
+  const isDashboardLayout = ['/dashboard', '/statistics', '/transfers', '/cards', '/settings', '/support', '/admin/users', '/admin/support'].includes(location.pathname) || location.pathname.startsWith('/wallet/');
   const isAuthPage = ['/login', '/register'].includes(location.pathname);
 
   return (
@@ -78,6 +79,7 @@ const MainLayout = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/wallet/:address" element={<WalletOverview />} />
         <Route path="/statistics" element={<Statistics />} />
         <Route path="/transfers" element={<Transfers />} />
         <Route path="/cards" element={<Cards />} />
