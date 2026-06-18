@@ -2645,6 +2645,18 @@ ul {
   color: #ffffff;
 }
 
+/* Dark Mode Hero Navbar Overrides */
+[data-theme="dark"] .home-navbar:not(.scrolled) .logo {
+  color: var(--primary) !important;
+}
+
+[data-theme="dark"] .home-navbar:not(.scrolled) .logo span,
+[data-theme="dark"] .home-navbar:not(.scrolled) .nav-menu a,
+[data-theme="dark"] .home-navbar:not(.scrolled) .btn-text,
+[data-theme="dark"] .home-navbar:not(.scrolled) .mobile-toggle {
+  color: #ffffff !important;
+}
+
 .nav-menu ul {
   display: flex;
   gap: 2rem;
@@ -3790,6 +3802,23 @@ footer {
   .global-footprint-section,
   .careers-section {
     padding: 2rem 0 3rem;
+  }
+
+  .contact-info,
+  .contact-form {
+    padding: 1.5rem;
+  }
+
+  .channel-card {
+    padding: 1.5rem;
+  }
+
+  .community-banner {
+    padding: 2rem 1.5rem;
+  }
+
+  .faq-item {
+    padding: 1.25rem 1rem;
   }
 }
 
@@ -5744,6 +5773,33 @@ footer {
   transform: scale(1.05);
 }
 
+.press-logo.duplicate {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .press-logos {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    width: max-content;
+    animation: marquee 15s linear infinite;
+  }
+
+  .press-logo.duplicate {
+    display: flex;
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(calc(-50% - 2rem));
+    }
+  }
+}
+
 /* Careers & Culture Section */
 .careers-section {
   padding: 2rem 0 7rem;
@@ -6124,6 +6180,22 @@ footer {
   flex-direction: column;
   align-items: center;
   z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .community-banner {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .faq-contact-section .faq-question {
+    padding: 1rem 1.25rem;
+    font-size: 1.25rem;
+  }
+
+  .faq-contact-section .faq-answer-inner {
+    padding: 0 1.25rem 1rem;
+    font-size: 1.0625rem;
+  }
 }
 
 .community-banner::before {
@@ -6837,12 +6909,13 @@ body.menu-open .theme-switcher {
 
 .mobile-drawer-actions .btn-primary {
   background: var(--secondary);
-  color: var(--primary-dark);
+  color: #321166;
+  font-weight: 600;
 }
 
 .mobile-drawer-actions .btn-primary:hover {
   background: #ffffff;
-  color: var(--primary-dark);
+  color: #321166;
 }
 
 /* Dashboard Responsiveness & Toggle Styles */
@@ -7416,4 +7489,20 @@ body.menu-open .theme-switcher {
       font-size: 0.85rem !important;
     }
   }
+}
+
+.action-buttons {
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+
+.dashboard-balance-card h2 {
+  font-size: 2.2rem !important;
+}
+
+.header-greeting h1 {
+  font-size: 1.4rem !important;
+}
+
+.header-greeting p {
+  font-size: 0.85rem !important;
 }
