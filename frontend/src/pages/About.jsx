@@ -326,12 +326,19 @@ const About = () => {
       </section>
 
       {/* NEW: Press Features */}
-      <section className="press-section">
+      <section className="press-section" style={{ overflow: 'hidden' }}>
         <div className="container">
           <div className="press-title">As Featured In</div>
           <div className="press-logos">
             {press.map((p, idx) => (
               <div className="press-logo" key={idx}>
+                <i className={`bx ${p.icon}`}></i>
+                {p.name}
+              </div>
+            ))}
+            {/* Duplicates for marquee effect on mobile */}
+            {press.map((p, idx) => (
+              <div className="press-logo duplicate" key={`dup-${idx}`}>
                 <i className={`bx ${p.icon}`}></i>
                 {p.name}
               </div>
