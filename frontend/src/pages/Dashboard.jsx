@@ -4,6 +4,8 @@ import { useWeb3Auth } from '../hooks/useWeb3Auth';
 import { useBalance } from 'wagmi';
 import { useTheme } from '../context/ThemeContext';
 import AppSidebar from '../components/AppSidebar';
+import ConfirmModal from '../components/ConfirmModal';
+import toast from 'react-hot-toast';
 
 const API = 'http://localhost:5000';
 
@@ -61,9 +63,11 @@ const Dashboard = () => {
   // Add-wallet modal
   const [showAddModal,    setShowAddModal]    = useState(false);
   const [newNickname,     setNewNickname]     = useState('');
+  const [newCustomName,   setNewCustomName]   = useState('');
   const [newAddress,      setNewAddress]      = useState('');
   const [addError,        setAddError]        = useState('');
   const [addLoading,      setAddLoading]      = useState(false);
+  const [walletToRemove,  setWalletToRemove]  = useState(null);
 
 
   // ── Auth & initial data load ──────────────────────────────────────────────
@@ -72,6 +76,16 @@ const Dashboard = () => {
     const token      = localStorage.getItem('token');
     if (!storedUser || !token) { navigate('/login'); return; }
     setUser(JSON.parse(storedUser));
+
+    fetch(`${API}/api/user/profile`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json())
+      .then(d => { 
+        if (d.email) {
+          setUser(d);
+          localStorage.setItem('user', JSON.stringify(d));
+        }
+      })
+      .catch(console.error);
 
     fetch(`${API}/api/wallets`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => { if (r.status === 401) { localStorage.clear(); navigate('/login'); return null; } return r.json(); })
@@ -85,34 +99,45 @@ const Dashboard = () => {
   const handleAddWallet = async (e) => {
     e.preventDefault();
     setAddError('');
-    if (!newNickname.trim() || !newAddress.trim()) { setAddError('Both fields are required.'); return; }
+    if (!newNickname.trim() || !newAddress.trim()) { setAddError('Wallet type and address are required.'); return; }
     setAddLoading(true);
+    
+    const finalNickname = newCustomName.trim() 
+      ? `${newCustomName.trim()} (${newNickname})` 
+      : newNickname;
+
     try {
       const token = localStorage.getItem('token');
       const res   = await fetch(`${API}/api/wallets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ nickname: newNickname.trim(), address: newAddress.trim() }),
+        body: JSON.stringify({ nickname: finalNickname, address: newAddress.trim() }),
       });
       const data = await res.json();
       if (!res.ok) { setAddError(data.error || 'Failed to add wallet.'); return; }
       setSavedWallets(data);
-      setNewNickname(''); setNewAddress(''); setShowAddModal(false);
+      setNewNickname(''); setNewCustomName(''); setNewAddress(''); setShowAddModal(false);
     } catch { setAddError('Cannot reach server.'); }
     finally { setAddLoading(false); }
   };
 
   // ── Remove wallet ─────────────────────────────────────────────────────────
-  const handleRemoveWallet = async (address) => {
-    if (!window.confirm('Remove this wallet from your profile?')) return;
+  const confirmRemoveWallet = async () => {
+    if (!walletToRemove) return;
     try {
       const token = localStorage.getItem('token');
-      const res   = await fetch(`${API}/api/wallets/${address}`, {
+      const res   = await fetch(`${API}/api/wallets/${walletToRemove}`, {
         method: 'DELETE', headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (res.ok) setSavedWallets(data);
-    } catch { console.error('Remove wallet error'); }
+      if (res.ok) {
+        setSavedWallets(data);
+        toast.success("Wallet removed successfully");
+      } else {
+        toast.error(data.error || "Failed to remove wallet");
+      }
+    } catch { toast.error('Remove wallet error'); }
+    finally { setWalletToRemove(null); }
   };
 
 
@@ -139,15 +164,26 @@ const Dashboard = () => {
               <p>Manage your wallets and view real balances.</p>
             </div>
             <div className="header-actions">
-              <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
-                <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
-              </button>
-              <button className="icon-btn"><i className='bx bx-bell' /></button>
-              <div className="user-profile">
-                <img src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=4B1D8F&color=fff`} alt="User" />
-              </div>
+            <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
+              <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
+            </button>
+            <button className="icon-btn"><i className='bx bx-bell' /></button>
+            <div className="user-profile" style={{ position: 'relative' }}>
+              <img src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=4B1D8F&color=fff`} alt="User" />
+              {(user?.plan === 'pro' || user?.plan === 'pro_plus') && (
+                <div style={{
+                  position: 'absolute', bottom: '-4px', right: '-4px', 
+                  background: 'linear-gradient(45deg, #f59e0b, #fbbf24)', 
+                  color: '#fff', fontSize: '0.6rem', fontWeight: 800, 
+                  padding: '2px 6px', borderRadius: '10px', 
+                  border: '2px solid var(--surface)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }}>
+                  {user.plan === 'pro_plus' ? 'PRO+' : 'PRO'}
+                </div>
+              )}
             </div>
-          </header>
+          </div>
+        </header>
 
           {/* ── Wallets Section ── */}
           <div style={{ padding:'2rem' }}>
@@ -172,7 +208,7 @@ const Dashboard = () => {
                   <div key={w._id || w.address} style={{ position:'relative' }}>
                     {/* Remove button */}
                     <button
-                      onClick={(e) => { e.stopPropagation(); handleRemoveWallet(w.address); }}
+                      onClick={(e) => { e.stopPropagation(); setWalletToRemove(w.address); }}
                       title="Remove wallet"
                       style={{ position:'absolute', top:'0.75rem', right:'0.75rem', zIndex:2, background:'rgba(239,68,68,0.15)', border:'1px solid rgba(239,68,68,0.3)', color:'#f87171', borderRadius:'8px', width:'30px', height:'30px', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:'0.9rem' }}
                     >
@@ -229,9 +265,12 @@ const Dashboard = () => {
                           body: JSON.stringify({ nickname: 'Web3 Wallet', address: web3Address })
                         });
                         const data = await res.json();
-                        if (res.ok) setSavedWallets(data);
-                        else alert(data.error || 'Failed to save wallet');
-                      } catch { alert('Cannot reach server.'); }
+                        if (res.ok) {
+                          setSavedWallets(data);
+                          toast.success("Web3 wallet saved successfully");
+                        }
+                        else toast.error(data.error || 'Failed to save wallet');
+                      } catch { toast.error('Cannot reach server.'); }
                     }}
                     style={{ position:'absolute', top:'-12px', right:'-12px', zIndex:2, background:'var(--primary)', color:'#fff', border:'none', borderRadius:'20px', padding:'0.4rem 0.8rem', fontSize:'0.75rem', fontWeight:600, cursor:'pointer', boxShadow:'0 4px 12px rgba(123,63,191,0.4)', transition:'transform 0.2s' }}
                     onMouseEnter={e => e.currentTarget.style.transform='scale(1.05)'}
@@ -248,7 +287,7 @@ const Dashboard = () => {
                     onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow=''; }}
                   >
                     <div style={{ display:'flex', alignItems:'center', gap:'1rem' }}>
-                      <div style={{ width:'48px', height:'48px', borderRadius:'12px', background:'linear-gradient(135deg,#7B3FBF,#4B1D8F)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.5rem', flexShrink:0 }}>💎</div>
+                      <div style={{ width:'48px', height:'48px', borderRadius:'12px', background:'linear-gradient(135deg,#7B3FBF,#4B1D8F)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}><i className='bx bx-cube' style={{ fontSize:'1.4rem', color:'#fff' }} /></div>
                       <div style={{ minWidth:0, display:'flex', alignItems:'center', gap:'0.5rem' }}>
                         <div>
                           <h3 style={{ margin:0, fontSize:'1rem', fontWeight:600, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>MetaMask (Live)</h3>
@@ -322,6 +361,16 @@ const Dashboard = () => {
                 </select>
               </div>
               <div className="form-group">
+                <label>Custom Name (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Main Trading Account"
+                  value={newCustomName}
+                  onChange={e => setNewCustomName(e.target.value)}
+                  style={{ width:'100%', padding:'0.75rem', borderRadius:'8px', border:'1px solid var(--border)', background:'var(--glass-bg,rgba(255,255,255,0.05))', color:'var(--text-color)', fontSize:'0.95rem' }}
+                />
+              </div>
+              <div className="form-group">
                 <label>Ethereum Wallet Address</label>
                 <input
                   type="text"
@@ -345,7 +394,15 @@ const Dashboard = () => {
         </div>
       )}
 
-
+      <ConfirmModal
+        isOpen={!!walletToRemove}
+        title="Remove Wallet"
+        message="Are you sure you want to remove this wallet from your profile? This action cannot be undone."
+        confirmText="Remove Wallet"
+        isCritical={true}
+        onConfirm={confirmRemoveWallet}
+        onCancel={() => setWalletToRemove(null)}
+      />
 
     </div>
   );

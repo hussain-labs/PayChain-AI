@@ -8,6 +8,24 @@
    Text: #2B2B2B (Charcoal)
 */
 
+/* ─── Hide all scrollbars globally (keep scroll functionality) ─────────────── */
+*,
+*::before,
+*::after {
+  /* Firefox */
+  scrollbar-width: none;
+  /* IE 10+ */
+  -ms-overflow-style: none;
+}
+
+/* Chrome, Safari, Edge */
+*::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+
 :root {
   --primary: #4B1D8F;
   --primary-light: #6b34b8;
@@ -151,12 +169,12 @@ ul {
 
 /* Glassmorphism Panel */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--modal-bg, #ffffff);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--modal-border, rgba(75, 29, 143, 0.15));
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--modal-shadow, var(--shadow-md));
   padding: 2rem;
 }
 
@@ -1255,7 +1273,7 @@ footer {
 }
 
 .sidebar-toggle-btn:hover {
-  background: rgba(123,63,191,0.15);
+  background: rgba(123, 63, 191, 0.15);
 }
 
 .sidebar.collapsed .sidebar-toggle-btn {
@@ -1566,8 +1584,8 @@ footer {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
+  background: var(--modal-overlay, rgba(0, 0, 0, 0.5));
+  backdrop-filter: blur(8px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -1928,6 +1946,15 @@ footer {
   --mockup-body: #f8f9fa;
   --switch-bg: #ccc;
   --sidebar-bg: rgba(255, 255, 255, 0.8);
+
+  /* Modal / glass panel tokens for light mode */
+  --glass-bg: #ffffff;
+  --glass-border: rgba(75, 29, 143, 0.15);
+  --modal-overlay: rgba(15, 10, 30, 0.55);
+  --modal-bg: #ffffff;
+  --modal-border: rgba(75, 29, 143, 0.15);
+  --modal-shadow: 0 24px 60px rgba(75, 29, 143, 0.15);
+  --input-surface: rgba(248, 246, 255, 0.9);
 }
 
 [data-theme="dark"] {
@@ -1981,6 +2008,13 @@ footer {
   --glass-border: rgba(124, 77, 204, 0.12);
   --navbar-scrolled-bg: rgba(13, 11, 20, 0.92);
   --input-bg: rgba(22, 19, 31, 0.6);
+
+  /* Modal / glass panel tokens for dark mode */
+  --modal-overlay: rgba(0, 0, 0, 0.7);
+  --modal-bg: rgba(22, 19, 31, 0.95);
+  --modal-border: rgba(124, 77, 204, 0.2);
+  --modal-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  --input-surface: rgba(22, 19, 31, 0.8);
 }
 
 [data-theme="dark"] body {
@@ -3997,9 +4031,13 @@ footer {
 /* Dashboard Layout */
 .dashboard-layout {
   display: flex;
-  height: 100vh;
+  height: 94vh;
+  max-height: 1600px;
   background: var(--bg);
   overflow: hidden;
+  max-width: 1800px;
+  margin: 0 auto;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
 }
 
 .sidebar {
@@ -6383,8 +6421,8 @@ footer {
 /* Grok AI Chatbot Styles */
 .chatbot-wrapper {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
+  bottom: max(calc(3vh + 30px), calc((100vh - 1600px) / 2 + 30px));
+  right: max(30px, calc((100vw - 1800px) / 2 + 30px));
   z-index: 9999;
   font-family: var(--font-body);
 }
@@ -7562,6 +7600,14 @@ body.menu-open .theme-switcher {
 
 .dashboard-balance-card h2 {
   font-size: 2.2rem !important;
+}
+
+.header-greeting h1 {
+  font-size: 1.4rem !important;
+}
+
+.header-greeting p {
+  font-size: 0.85rem !important;
 }
 
 .header-greeting h1 {

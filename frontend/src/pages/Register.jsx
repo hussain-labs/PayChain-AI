@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import registerBg from '../assets/register_bg.png';
 
 const Register = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,7 +33,7 @@ const Register = () => {
       }
 
       // Registration successful
-      navigate('/login');
+      navigate(`/login?${searchParams.toString()}`);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -82,7 +83,7 @@ const Register = () => {
           </form>
           
           <p className="auth-redirect">
-            Already have an account? <Link to="/login">Log In</Link>
+            Already have an account? <Link to={`/login?${searchParams.toString()}`}>Log In</Link>
           </p>
         </div>
         

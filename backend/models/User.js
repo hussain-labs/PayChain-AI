@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
   currency: { type: String, default: 'USD' },
   language: { type: String, default: 'EN' },
   isAdmin: { type: Boolean, default: false },
+  plan: { type: String, enum: ['free', 'pro', 'pro_plus'], default: 'free' },
+  transactionCount: { type: Number, default: 0 },
+  stripeCustomerId: { type: String, default: null },
+  stripeSubscriptionId: { type: String, default: null },
   createdAt: {
     type: Date,
     default: Date.now

@@ -1,9 +1,11 @@
+import { useTheme } from '../context/ThemeContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import AppSidebar from '../components/AppSidebar';
 
 const Cards = () => {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [user, setUser] = useState(null);
   const [isFrozen, setIsFrozen] = useState(false);
 
@@ -47,12 +49,26 @@ const Cards = () => {
               <p>Manage your crypto debit cards and spending limits.</p>
             </div>
             <div className="header-actions">
-              <button className="icon-btn"><i className='bx bx-bell'></i></button>
-              <div className="user-profile">
-                <img src={user?.avatar || `https://ui-avatars.com/api/?name=${user ? user.name.replace(' ', '+') : 'User'}&background=4B1D8F&color=fff`} alt="User" />
-              </div>
+            <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
+              <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
+            </button>
+            <button className="icon-btn"><i className='bx bx-bell' /></button>
+            <div className="user-profile" style={{ position: 'relative' }}>
+              <img src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=4B1D8F&color=fff`} alt="User" />
+              {(user?.plan === 'pro' || user?.plan === 'pro_plus') && (
+                <div style={{
+                  position: 'absolute', bottom: '-4px', right: '-4px', 
+                  background: 'linear-gradient(45deg, #f59e0b, #fbbf24)', 
+                  color: '#fff', fontSize: '0.6rem', fontWeight: 800, 
+                  padding: '2px 6px', borderRadius: '10px', 
+                  border: '2px solid var(--surface)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }}>
+                  {user.plan === 'pro_plus' ? 'PRO+' : 'PRO'}
+                </div>
+              )}
             </div>
-          </header>
+          </div>
+        </header>
 
           <div className="dashboard-grid" style={{ gridTemplateColumns: '1fr 1.5fr' }}>
 

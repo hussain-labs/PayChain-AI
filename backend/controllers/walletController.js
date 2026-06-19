@@ -5,7 +5,7 @@ import User from '../models/User.js';
 // We try Alchemy first (full token support), fall back to public RPC for ETH only
 const ALCHEMY_KEY = process.env.ALCHEMY_API_KEY;
 const ALCHEMY_BASE = ALCHEMY_KEY && ALCHEMY_KEY !== 'your_key_here'
-  ? `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`
+  ? (ALCHEMY_KEY.startsWith('http') ? ALCHEMY_KEY.replace('mainnet', 'sepolia') : `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`)
   : null;
 
 // Public fallback – reads ETH balance only (Sepolia Testnet)
@@ -62,6 +62,15 @@ export const addWallet = async (req, res) => {
     );
     if (exists) {
       return res.status(409).json({ error: 'This wallet address is already saved.' });
+    }
+
+    // Check Plan Limits
+    const currentWalletsCount = user.savedWallets.length;
+    if (user.plan === 'free' && currentWalletsCount >= 1) {
+      return res.status(403).json({ error: 'Free plan is limited to 1 wallet. Please upgrade to Pro.' });
+    }
+    if (user.plan === 'pro' && currentWalletsCount >= 10) {
+      return res.status(403).json({ error: 'Pro plan is limited to 10 wallets. Please upgrade to Enterprise.' });
     }
 
     user.savedWallets.push({ nickname: nickname.trim(), address: address.trim() });
@@ -201,5 +210,89 @@ export const getWalletAssets = async (req, res) => {
   } catch (err) {
     console.error('getWalletAssets error:', err.message);
     res.status(500).json({ error: 'Failed to fetch wallet assets. ' + err.message });
+  }
+};
+
+// GET /api/wallets/:address/history
+export const getWalletHistory = async (req, res) => {
+  const { address } = req.params;
+
+  if (!isValidEthAddress(address)) {
+    return res.status(400).json({ error: 'Invalid Ethereum address.' });
+  }
+
+  try {
+    if (!ALCHEMY_BASE) {
+      console.warn('No Alchemy key found, returning empty history.');
+      return res.json([]);
+    }
+
+    const fetchTransfers = async (isFrom) => {
+      const payload = {
+        jsonrpc: "2.0",
+        id: 1,
+        method: "alchemy_getAssetTransfers",
+        params: [{
+          fromBlock: "0x0",
+          toBlock: "latest",
+          [isFrom ? "fromAddress" : "toAddress"]: address,
+          category: ["external", "internal", "erc20"],
+          maxCount: "0x15"
+        }]
+      };
+
+      const r = await fetch(ALCHEMY_BASE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await r.json();
+      return data?.result?.transfers || [];
+    };
+
+    const [sentTxs, rcvTxs] = await Promise.all([
+      fetchTransfers(true),
+      fetchTransfers(false)
+    ]);
+
+    let combined = [...sentTxs, ...rcvTxs];
+
+    // Sort by blockNum descending
+    combined.sort((a, b) => parseInt(b.blockNum, 16) - parseInt(a.blockNum, 16));
+
+    // Take top 15 recent
+    combined = combined.slice(0, 15);
+
+    // Fetch block timestamps
+    const blockCache = {};
+    const txs = await Promise.all(combined.map(async tx => {
+      if (!blockCache[tx.blockNum]) {
+        try {
+          const b = await publicProvider.getBlock(tx.blockNum);
+          blockCache[tx.blockNum] = b ? b.timestamp * 1000 : Date.now();
+        } catch {
+          blockCache[tx.blockNum] = Date.now();
+        }
+      }
+
+      const isReceive = tx.to.toLowerCase() === address.toLowerCase();
+
+      return {
+        id: tx.hash,
+        hash: tx.hash,
+        timestamp: blockCache[tx.blockNum],
+        isReceive,
+        value: tx.value || 0,
+        symbol: tx.asset || 'SepoliaETH',
+        from: tx.from,
+        to: tx.to,
+        status: 'Success'
+      };
+    }));
+
+    res.json(txs);
+  } catch (err) {
+    console.error('getWalletHistory error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch wallet history.' });
   }
 };

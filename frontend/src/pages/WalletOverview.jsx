@@ -3,8 +3,13 @@ import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { useWeb3Auth } from '../hooks/useWeb3Auth';
 import AppSidebar from '../components/AppSidebar';
+import ConfirmModal from '../components/ConfirmModal';
+import QRScannerModal from '../components/QRScannerModal';
+import TopUpModal from '../components/TopUpModal';
+import toast from 'react-hot-toast';
 
 const API = 'http://localhost:5000';
+const fmt = (addr) => addr ? `${addr.slice(0,8)}…${addr.slice(-6)}` : '';
 
 const WALLET_ICONS  = { MetaMask: '🦊', KuCoin: '🔵', Kraken: '🐙', Coinbase: '🔷', 'Trust Wallet': '🛡️', Binance: '🟡', OKX: '⚫', 'Web3 Wallet': '💎' };
 
@@ -42,7 +47,12 @@ const WalletOverview = () => {
   
   const [walletDetail, setWalletDetail] = useState(null); // nickname etc
   const [assets, setAssets] = useState(null);
+  const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
+  const [showReceiveModal, setShowReceiveModal] = useState(false);
+  const [showTopUp, setShowTopUp] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
 
   const activeName = walletDetail?.nickname || (address.toLowerCase() === web3Address?.toLowerCase() ? 'MetaMask' : '');
   const wStyle = getWS(activeName);
@@ -74,32 +84,34 @@ const WalletOverview = () => {
       .catch(console.error)
       .finally(() => setLoading(false));
 
+    // Fetch history
+    fetch(`${API}/api/wallets/${address}/history`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) setHistory(data);
+      })
+      .catch(console.error);
+
   }, [address, navigate]);
 
   const handleLogout = () => { localStorage.clear(); navigate('/'); };
 
   const handleDisconnect = async () => {
-    if (!window.confirm('Are you sure you want to disconnect and remove this wallet?')) return;
     const token = localStorage.getItem('token');
     try {
       await fetch(`${API}/api/wallets/${address}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
+      toast.success("Wallet removed");
       navigate('/dashboard');
     } catch (e) {
       console.error(e);
-      alert('Failed to remove wallet');
+      toast.error('Failed to remove wallet');
+    } finally {
+      setShowDisconnectConfirm(false);
     }
   };
-
-  // Mock Activity
-  const activities = [
-    { name: 'Starbucks', time: 'Today, 09:41 AM', amount: '-$4.50', icon: 'bx bx-coffee', color: '#8b5cf6' },
-    { name: 'Upwork Escrow', time: 'Yesterday, 02:30 PM', amount: '+$1,200.00', icon: 'bx bx-briefcase', color: '#10b981', positive: true },
-    { name: 'Amazon', time: 'Nov 12, 11:20 AM', amount: '-$49.99', icon: 'bx bx-shopping-bag', color: '#8b5cf6' },
-    { name: 'Transfer from Muzamil', time: 'Nov 10, 08:15 AM', amount: '+$250.00', icon: 'bx bx-transfer', color: '#10b981', positive: true },
-  ];
 
   return (
     <div className="dashboard-layout wallet-overview-page fade-in">
@@ -205,7 +217,7 @@ const WalletOverview = () => {
                   <i className='bx bx-wallet-alt' style={{ fontSize: '1.2rem' }} />
                   {address.slice(0, 10)}...{address.slice(-6)}
                 </div>
-                <button className="wo-disconnect" onClick={handleDisconnect}>Disconnect</button>
+                <button className="wo-disconnect" onClick={() => setShowDisconnectConfirm(true)}>Disconnect</button>
               </div>
             </div>
 
@@ -217,18 +229,18 @@ const WalletOverview = () => {
                   <div className="wo-action-icon" style={{ background: wStyle.border }}><i className='bx bx-send' /></div>
                   <span>Send</span>
                 </Link>
-                <Link to="#" className="wo-action-item">
+                <div className="wo-action-item" style={{ cursor: 'pointer' }} onClick={() => setShowReceiveModal(true)}>
                   <div className="wo-action-icon" style={{ background: wStyle.border }}><i className='bx bx-download' /></div>
                   <span>Receive</span>
-                </Link>
-                <Link to="#" className="wo-action-item">
+                </div>
+                <div className="wo-action-item" style={{ cursor: 'pointer' }} onClick={() => setShowTopUp(true)}>
                   <div className="wo-action-icon" style={{ background: wStyle.border }}><i className='bx bx-plus' /></div>
                   <span>Top Up</span>
-                </Link>
-                <Link to="#" className="wo-action-item">
+                </div>
+                <div className="wo-action-item" style={{ cursor: 'pointer' }} onClick={() => setShowScanner(true)}>
                   <div className="wo-action-icon" style={{ background: wStyle.border }}><i className='bx bx-scan' /></div>
                   <span>Scan</span>
-                </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -240,27 +252,94 @@ const WalletOverview = () => {
               <Link to="/transfers">View All</Link>
             </div>
             <div className="wo-activity-list">
-              {activities.map((act, i) => (
-                <div className="wo-activity-item" key={i}>
+              {history.length === 0 && !loading && (
+                <div style={{ textAlign:'center', padding:'2rem', color:'var(--text-muted)' }}>No recent transactions found on Sepolia Testnet.</div>
+              )}
+              {loading && <div style={{ textAlign:'center', padding:'2rem', color:'var(--text-muted)' }}>Loading history...</div>}
+              {history.map((tx, i) => (
+                <div className="wo-activity-item" key={tx.id || i}>
                   <div className="wo-activity-info">
-                    <div className="wo-activity-icon" style={{ background: act.color }}>
-                      <i className={act.icon} />
+                    <div className="wo-activity-icon" style={{ background: tx.isReceive ? '#10b981' : '#8b5cf6' }}>
+                      <i className={tx.isReceive ? 'bx bx-down-arrow-alt' : 'bx bx-up-arrow-alt'} />
                     </div>
                     <div className="wo-activity-details">
-                      <h4>{act.name}</h4>
-                      <p>{act.time}</p>
+                      <h4>{tx.isReceive ? 'Received' : 'Sent'} {tx.symbol}</h4>
+                      <p>{new Date(tx.timestamp).toLocaleString()} • {tx.isReceive ? 'From: ' : 'To: '} {fmt(tx.isReceive ? tx.from : tx.to)}</p>
                     </div>
                   </div>
-                  <div className="wo-activity-amount" style={{ color: act.positive ? '#10b981' : 'var(--text-color)' }}>
-                    {act.amount}
+                  <div className="wo-activity-amount" style={{ color: tx.isReceive ? '#10b981' : 'inherit' }}>
+                    {tx.isReceive ? '+' : '-'}{tx.value.toFixed(4)} {tx.symbol}
                   </div>
                 </div>
               ))}
             </div>
           </div>
-
         </div>
       </main>
+
+      <ConfirmModal 
+        isOpen={showDisconnectConfirm}
+        title="Disconnect Wallet"
+        message={`Are you sure you want to remove ${activeName} from your account? You will lose access to its fast-checkout features.`}
+        onConfirm={handleDisconnect}
+        onCancel={() => setShowDisconnectConfirm(false)}
+        confirmText="Yes, Disconnect"
+        isDanger={true}
+      />
+
+      {/* Receive Modal */}
+      {showReceiveModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'var(--modal-overlay)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, animation: 'fadeIn 0.2s ease' }}>
+          <div style={{ background: 'var(--modal-bg)', border: '1px solid var(--modal-border)', borderRadius: '24px', padding: '2.5rem', width: '90%', maxWidth: '400px', textAlign: 'center', position: 'relative', boxShadow: 'var(--modal-shadow)', animation: 'slideUp 0.3s ease' }}>
+            <button 
+              onClick={() => setShowReceiveModal(false)}
+              style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer', transition: '0.2s' }}
+              onMouseOver={(e) => e.currentTarget.style.color = 'var(--text-color)'}
+              onMouseOut={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
+            >
+              <i className='bx bx-x' />
+            </button>
+            <h3 style={{ marginTop: 0, marginBottom: '0.5rem', fontSize: '1.5rem', color: 'var(--text-color)' }}>Receive Funds</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem' }}>Scan this QR code or copy the address below to receive assets.</p>
+            
+            <div style={{ background: '#fff', padding: '1rem', borderRadius: '16px', display: 'inline-block', marginBottom: '2rem', boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}>
+              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${address}`} alt="QR Code" style={{ display: 'block', borderRadius: '8px' }} />
+            </div>
+
+            <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+              <span style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: 'var(--text-color)', wordBreak: 'break-all', textAlign: 'left' }}>{address}</span>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(address);
+                  toast.success("Address copied to clipboard!");
+                }}
+                style={{ background: 'var(--primary)', border: 'none', borderRadius: '8px', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', cursor: 'pointer', transition: '0.2s', flexShrink: 0 }}
+                onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <i className='bx bx-copy' style={{ fontSize: '1.2rem' }} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Top Up Modal */}
+      <TopUpModal
+        isOpen={showTopUp}
+        onClose={() => setShowTopUp(false)}
+        walletAddress={address}
+      />
+
+      {/* QR Scanner Modal */}
+      <QRScannerModal
+        isOpen={showScanner}
+        onClose={() => setShowScanner(false)}
+        onAddressFound={(scannedAddress) => {
+          setShowScanner(false);
+          navigate(`/transfers?to=${encodeURIComponent(scannedAddress)}`);
+        }}
+      />
     </div>
   );
 };

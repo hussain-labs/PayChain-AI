@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const Contact = () => {
   const [openFaq, setOpenFaq] = useState(null);
@@ -79,7 +80,7 @@ const Contact = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("Thank you! Your message has been sent. A representative will contact you shortly.");
+    toast.success("Thank you! Your message has been sent. A representative will contact you shortly.");
   };
 
   return (

@@ -1,11 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import AppSidebar from '../components/AppSidebar';
 
 const Settings = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   // Profile state
   const [profile, setProfile] = useState({ name: '', email: '', phone: '', avatar: '', currency: 'USD', language: 'EN' });
@@ -171,38 +173,13 @@ const Settings = () => {
 
   return (
     <div className="dashboard-layout">
-      <div className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
-
-      {/* Sidebar */}
-      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', width: '100%' }}>
-          <div className="sidebar-logo" style={{ marginBottom: 0 }}>
-            <i className='bx bx-link'></i> Pay<span>Chain</span>
-          </div>
-          <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)} aria-label="Close sidebar">
-            <i className='bx bx-x'></i>
-          </button>
-        </div>
-        <nav className="sidebar-nav">
-          <Link to="/dashboard" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-grid-alt'></i> Overview</Link>
-          <Link to="/transfers" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-transfer'></i> Transfers</Link>
-          <Link to="/cards" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-credit-card'></i> Cards</Link>
-          <Link to="/statistics" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-line-chart'></i> Statistics</Link>
-          <Link to="/settings" className="active" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-cog'></i> Settings</Link>
-          <Link to="/support" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-help-circle'></i> Support</Link>
-
-          {JSON.parse(localStorage.getItem('user') || '{}')?.isAdmin && (
-            <>
-              <div style={{ padding: '1rem 1rem 0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Admin</div>
-              <Link to="/admin/users" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-user-circle'></i> Users</Link>
-              <Link to="/admin/support" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-message-square-detail'></i> Tickets</Link>
-            </>
-          )}
-        </nav>
-        <div className="sidebar-bottom">
-          <button className="logout-btn" onClick={handleLogout}><i className='bx bx-log-out'></i> Log Out</button>
-        </div>
-      </aside>
+      <AppSidebar
+        activeRoute="/settings"
+        user={user}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        onLogout={handleLogout}
+      />
 
       {/* Main Content */}
       <main className="dashboard-main fade-in">
@@ -216,15 +193,26 @@ const Settings = () => {
               <p>Manage your account preferences and security.</p>
             </div>
             <div className="header-actions">
-              <button className="icon-btn" onClick={toggleTheme} title="Toggle theme">
-                <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`}></i>
-              </button>
-              <button className="icon-btn"><i className='bx bx-bell'></i></button>
-              <div className="user-profile">
-                <img src={avatarSrc} alt="User" />
-              </div>
+            <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
+              <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
+            </button>
+            <button className="icon-btn"><i className='bx bx-bell' /></button>
+            <div className="user-profile" style={{ position: 'relative' }}>
+              <img src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=4B1D8F&color=fff`} alt="User" />
+              {(user?.plan === 'pro' || user?.plan === 'pro_plus') && (
+                <div style={{
+                  position: 'absolute', bottom: '-4px', right: '-4px', 
+                  background: 'linear-gradient(45deg, #f59e0b, #fbbf24)', 
+                  color: '#fff', fontSize: '0.6rem', fontWeight: 800, 
+                  padding: '2px 6px', borderRadius: '10px', 
+                  border: '2px solid var(--surface)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }}>
+                  {user.plan === 'pro_plus' ? 'PRO+' : 'PRO'}
+                </div>
+              )}
             </div>
-          </header>
+          </div>
+        </header>
 
           <div className="dashboard-grid" style={{ gridTemplateColumns: '1fr 1fr', padding: '1rem' }}>
 

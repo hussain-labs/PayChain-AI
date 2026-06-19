@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
+import ConfirmModal from '../../components/ConfirmModal';
+import toast from 'react-hot-toast';
 
 const AdminUsers = () => {
   const navigate = useNavigate();
@@ -12,6 +14,7 @@ const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [userToDelete, setUserToDelete] = useState(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -46,20 +49,22 @@ const AdminUsers = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
-        setUsers(users.filter(u => u._id !== id));
-      } catch (err) {
-        alert(err.message || 'Failed to delete user');
-      }
+  const confirmDelete = async () => {
+    if (!userToDelete) return;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/admin/users/${userToDelete}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error);
+      setUsers(users.filter(u => u._id !== userToDelete));
+      toast.success("User deleted successfully");
+    } catch (err) {
+      toast.error(err.message || 'Failed to delete user');
+    } finally {
+      setUserToDelete(null);
     }
   };
 
@@ -76,8 +81,9 @@ const AdminUsers = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setUsers(users.map(u => u._id === id ? { ...u, isAdmin: data.isAdmin } : u));
+      toast.success("Role updated successfully");
     } catch (err) {
-      alert(err.message || 'Failed to update role');
+      toast.error(err.message || 'Failed to update role');
     }
   };
 
@@ -189,7 +195,7 @@ const AdminUsers = () => {
                             Toggle Role
                           </button>
                           <button 
-                            onClick={() => handleDelete(u._id)}
+                            onClick={() => setUserToDelete(u._id)}
                             style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#fca5a5', padding: '0.4rem 0.8rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}
                           >
                             Delete
@@ -204,6 +210,17 @@ const AdminUsers = () => {
           </div>
         </div>
       </main>
+
+      <ConfirmModal
+        isOpen={!!userToDelete}
+        title="Delete User"
+        message="Are you sure you want to delete this user? This action cannot be undone."
+        confirmText="Delete"
+        isCritical={true}
+        onConfirm={confirmDelete}
+        onCancel={() => setUserToDelete(null)}
+      />
+
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 
 import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
+import toast from 'react-hot-toast';
 
 const AdminSupport = () => {
   const navigate = useNavigate();
@@ -60,8 +61,9 @@ const AdminSupport = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setMessages(messages.map(msg => msg._id === id ? data : msg));
+      toast.success("Status updated");
     } catch (err) {
-      alert(err.message || 'Failed to update status');
+      toast.error(err.message || 'Failed to update status');
     }
   };
 

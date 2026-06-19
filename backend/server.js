@@ -8,6 +8,9 @@ import userRoutes from './routes/user.js';
 import adminRoutes from './routes/adminRoutes.js';
 import supportRoutes from './routes/supportRoutes.js';
 import walletRoutes from './routes/walletRoutes.js';
+import transactionRoutes from './routes/transactionRoutes.js';
+import subscriptionRoutes from './routes/subscriptionRoutes.js';
+import { stripeWebhook } from './controllers/subscriptionController.js';
 import { connectDb } from './database.js';
 
 // Load env variables
@@ -18,6 +21,10 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
+
+// Mount stripe webhook BEFORE express.json() because Stripe needs the raw body
+app.post('/api/subscription/webhook', express.raw({ type: 'application/json' }), stripeWebhook);
+
 app.use(express.json({ limit: '10kb' })); // Added size limit for security
 
 // Routes
@@ -28,6 +35,8 @@ app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/support', supportRoutes);
 app.use('/api/wallets', walletRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/subscription', subscriptionRoutes);
 
 // Connect to MongoDB and start server
 async function startServer() {

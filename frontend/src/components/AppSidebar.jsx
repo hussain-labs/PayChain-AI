@@ -81,6 +81,7 @@ const AppSidebar = ({ activeRoute = '/dashboard', user, isOpen, onClose, onLogou
           {nav('/transfers',  'bx bx-transfer',             'Transfers')}
           {nav('/cards',      'bx bx-credit-card',          'Cards')}
           {nav('/statistics', 'bx bx-line-chart',           'Statistics')}
+          {nav('/upgrade',    'bx bx-up-arrow-circle',      'Upgrade')}
           {nav('/settings',   'bx bx-cog',                  'Settings')}
           {nav('/support',    'bx bx-help-circle',          'Support')}
           {user?.isAdmin && (

@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import loginBg from '../assets/login_bg.png';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,7 +36,14 @@ const Login = () => {
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('token', data.token);
 
-      navigate('/dashboard');
+      const redirect = searchParams.get('redirect');
+      if (redirect === 'pricing') {
+        const autoCheckout = searchParams.get('autoCheckout');
+        const wallets = searchParams.get('wallets');
+        navigate(`/pricing?autoCheckout=${autoCheckout}&wallets=${wallets}`);
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -91,7 +99,7 @@ const Login = () => {
           </form>
           
           <p className="auth-redirect">
-            Don't have an account? <Link to="/register">Sign Up</Link>
+            Don't have an account? <Link to={`/register?${searchParams.toString()}`}>Sign Up</Link>
           </p>
         </div>
         

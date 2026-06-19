@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -16,10 +16,12 @@ import Support from './pages/Support';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminSupport from './pages/admin/AdminSupport';
 import WalletOverview from './pages/WalletOverview';
+import Upgrade from './pages/Upgrade';
 import { ThemeProvider } from './context/ThemeContext';
 import PricingPage from './pages/PricingPage';
 import Chatbot from './components/Chatbot';
 import ThemeSwitcher from './components/ThemeSwitcher';
+import { Toaster } from 'react-hot-toast';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -63,8 +65,17 @@ const AnimationObserver = () => {
 
 const MainLayout = () => {
   const location = useLocation();
-  const isDashboardLayout = ['/dashboard', '/statistics', '/transfers', '/cards', '/settings', '/support', '/admin/users', '/admin/support'].includes(location.pathname) || location.pathname.startsWith('/wallet/');
+  const navigate = useNavigate();
+  const isDashboardLayout = ['/dashboard', '/statistics', '/transfers', '/cards', '/settings', '/support', '/upgrade', '/admin/users', '/admin/support'].includes(location.pathname) || location.pathname.startsWith('/wallet/');
   const isAuthPage = ['/login', '/register'].includes(location.pathname);
+
+  // Prevent logged-in users from accessing public or auth pages
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token && !isDashboardLayout) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [location.pathname, isDashboardLayout, navigate]);
 
   return (
     <>
@@ -87,6 +98,7 @@ const MainLayout = () => {
         <Route path="/support" element={<Support />} />
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/support" element={<AdminSupport />} />
+        <Route path="/upgrade" element={<Upgrade />} />
       </Routes>
       </div>
 
@@ -101,6 +113,18 @@ const MainLayout = () => {
 function App() {
   return (
     <ThemeProvider>
+      <Toaster 
+        position="top-center" 
+        toastOptions={{
+          style: {
+            background: 'var(--glass-bg, rgba(255,255,255,0.1))',
+            color: 'var(--text-color)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid var(--border)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+          },
+        }} 
+      />
       <Router>
         <ScrollToTop />
         <AnimationObserver />
