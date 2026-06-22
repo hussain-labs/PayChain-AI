@@ -70,29 +70,26 @@ const Notifications = () => {
       />
 
       <main className="dashboard-main fade-in">
-        <header className="dashboard-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button className="mobile-menu-btn" onClick={() => setIsSidebarOpen(true)}>
+        <div className="dashboard-content-wrapper">
+          <header className="dashboard-header">
+            <div className="header-toggle" onClick={() => setIsSidebarOpen(true)}>
               <i className='bx bx-menu' />
-            </button>
-            <div>
-              <h1 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--text-color)' }}>Notifications</h1>
-              <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                Your recent activity and system updates
-              </p>
             </div>
-          </div>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <button className="icon-btn" onClick={toggleTheme} style={{ fontSize: '1.2rem' }}>
-              <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
-            </button>
-            <NotificationBell user={user} />
-            <UserProfilePopup user={user} />
-          </div>
-        </header>
+            <div className="header-greeting">
+              <h1>Notifications</h1>
+              <p>Your recent activity and system updates</p>
+            </div>
+            
+            <div className="header-actions">
+              <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize: '1.2rem' }}>
+                <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
+              </button>
+              <NotificationBell user={user} />
+              <UserProfilePopup user={user} />
+            </div>
+          </header>
 
-        <div className="dashboard-content" style={{ maxWidth: '800px', margin: '0 auto', width: '100%' }}>
+        <div className="dashboard-content" style={{ width: '100%', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <h2 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-color)' }}>All Notifications</h2>
             {notifications.some(n => !n.isRead) && (
@@ -171,6 +168,7 @@ const Notifications = () => {
               })
             )}
           </div>
+        </div>
         </div>
       </main>
     </div>
