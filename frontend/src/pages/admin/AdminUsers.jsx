@@ -1,204 +1,216 @@
 import { useState, useEffect } from 'react';
-
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import AppSidebar from '../../components/AppSidebar';
+import UserProfilePopup from '../../components/UserProfilePopup';
+import NotificationBell from '../../components/NotificationBell';
 import { useTheme } from '../../context/ThemeContext';
-import ConfirmModal from '../../components/ConfirmModal';
 import toast from 'react-hot-toast';
+
+const API = 'http://localhost:5000';
+
+const Badge = ({ plan }) => {
+  const map = {
+    free: ['FREE', '#6366f1', '#eef2ff'],
+    pro: ['PRO', '#f59e0b', '#fffbeb'],
+    pro_plus: ['PRO+', '#8b5cf6', '#f5f3ff'],
+  };
+  const [label, color, bg] = map[plan] || map.free;
+  return (
+    <span style={{ fontSize: '0.72rem', fontWeight: 800, padding: '3px 9px', borderRadius: '9px', background: bg, color, border: `1px solid ${color}44` }}>
+      {label}
+    </span>
+  );
+};
 
 const AdminUsers = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
   const { theme, toggleTheme } = useTheme();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
+  const [adminUser, setAdminUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [userToDelete, setUserToDelete] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [filterPlan, setFilterPlan] = useState('all');
+  const [filterActive, setFilterActive] = useState('all');
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
-    if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
-      fetchUsers();
-    } else {
-      navigate('/login');
-    }
+    if (!storedUser || !token) { navigate('/login'); return; }
+    const u = JSON.parse(storedUser);
+    if (!u.isAdmin) { navigate('/dashboard'); return; }
+    setAdminUser(u);
+    fetchUsers(token);
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/');
+  const token = () => localStorage.getItem('token');
+
+  const fetchUsers = async (tk) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}/api/admin/users`, {
+        headers: { Authorization: `Bearer ${tk || token()}` },
+      });
+      const data = await res.json();
+      if (res.ok) setUsers(data);
+      else toast.error(data.error || 'Failed to load users');
+    } catch { toast.error('Network error'); }
+    finally { setLoading(false); }
   };
 
-  const fetchUsers = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/admin/users', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-      setUsers(data);
-      setLoading(false);
-    } catch (err) {
-      setError(err.message || 'Failed to load users');
-      setLoading(false);
-    }
-  };
-
-  const confirmDelete = async () => {
-    if (!userToDelete) return;
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userToDelete}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-      setUsers(users.filter(u => u._id !== userToDelete));
-      toast.success("User deleted successfully");
-    } catch (err) {
-      toast.error(err.message || 'Failed to delete user');
-    } finally {
-      setUserToDelete(null);
-    }
-  };
-
-  const handleRoleToggle = async (id) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/admin/users/${id}/role`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}` 
-        }
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-      setUsers(users.map(u => u._id === id ? { ...u, isAdmin: data.isAdmin } : u));
-      toast.success("Role updated successfully");
-    } catch (err) {
-      toast.error(err.message || 'Failed to update role');
-    }
-  };
+  const filtered = users.filter(u => {
+    const matchSearch = u.name?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase());
+    const matchPlan = filterPlan === 'all' || u.plan === filterPlan;
+    const matchActive = filterActive === 'all' || (filterActive === 'active' ? u.isActive !== false : u.isActive === false);
+    return matchSearch && matchPlan && matchActive && !u.isAdmin;
+  });
 
   return (
     <div className="dashboard-layout">
-      <div className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`} onClick={() => setIsSidebarOpen(false)}></div>
+      <AppSidebar
+        activeRoute="/admin/users"
+        user={adminUser}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        onLogout={() => { localStorage.clear(); navigate('/'); }}
+      />
 
-      {/* Sidebar */}
-      <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', width: '100%' }}>
-          <div className="sidebar-logo" style={{ marginBottom: 0 }}>
-            <i className='bx bx-link'></i> Pay<span>Chain</span>
-          </div>
-          <button className="sidebar-close-btn" onClick={() => setIsSidebarOpen(false)} aria-label="Close sidebar">
-            <i className='bx bx-x'></i>
-          </button>
-        </div>
-        <nav className="sidebar-nav">
-          <Link to="/dashboard" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-grid-alt'></i> Overview</Link>
-          <Link to="/transfers" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-transfer'></i> Transfers</Link>
-          <Link to="/cards" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-credit-card'></i> Cards</Link>
-          <Link to="/statistics" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-line-chart'></i> Statistics</Link>
-          <Link to="/settings" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-cog'></i> Settings</Link>
-          <Link to="/support" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-help-circle'></i> Support</Link>
-
-          {user?.isAdmin && (
-            <>
-              <div style={{ padding: '1rem 1rem 0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Admin</div>
-              <Link to="/admin/users" className="active" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-user-circle'></i> Users</Link>
-              <Link to="/admin/support" onClick={() => setIsSidebarOpen(false)}><i className='bx bx-message-square-detail'></i> Tickets</Link>
-            </>
-          )}
-        </nav>
-        <div className="sidebar-bottom">
-          <button className="logout-btn" onClick={handleLogout}>
-            <i className='bx bx-log-out'></i> Log Out
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
       <main className="dashboard-main fade-in">
         <div className="dashboard-content-wrapper">
           {/* Header */}
           <header className="dashboard-header">
-            <div className="header-toggle" onClick={() => setIsSidebarOpen(true)} aria-label="Open sidebar">
-              <i className='bx bx-menu'></i>
+            <div className="header-toggle" onClick={() => setIsSidebarOpen(true)}>
+              <i className='bx bx-menu' />
             </div>
             <div className="header-greeting">
-              <h1>Manage Users</h1>
-              <p>View and manage all registered users.</p>
+              <h1>User Management</h1>
+              <p>{filtered.length} user{filtered.length !== 1 ? 's' : ''} found</p>
             </div>
             <div className="header-actions">
-              <button
-                className="icon-btn"
-                onClick={toggleTheme}
-                title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                style={{ fontSize: '1.2rem' }}
-              >
-                <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`}></i>
+              <button className="icon-btn" onClick={toggleTheme} style={{ fontSize: '1.2rem' }}>
+                <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
               </button>
-              <button className="icon-btn"><i className='bx bx-bell'></i></button>
-              <div className="user-profile">
-                <img src={user?.avatar || `https://ui-avatars.com/api/?name=${user ? user.name.replace(' ', '+') : 'User'}&background=4B1D8F&color=fff`} alt="User" />
-              </div>
+              <NotificationBell user={adminUser} />
+              <UserProfilePopup user={adminUser} />
             </div>
           </header>
 
-          <div className="admin-users">
+          <div style={{ marginTop: '2rem' }}>
+            {/* Toolbar */}
+            <div className="admin-toolbar">
+              <div className="admin-search-wrap">
+                <i className='bx bx-search' />
+                <input
+                  type="text"
+                  placeholder="Search by name or email…"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="admin-search-input"
+                />
+              </div>
+              <select value={filterPlan} onChange={e => setFilterPlan(e.target.value)} className="admin-select">
+                <option value="all">All Plans</option>
+                <option value="free">Free</option>
+                <option value="pro">Pro</option>
+                <option value="pro_plus">Pro+</option>
+              </select>
+              <select value={filterActive} onChange={e => setFilterActive(e.target.value)} className="admin-select">
+                <option value="all">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <button onClick={() => fetchUsers()} className="admin-btn-outline">
+                <i className='bx bx-refresh' /> Refresh
+              </button>
+            </div>
+
+            {/* Table */}
             {loading ? (
-              <p>Loading users...</p>
-            ) : error ? (
-              <p style={{ color: 'var(--danger)' }}>{error}</p>
+              <div className="admin-loading">
+                <i className='bx bx-loader-alt bx-spin' /> Loading users…
+              </div>
             ) : (
-              <div className="glass-panel dark-panel" style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <div className="admin-table-wrap">
+                <table className="admin-table">
                   <thead>
-                    <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                      <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Name</th>
-                      <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Email</th>
-                      <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Joined</th>
-                      <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Role</th>
-                      <th style={{ padding: '1rem', color: 'var(--text-muted)' }}>Actions</th>
+                    <tr>
+                      <th>User</th>
+                      <th>Plan</th>
+                      <th>Transactions Used</th>
+                      <th>Status</th>
+                      <th>Joined</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {users.map(u => (
-                      <tr key={u._id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                        <td style={{ padding: '1rem', color: 'var(--text-color)' }}>{u.name}</td>
-                        <td style={{ padding: '1rem', color: 'var(--text-color)' }}>{u.email}</td>
-                        <td style={{ padding: '1rem', color: 'var(--text-color)' }}>{new Date(u.createdAt).toLocaleDateString()}</td>
-                        <td style={{ padding: '1rem' }}>
-                          <span style={{ 
-                            background: u.isAdmin ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255, 255, 255, 0.1)', 
-                            color: u.isAdmin ? '#34d399' : '#ccc', 
-                            padding: '0.3rem 0.8rem', 
-                            borderRadius: '20px',
-                            fontSize: '0.85rem',
-                            fontWeight: 500
-                          }}>
-                            {u.isAdmin ? 'Admin' : 'User'}
+                    {filtered.length === 0 && (
+                      <tr>
+                        <td colSpan={6} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '3rem' }}>
+                          <i className='bx bx-user-x' style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }} />
+                          No users found
+                        </td>
+                      </tr>
+                    )}
+                    {filtered.map(u => (
+                      <tr key={u._id}>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            {u.avatar
+                              ? <img src={u.avatar} alt={u.name} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(99,102,241,0.2)' }} />
+                              : (
+                                <div
+                                  style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1rem', flexShrink: 0 }}
+                                >
+                                  {u.name?.charAt(0)?.toUpperCase()}
+                                </div>
+                              )
+                            }
+                            <div>
+                              <div className="admin-table-name">{u.name}</div>
+                              <div className="admin-table-email">{u.email}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td><Badge plan={u.plan} /></td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                            <span style={{ fontWeight: 700, color: 'var(--text-color)' }}>{u.transactionCount ?? 0}</span>
+                            <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                              / {u.plan === 'free' ? '3' : u.plan === 'pro' ? '1,000' : '∞'}
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <span
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+                              fontSize: '0.78rem', fontWeight: 700, padding: '3px 10px', borderRadius: '10px',
+                              background: u.isActive !== false ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+                              color: u.isActive !== false ? '#10b981' : '#ef4444',
+                              border: `1px solid ${u.isActive !== false ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                            }}
+                          >
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'currentColor', flexShrink: 0 }} />
+                            {u.isActive !== false ? 'Active' : 'Inactive'}
                           </span>
                         </td>
-                        <td style={{ padding: '1rem', display: 'flex', gap: '0.5rem' }}>
-                          <button 
-                            onClick={() => handleRoleToggle(u._id)}
-                            style={{ background: 'var(--primary-light)', border: 'none', color: '#fff', padding: '0.4rem 0.8rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}
+                        <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                          {new Date(u.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </td>
+                        <td>
+                          <button
+                            onClick={() => navigate(`/admin/users/${u._id}`)}
+                            style={{
+                              display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
+                              padding: '0.5rem 1.1rem', borderRadius: '10px',
+                              background: 'rgba(99,102,241,0.1)', color: '#6366f1',
+                              border: '1px solid rgba(99,102,241,0.25)', cursor: 'pointer',
+                              fontWeight: 700, fontSize: '0.82rem', transition: 'all 0.2s',
+                            }}
+                            onMouseOver={e => { e.currentTarget.style.background = 'var(--primary)'; e.currentTarget.style.color = '#fff'; }}
+                            onMouseOut={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.1)'; e.currentTarget.style.color = '#6366f1'; }}
                           >
-                            Toggle Role
-                          </button>
-                          <button 
-                            onClick={() => setUserToDelete(u._id)}
-                            style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#fca5a5', padding: '0.4rem 0.8rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem' }}
-                          >
-                            Delete
+                            <i className='bx bx-user-circle' style={{ fontSize: '1.05rem' }} /> View Profile
                           </button>
                         </td>
                       </tr>
@@ -210,17 +222,6 @@ const AdminUsers = () => {
           </div>
         </div>
       </main>
-
-      <ConfirmModal
-        isOpen={!!userToDelete}
-        title="Delete User"
-        message="Are you sure you want to delete this user? This action cannot be undone."
-        confirmText="Delete"
-        isCritical={true}
-        onConfirm={confirmDelete}
-        onCancel={() => setUserToDelete(null)}
-      />
-
     </div>
   );
 };

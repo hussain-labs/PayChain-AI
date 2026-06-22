@@ -1,3 +1,4 @@
+import UserProfilePopup from '../components/UserProfilePopup';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
@@ -19,6 +20,7 @@ const Settings = () => {
   const [passwordMsg, setPasswordMsg] = useState({ text: '', type: '' });
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const getToken = () => localStorage.getItem('token');
 
@@ -107,7 +109,8 @@ const Settings = () => {
       if (res.status === 401) { autoLogout(); return; }
       const data = await res.json();
       if (res.ok) {
-        localStorage.setItem('user', JSON.stringify(data));
+        const stored = JSON.parse(localStorage.getItem('user') || '{}');
+        localStorage.setItem('user', JSON.stringify({ ...stored, ...data }));
         setProfileMsg({ text: '✅ Profile updated successfully!', type: 'success' });
       } else {
         setProfileMsg({ text: `❌ ${data.error}`, type: 'error' });
@@ -197,20 +200,7 @@ const Settings = () => {
               <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
             </button>
             <button className="icon-btn"><i className='bx bx-bell' /></button>
-            <div className="user-profile" style={{ position: 'relative' }}>
-              <img src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=4B1D8F&color=fff`} alt="User" />
-              {(user?.plan === 'pro' || user?.plan === 'pro_plus') && (
-                <div style={{
-                  position: 'absolute', bottom: '-4px', right: '-4px', 
-                  background: 'linear-gradient(45deg, #f59e0b, #fbbf24)', 
-                  color: '#fff', fontSize: '0.6rem', fontWeight: 800, 
-                  padding: '2px 6px', borderRadius: '10px', 
-                  border: '2px solid var(--surface)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                }}>
-                  {user.plan === 'pro_plus' ? 'PRO+' : 'PRO'}
-                </div>
-              )}
-            </div>
+            <UserProfilePopup user={user} />
           </div>
         </header>
 
@@ -346,11 +336,25 @@ const Settings = () => {
             <form onSubmit={handlePasswordSubmit} className="modal-form">
               <div className="form-group">
                 <label>New Password</label>
-                <input type="password" placeholder="Min. 6 characters" value={passwords.newPassword} onChange={e => setPasswords({ ...passwords, newPassword: e.target.value })} required />
+                <div style={{ position: 'relative' }}>
+                  <input type={showPassword ? "text" : "password"} placeholder="Min. 6 characters" value={passwords.newPassword} onChange={e => setPasswords({ ...passwords, newPassword: e.target.value })} required style={{ paddingRight: '2.5rem' }} />
+                  <i 
+                    className={`bx ${showPassword ? 'bx-hide' : 'bx-show'}`} 
+                    style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.2rem' }}
+                    onClick={() => setShowPassword(!showPassword)}
+                  />
+                </div>
               </div>
               <div className="form-group">
                 <label>Confirm New Password</label>
-                <input type="password" placeholder="Repeat new password" value={passwords.confirmPassword} onChange={e => setPasswords({ ...passwords, confirmPassword: e.target.value })} required />
+                <div style={{ position: 'relative' }}>
+                  <input type={showPassword ? "text" : "password"} placeholder="Repeat new password" value={passwords.confirmPassword} onChange={e => setPasswords({ ...passwords, confirmPassword: e.target.value })} required style={{ paddingRight: '2.5rem' }} />
+                  <i 
+                    className={`bx ${showPassword ? 'bx-hide' : 'bx-show'}`} 
+                    style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.2rem' }}
+                    onClick={() => setShowPassword(!showPassword)}
+                  />
+                </div>
               </div>
               {passwordMsg.text && <div style={msgStyle(passwordMsg.type)}>{passwordMsg.text}</div>}
               <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '1rem' }} disabled={passwordLoading}>

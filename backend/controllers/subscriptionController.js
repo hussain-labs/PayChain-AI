@@ -1,5 +1,7 @@
 import Stripe from 'stripe';
 import User from '../models/User.js';
+import dotenv from 'dotenv';
+import { notifyUser, notifyAdmins } from '../utils/notify.js';
 
 // Use process.env.STRIPE_SECRET_KEY in production
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', {
@@ -11,7 +13,7 @@ export const createCheckoutSession = async (req, res) => {
   try {
     const { plan, extraWallets } = req.body;
     const user = await User.findById(req.userId);
-    
+
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     let lineItems = [];
@@ -35,7 +37,7 @@ export const createCheckoutSession = async (req, res) => {
       const basePrice = 9900; // $99.00 base for enterprise
       const additionalWalletPrice = 500; // $5.00 per extra wallet above 10
       const totalExtraWallets = extraWallets || 0;
-      
+
       lineItems.push({
         price_data: {
           currency: 'usd',
@@ -50,7 +52,7 @@ export const createCheckoutSession = async (req, res) => {
       });
       metadata.extraWallets = totalExtraWallets.toString();
     } else {
-       return res.status(400).json({ error: 'Invalid plan selected' });
+      return res.status(400).json({ error: 'Invalid plan selected' });
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -88,7 +90,7 @@ export const stripeWebhook = async (req, res) => {
   // Handle the checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
-    
+
     if (session.metadata && session.metadata.userId && session.metadata.plan) {
       try {
         const user = await User.findById(session.metadata.userId);
@@ -99,6 +101,11 @@ export const stripeWebhook = async (req, res) => {
           user.transactionCount = 0; // Reset limit immediately upon new purchase
           await user.save();
           console.log(`User ${user._id} upgraded to ${user.plan} and limits reset`);
+
+          // Notifications
+          const planName = user.plan === 'pro_plus' ? 'Enterprise' : 'Business Pro';
+          await notifyUser(user._id, `Your subscription has been successfully upgraded to ${planName}!`, '/settings');
+          await notifyAdmins(`User upgraded plan to ${planName}: ${user.email}`, `/admin/users/${user._id}`);
         }
       } catch (error) {
         console.error('Error updating user plan after successful payment:', error);

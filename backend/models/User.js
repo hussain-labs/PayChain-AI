@@ -23,13 +23,24 @@ const userSchema = new mongoose.Schema({
   language: { type: String, default: 'EN' },
   isAdmin: { type: Boolean, default: false },
   plan: { type: String, enum: ['free', 'pro', 'pro_plus'], default: 'free' },
+  isActive: { type: Boolean, default: true },
   transactionCount: { type: Number, default: 0 },
+  lastResetAt: { type: Date, default: null },
   stripeCustomerId: { type: String, default: null },
   stripeSubscriptionId: { type: String, default: null },
   createdAt: {
     type: Date,
     default: Date.now
   },
+  bonusTransactions: { type: Number, default: 0 },
+  notifications: [
+    {
+      message: { type: String, required: true },
+      link: { type: String, default: null },
+      isRead: { type: Boolean, default: false },
+      createdAt: { type: Date, default: Date.now }
+    }
+  ],
   connectedAccounts: [
     {
       name: String,
@@ -44,8 +55,8 @@ const userSchema = new mongoose.Schema({
   savedWallets: [
     {
       nickname: { type: String, required: true, trim: true },
-      address:  { type: String, required: true, trim: true },
-      addedAt:  { type: Date, default: Date.now }
+      address: { type: String, required: true, trim: true },
+      addedAt: { type: Date, default: Date.now }
     }
   ]
 });

@@ -1,3 +1,5 @@
+import UserProfilePopup from '../components/UserProfilePopup';
+import NotificationBell from '../components/NotificationBell';
 import { useTheme } from '../context/ThemeContext';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -125,13 +127,13 @@ const Transfers = () => {
     if (user) {
       const plan = user.plan || 'free';
       const count = user.transactionCount || 0;
-      if (plan === 'free' && count >= 3) {
-        toast.error("Free plan limit reached (3 transactions max). Please upgrade to Pro.");
-        navigate('/upgrade');
-        return;
-      }
-      if (plan === 'pro' && count >= 1000) {
-        toast.error("Pro plan limit reached (1000 transactions max). Please upgrade to Enterprise.");
+      const bonus = user.bonusTransactions || 0;
+      
+      const baseMax = plan === 'free' ? 3 : plan === 'pro' ? 1000 : Infinity;
+      const totalMax = baseMax + bonus;
+
+      if (count >= totalMax && baseMax !== Infinity) {
+        toast.error(`Plan limit reached (${totalMax} transactions max including bonuses). Please upgrade.`);
         navigate('/upgrade');
         return;
       }
@@ -232,21 +234,8 @@ const Transfers = () => {
             <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
               <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
             </button>
-            <button className="icon-btn"><i className='bx bx-bell' /></button>
-            <div className="user-profile" style={{ position: 'relative' }}>
-              <img src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=4B1D8F&color=fff`} alt="User" />
-              {(user?.plan === 'pro' || user?.plan === 'pro_plus') && (
-                <div style={{
-                  position: 'absolute', bottom: '-4px', right: '-4px', 
-                  background: 'linear-gradient(45deg, #f59e0b, #fbbf24)', 
-                  color: '#fff', fontSize: '0.6rem', fontWeight: 800, 
-                  padding: '2px 6px', borderRadius: '10px', 
-                  border: '2px solid var(--surface)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                }}>
-                  {user.plan === 'pro_plus' ? 'PRO+' : 'PRO'}
-                </div>
-              )}
-            </div>
+            <NotificationBell user={user} />
+            <UserProfilePopup user={user} />
           </div>
         </header>
 

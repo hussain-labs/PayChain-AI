@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import Transaction from '../models/Transaction.js';
+import { notifyUser } from '../utils/notify.js';
 
 // GET /api/transactions
 // Get all internal transactions for the logged in user
@@ -17,7 +18,7 @@ export const getTransactions = async (req, res) => {
 export const createTransaction = async (req, res) => {
   try {
     const { from, to, amount, asset, network, hash, status } = req.body;
-    
+
     if (!from || !to || !amount || !asset || !network || !hash) {
       return res.status(400).json({ error: 'All transaction fields are required' });
     }
@@ -26,11 +27,12 @@ export const createTransaction = async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     // Check Plan Limits
-    if (user.plan === 'free' && user.transactionCount >= 3) {
-      return res.status(403).json({ error: 'Free plan is limited to 3 transactions total. Please upgrade to Pro.' });
-    }
-    if (user.plan === 'pro' && user.transactionCount >= 1000) {
-      return res.status(403).json({ error: 'Pro plan is limited to 1000 transactions. Please upgrade to Enterprise.' });
+    const bonus = user.bonusTransactions || 0;
+    const planMax = user.plan === 'free' ? 3 : user.plan === 'pro' ? 1000 : Infinity;
+    const totalLimit = planMax + bonus;
+
+    if (user.transactionCount >= totalLimit) {
+      return res.status(403).json({ error: `Transaction limit reached. You have used all ${totalLimit} transactions for your current plan${bonus > 0 ? ' (including bonuses)' : ''}. Please upgrade for more.` });
     }
 
     const transaction = await Transaction.create({
@@ -47,6 +49,9 @@ export const createTransaction = async (req, res) => {
     // Increment transaction count
     user.transactionCount += 1;
     await user.save();
+
+    // Notify user
+    await notifyUser(req.userId, `Transaction processed: ${amount} ${asset} to ${to}`, '/transfers');
 
     res.status(201).json(transaction);
   } catch (error) {

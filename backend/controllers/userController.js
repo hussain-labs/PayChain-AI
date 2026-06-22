@@ -69,16 +69,8 @@ export const updateProfile = async (req, res) => {
 
     await user.save();
 
-    res.status(200).json({
-      id: user._id,
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      avatar: user.avatar,
-      currency: user.currency,
-      language: user.language,
-    });
+    const updatedUser = await User.findById(req.userId).select('-password -connectedAccounts');
+    res.status(200).json(updatedUser);
   } catch (error) {
     console.error('Update profile error:', error);
     res.status(500).json({ error: 'Server error' });

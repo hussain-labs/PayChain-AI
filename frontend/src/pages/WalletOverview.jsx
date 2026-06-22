@@ -1,3 +1,4 @@
+import UserProfilePopup from '../components/UserProfilePopup';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
@@ -171,29 +172,24 @@ const WalletOverview = () => {
 
       {/* Main Content */}
       <main className="dashboard-main">
-        <div className="dashboard-content-wrapper" style={{ maxWidth: '1000px', margin: '0 auto', paddingTop: '2rem' }}>
+        <div className="dashboard-content-wrapper fade-in">
           
           {/* Header */}
-          <header className="wo-header">
-            <div className="wo-title-group">
+          <header className="dashboard-header">
+            <div className="header-toggle" onClick={() => setIsSidebarOpen(true)}><i className='bx bx-menu' /></div>
+            <div className="header-greeting" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <Link to="/dashboard" className="wo-back-btn"><i className='bx bx-left-arrow-alt' /></Link>
               <div>
-                <h1 style={{ fontSize: '1.4rem', margin: '0 0 0.2rem' }}>
-                  {walletDetail?.nickname || (address.toLowerCase() === web3Address?.toLowerCase() ? 'MetaMask (Live)' : 'Wallet')}
-                </h1>
-                <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>Wallet Overview</p>
+                <h1>{walletDetail?.nickname || (address.toLowerCase() === web3Address?.toLowerCase() ? 'Web3 Wallet' : 'Wallet')}</h1>
+                <p>Wallet Overview</p>
               </div>
             </div>
             <div className="header-actions">
-              <button className="icon-btn" onClick={toggleTheme}>
+              <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
                 <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
               </button>
               <button className="icon-btn"><i className='bx bx-bell' /></button>
-              <div className="user-profile">
-                <span style={{ background: '#5a32a3', color: '#fff', width:'35px', height:'35px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:'bold' }}>
-                  {user?.name?.charAt(0) || 'U'}
-                </span>
-              </div>
+              <UserProfilePopup user={user} />
             </div>
           </header>
 

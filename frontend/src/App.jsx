@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -13,8 +13,12 @@ import Transfers from './pages/Transfers';
 import Cards from './pages/Cards';
 import Settings from './pages/Settings';
 import Support from './pages/Support';
+import Notifications from './pages/Notifications';
+import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminSupport from './pages/admin/AdminSupport';
+import AdminSettings from './pages/admin/AdminSettings';
+import AdminUserProfile from './pages/admin/AdminUserProfile';
 import WalletOverview from './pages/WalletOverview';
 import Upgrade from './pages/Upgrade';
 import { ThemeProvider } from './context/ThemeContext';
@@ -23,59 +27,64 @@ import Chatbot from './components/Chatbot';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import { Toaster } from 'react-hot-toast';
 
+const ADMIN_ROUTES = ['/admin/dashboard', '/admin/users', '/admin/support', '/admin/settings'];
+const ADMIN_PREFIXES = ['/admin/users/'];
+const USER_ROUTES = ['/dashboard', '/statistics', '/transfers', '/cards', '/support', '/upgrade', '/notifications'];
+const SHARED_ROUTES = ['/settings'];
+const WALLET_PREFIX = '/wallet/';
+
+const ProtectedRoute = ({ children, allowedRole }) => {
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+  if (!token) return <Navigate to="/login" replace />;
+
+  if (allowedRole === 'admin' && !user.isAdmin) return <Navigate to="/dashboard" replace />;
+  if (allowedRole === 'user' && user.isAdmin) return <Navigate to="/admin/dashboard" replace />;
+
+  return children;
+};
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return null;
 };
 
 const AnimationObserver = () => {
   const { pathname } = useLocation();
-
   useEffect(() => {
-    const observerOptions = {
-      root: null,
-      rootMargin: '0px',
-      threshold: 0.1
-    };
-
-    const observer = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, observerOptions);
-
-    // Give React time to render the new page
-    setTimeout(() => {
-      document.querySelectorAll('.fade-in').forEach(el => {
-        observer.observe(el);
-      });
-    }, 100);
-
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); obs.unobserve(entry.target); } });
+    }, { threshold: 0.1 });
+    setTimeout(() => { document.querySelectorAll('.fade-in').forEach(el => observer.observe(el)); }, 100);
     return () => observer.disconnect();
   }, [pathname]);
-
   return null;
-}
+};
 
 const MainLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isDashboardLayout = ['/dashboard', '/statistics', '/transfers', '/cards', '/settings', '/support', '/upgrade', '/admin/users', '/admin/support'].includes(location.pathname) || location.pathname.startsWith('/wallet/');
-  const isAuthPage = ['/login', '/register'].includes(location.pathname);
+  const path = location.pathname;
 
-  // Prevent logged-in users from accessing public or auth pages
+  const isAdminRoute = ADMIN_ROUTES.includes(path) || ADMIN_PREFIXES.some(p => path.startsWith(p));
+  const isUserRoute = USER_ROUTES.includes(path) || path.startsWith(WALLET_PREFIX);
+  const isSharedRoute = SHARED_ROUTES.includes(path);
+  const isDashboardLayout = isAdminRoute || isUserRoute || isSharedRoute;
+  const isAuthPage = ['/login', '/register'].includes(path);
+
+  // Route guard: redirect logged-in users away from public/auth pages
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
     if (token && !isDashboardLayout) {
-      navigate('/dashboard', { replace: true });
+      // Logged in user hitting public page → redirect to correct home
+      if (user.isAdmin) navigate('/admin/dashboard', { replace: true });
+      else navigate('/dashboard', { replace: true });
     }
-  }, [location.pathname, isDashboardLayout, navigate]);
+  }, [path, isDashboardLayout, navigate]);
 
   return (
     <>
@@ -83,28 +92,39 @@ const MainLayout = () => {
 
       <div className="main-content-wrapper">
         <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/pricing" element={<PricingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/wallet/:address" element={<WalletOverview />} />
-        <Route path="/statistics" element={<Statistics />} />
-        <Route path="/transfers" element={<Transfers />} />
-        <Route path="/cards" element={<Cards />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/support" element={<Support />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
-        <Route path="/admin/support" element={<AdminSupport />} />
-        <Route path="/upgrade" element={<Upgrade />} />
-      </Routes>
+          {/* Public pages */}
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          {/* User dashboard pages */}
+          <Route path="/dashboard" element={<ProtectedRoute allowedRole="user"><Dashboard /></ProtectedRoute>} />
+          <Route path="/wallet/:address" element={<ProtectedRoute allowedRole="user"><WalletOverview /></ProtectedRoute>} />
+          <Route path="/statistics" element={<ProtectedRoute allowedRole="user"><Statistics /></ProtectedRoute>} />
+          <Route path="/transfers" element={<ProtectedRoute allowedRole="user"><Transfers /></ProtectedRoute>} />
+          <Route path="/cards" element={<ProtectedRoute allowedRole="user"><Cards /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute allowedRole="shared"><Settings /></ProtectedRoute>} />
+          <Route path="/support" element={<ProtectedRoute allowedRole="user"><Support /></ProtectedRoute>} />
+          <Route path="/upgrade" element={<ProtectedRoute allowedRole="user"><Upgrade /></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute allowedRole="user"><Notifications /></ProtectedRoute>} />
+
+          {/* Admin dashboard pages */}
+          <Route path="/admin/dashboard" element={<ProtectedRoute allowedRole="admin"><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/users" element={<ProtectedRoute allowedRole="admin"><AdminUsers /></ProtectedRoute>} />
+          <Route path="/admin/support" element={<ProtectedRoute allowedRole="admin"><AdminSupport /></ProtectedRoute>} />
+          <Route path="/admin/settings" element={<ProtectedRoute allowedRole="admin"><AdminSettings /></ProtectedRoute>} />
+          <Route path="/admin/users/:id" element={<ProtectedRoute allowedRole="admin"><AdminUserProfile /></ProtectedRoute>} />
+
+          {/* Legacy route fallback */}
+          <Route path="/admin/tickets" element={<Navigate to="/admin/support" replace />} />
+        </Routes>
       </div>
 
-      {!isAuthPage && <Chatbot />}
+      {!isAuthPage && !isAdminRoute && <Chatbot />}
       {!isAuthPage && !isDashboardLayout && <ThemeSwitcher />}
-
       {!isDashboardLayout && <Footer />}
     </>
   );
@@ -113,8 +133,8 @@ const MainLayout = () => {
 function App() {
   return (
     <ThemeProvider>
-      <Toaster 
-        position="top-center" 
+      <Toaster
+        position="top-center"
         toastOptions={{
           style: {
             background: 'var(--glass-bg, rgba(255,255,255,0.1))',
@@ -123,16 +143,13 @@ function App() {
             border: '1px solid var(--border)',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
           },
-        }} 
+        }}
       />
       <Router>
         <ScrollToTop />
         <AnimationObserver />
-
-        {/* Background Decor */}
-        <div className="bg-shape shape-1"></div>
-        <div className="bg-shape shape-2"></div>
-
+        <div className="bg-shape shape-1" />
+        <div className="bg-shape shape-2" />
         <MainLayout />
       </Router>
     </ThemeProvider>

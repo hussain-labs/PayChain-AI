@@ -17,7 +17,7 @@ const AppSidebar = ({ activeRoute = '/dashboard', user, isOpen, onClose, onLogou
   });
 
   useEffect(() => {
-    try { localStorage.setItem('sidebarCollapsed', collapsed); } catch {}
+    try { localStorage.setItem('sidebarCollapsed', collapsed); } catch { }
   }, [collapsed]);
 
   const nav = (href, icon, label) => (
@@ -65,7 +65,7 @@ const AppSidebar = ({ activeRoute = '/dashboard', user, isOpen, onClose, onLogou
             >
               <i className='bx bx-chevrons-left' />
             </button>
-            
+
             {/* Close button (mobile) – only when expanded */}
             {!collapsed && (
               <button className="sidebar-close-btn" onClick={onClose}>
@@ -77,23 +77,29 @@ const AppSidebar = ({ activeRoute = '/dashboard', user, isOpen, onClose, onLogou
 
         {/* Nav links */}
         <nav className="sidebar-nav">
-          {nav('/dashboard',  'bx bx-grid-alt',            'Overview')}
-          {nav('/transfers',  'bx bx-transfer',             'Transfers')}
-          {nav('/cards',      'bx bx-credit-card',          'Cards')}
-          {nav('/statistics', 'bx bx-line-chart',           'Statistics')}
-          {nav('/upgrade',    'bx bx-up-arrow-circle',      'Upgrade')}
-          {nav('/settings',   'bx bx-cog',                  'Settings')}
-          {nav('/support',    'bx bx-help-circle',          'Support')}
+          {nav(user?.isAdmin ? '/admin/dashboard' : '/dashboard', 'bx bx-grid-alt', 'Overview')}
+          {!user?.isAdmin && (
+            <>
+              {nav('/transfers', 'bx bx-transfer', 'Transfers')}
+              {nav('/cards', 'bx bx-credit-card', 'Cards')}
+              {nav('/statistics', 'bx bx-line-chart', 'Statistics')}
+              {nav('/upgrade', 'bx bx-up-arrow-circle', 'Upgrade')}
+              {nav('/notifications', 'bx bx-bell', 'Notifications')}
+              {nav('/settings', 'bx bx-cog', 'Settings')}
+              {nav('/support', 'bx bx-help-circle', 'Support')}
+            </>
+          )}
           {user?.isAdmin && (
             <>
               <div
                 className="sidebar-section-label"
-                style={{ padding:'1rem 1rem 0.5rem', fontSize:'0.8rem', fontWeight:700, color:'var(--text-muted)', textTransform:'uppercase', letterSpacing:'1px' }}
+                style={{ padding: '1rem 1rem 0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}
               >
                 Admin
               </div>
-              {nav('/admin/users',   'bx bx-user-circle',          'Users')}
-              {nav('/admin/support', 'bx bx-message-square-detail','Tickets')}
+              {nav('/admin/users', 'bx bx-user-circle', 'Users')}
+              {nav('/admin/support', 'bx bx-message-square-detail', 'Tickets')}
+              {nav('/admin/settings', 'bx bx-cog', 'Settings')}
             </>
           )}
         </nav>

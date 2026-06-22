@@ -18,8 +18,11 @@ const supportMessageSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Open', 'In Progress', 'Resolved'],
-    default: 'Open'
+    default: 'open'
+  },
+  adminComment: {
+    type: String,
+    default: null
   },
   createdAt: {
     type: Date,

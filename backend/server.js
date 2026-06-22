@@ -12,6 +12,7 @@ import transactionRoutes from './routes/transactionRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import { stripeWebhook } from './controllers/subscriptionController.js';
 import { connectDb } from './database.js';
+import startDailyResetScheduler from './services/dailyResetScheduler.js';
 
 // Load env variables
 dotenv.config();
@@ -42,6 +43,7 @@ app.use('/api/subscription', subscriptionRoutes);
 async function startServer() {
   try {
     await connectDb();
+    startDailyResetScheduler(); // Reset free users' transaction count at 6 AM daily
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });

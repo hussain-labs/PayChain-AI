@@ -49,7 +49,18 @@ const Register = () => {
           <h2>Create Account</h2>
           <p>Join PayChain and unlock borderless payments.</p>
           
-          {error && <div style={{color: 'red', marginBottom: '1rem', background: 'rgba(255,0,0,0.1)', padding: '0.5rem', borderRadius: '4px'}}>{error}</div>}
+          {error && (
+            <div style={{
+              display: 'flex', alignItems: 'flex-start', gap: '0.6rem',
+              color: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.08)',
+              border: '1px solid rgba(239, 68, 68, 0.2)', padding: '0.9rem 1.1rem',
+              borderRadius: '12px', marginBottom: '1.25rem', fontSize: '0.88rem', fontWeight: 500,
+              animation: 'fadeInDown 0.3s ease-out'
+            }}>
+              <i className='bx bx-error-circle' style={{ fontSize: '1.2rem', marginTop: '0.1rem' }}></i>
+              <span style={{ lineHeight: 1.4 }}>{error}</span>
+            </div>
+          )}
 
           <form className="auth-form" onSubmit={handleSubmit}>
             <div className="form-group">

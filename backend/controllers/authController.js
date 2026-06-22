@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import { notifyUser, notifyAdmins } from '../utils/notify.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -35,6 +36,10 @@ export const registerUser = async (req, res) => {
       password: hashedPassword
     });
 
+    // Notify user and admins
+    await notifyUser(newUser._id, 'Welcome to PayChain! Your borderless payment journey begins here.', '/dashboard');
+    await notifyAdmins(`New user registered: ${name} (${email})`, `/admin/users/${newUser._id}`);
+
     res.status(201).json({ message: 'User registered successfully!', userId: newUser._id });
   } catch (error) {
     console.error('Registration error:', error);
@@ -59,6 +64,10 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ error: 'Invalid email or password.' });
     }
 
+    if (user.isActive === false) {
+      return res.status(403).json({ error: 'Your account has been deactivated. Please contact customer support for assistance.' });
+    }
+
     // Compare passwords
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
@@ -72,15 +81,16 @@ export const loginUser = async (req, res) => {
       { expiresIn: '7d' }
     );
 
+    const userObj = user.toObject();
+    delete userObj.password;
+    delete userObj.connectedAccounts;
+
     res.status(200).json({
       message: 'Login successful',
       token,
       user: {
-        id: user._id,
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        isAdmin: user.isAdmin || false
+        id: userObj._id,
+        ...userObj
       }
     });
 

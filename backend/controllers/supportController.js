@@ -1,4 +1,5 @@
 import SupportMessage from '../models/SupportMessage.js';
+import { notifyAdmins } from '../utils/notify.js';
 
 // @desc    Create a support message
 // @route   POST /api/support
@@ -18,6 +19,10 @@ export const createSupportMessage = async (req, res) => {
     });
 
     const createdMessage = await supportMessage.save();
+    
+    // Notify admins
+    await notifyAdmins(`New Support Ticket: ${subject}`, `/admin/support?ticketId=${createdMessage._id}`);
+
     res.status(201).json(createdMessage);
   } catch (error) {
     console.error('Error creating support message:', error);
