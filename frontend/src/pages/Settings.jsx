@@ -204,7 +204,7 @@ const Settings = () => {
           </div>
         </header>
 
-          <div className="dashboard-grid" style={{ gridTemplateColumns: '1fr 1fr', padding: '1rem' }}>
+          <div className="dashboard-grid" style={{ gridTemplateColumns: '1fr 1fr', padding: '1rem', marginTop: '-1rem' }}>
 
             {/* Profile Information */}
             <div className="glass-panel" style={{ gridColumn: 'span 1' }}>
