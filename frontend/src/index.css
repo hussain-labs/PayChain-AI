@@ -1619,13 +1619,17 @@ footer {
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: var(--text-muted);
+  color: #6b7280;
   cursor: pointer;
   transition: var(--transition);
+  line-height: 1;
+  padding: 0.25rem;
+  border-radius: 6px;
 }
 
 .close-btn:hover {
   color: var(--primary);
+  background: rgba(123,63,191,0.08);
 }
 
 .modal-form .form-group {
@@ -1705,7 +1709,7 @@ footer {
 }
 
 .bg-primary-light {
-  background: var(--primary-light);
+  background: #f3e8ff;
   color: var(--primary);
 }
 
@@ -4479,8 +4483,8 @@ footer {
 }
 
 .bg-primary-light {
-  background: var(--primary-light);
-  color: var(--primary);
+  background: rgba(167, 139, 250, 0.15);
+  color: #a78bfa;
 }
 
 .bg-success-light {

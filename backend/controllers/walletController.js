@@ -56,7 +56,7 @@ export const addWallet = async (req, res) => {
     const user = await User.findById(req.userId);
     if (!user) return res.status(404).json({ error: 'User not found.' });
 
-    // Check for duplicate
+    // Check for duplicate address
     const exists = user.savedWallets.some(
       w => w.address.toLowerCase() === address.trim().toLowerCase()
     );
@@ -64,13 +64,32 @@ export const addWallet = async (req, res) => {
       return res.status(409).json({ error: 'This wallet address is already saved.' });
     }
 
-    // Check Plan Limits
-    const currentWalletsCount = user.savedWallets.length;
-    if (user.plan === 'free' && currentWalletsCount >= 1) {
-      return res.status(403).json({ error: 'Free plan is limited to 1 wallet. Please upgrade to Pro.' });
-    }
-    if (user.plan === 'pro' && currentWalletsCount >= 10) {
-      return res.status(403).json({ error: 'Pro plan is limited to 10 wallets. Please upgrade to Enterprise.' });
+    // ── Plan Limits ───────────────────────────────────────────────────────────
+    const plan = user.plan || 'free';
+    const currentCount = user.savedWallets.length;
+    const bonusWallets = user.bonusTransactions || 0; // reuse bonusTransactions field for extra wallet slots
+
+    const PLAN_LIMITS = {
+      free:     1,
+      pro:      60,
+      pro_plus: 200 + bonusWallets,
+    };
+    const walletLimit = PLAN_LIMITS[plan] ?? 1;
+
+    if (currentCount >= walletLimit) {
+      const planLabel = plan === 'pro' ? 'Business Pro' : plan === 'pro_plus' ? 'Enterprise' : 'Free';
+      if (plan === 'pro_plus') {
+        return res.status(403).json({
+          error: `You have reached your ${walletLimit}-wallet limit. You can add extra wallet slots for $1/each. Contact support or upgrade your add-ons.`,
+          code: 'WALLET_LIMIT_EXTRA'
+        });
+      }
+      return res.status(403).json({
+        error: plan === 'free'
+          ? 'Free plan allows only 1 saved wallet. Please delete the existing one or upgrade to Pro.'
+          : `${planLabel} plan is limited to ${walletLimit} wallets. Please upgrade to Enterprise.`,
+        code: 'WALLET_LIMIT'
+      });
     }
 
     user.savedWallets.push({ nickname: nickname.trim(), address: address.trim() });

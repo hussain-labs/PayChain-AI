@@ -2,18 +2,20 @@ import cron from 'node-cron';
 import User from '../models/User.js';
 
 /**
- * Resets transactionCount to 0 for all FREE plan users.
- * Runs every day at 06:00 AM server time.
- * Also records the reset timestamp in lastResetAt.
+ * Resets transactionCount to 0 for ALL users on the 1st of every month.
+ * - Free plan: resets their 3/month limit
+ * - Pro plan: resets their 10,000/month limit (safety net alongside Stripe webhook)
+ * - Pro Plus: unlimited so no practical effect, but keeps data clean
+ * Runs at 01:00 AM UTC on the 1st of every month.
  */
 const startDailyResetScheduler = () => {
-  // Cron: "0 1 * * *" = 01:00 AM UTC = 06:00 AM Pakistan Standard Time (UTC+5)
-  cron.schedule('0 1 * * *', async () => {
+  // Cron: "0 1 1 * *" = 01:00 AM UTC on the 1st of every month
+  cron.schedule('0 1 1 * *', async () => {
     try {
-      console.log(`[CRON] Running daily free plan reset at ${new Date().toISOString()} (06:00 AM PKT)`);
+      console.log(`[CRON] Running monthly transaction reset at ${new Date().toISOString()}`);
 
       const result = await User.updateMany(
-        { plan: 'free' },
+        {},
         {
           $set: {
             transactionCount: 0,
@@ -22,13 +24,13 @@ const startDailyResetScheduler = () => {
         }
       );
 
-      console.log(`[CRON] Reset transactionCount for ${result.modifiedCount} free plan users.`);
+      console.log(`[CRON] Monthly reset done. Updated ${result.modifiedCount} users.`);
     } catch (err) {
-      console.error('[CRON] Daily reset failed:', err.message);
+      console.error('[CRON] Monthly reset failed:', err.message);
     }
   });
 
-  console.log('[CRON] Daily free plan reset scheduler started (fires at 06:00 AM every day).');
+  console.log('[CRON] Monthly transaction reset scheduler started (fires on 1st of every month at 01:00 AM UTC).');
 };
 
 export default startDailyResetScheduler;

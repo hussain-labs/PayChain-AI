@@ -25,7 +25,7 @@ export const createCheckoutSession = async (req, res) => {
           currency: 'usd',
           product_data: {
             name: 'Business Pro Plan',
-            description: 'Up to 10 wallets, 1000 transactions/month',
+            description: 'Up to 60 wallet accounts, 10,000 transactions/month',
           },
           unit_amount: 2900, // $29.00
           recurring: { interval: 'month' }
@@ -33,9 +33,9 @@ export const createCheckoutSession = async (req, res) => {
         quantity: 1,
       });
     } else if (plan === 'pro_plus') {
-      // Dynamic pricing for Pro Plus based on number of extra wallets
-      const basePrice = 9900; // $99.00 base for enterprise
-      const additionalWalletPrice = 500; // $5.00 per extra wallet above 10
+      // Dynamic pricing for Enterprise based on number of extra wallets
+      const basePrice = 9900; // $99.00 base for enterprise (200 wallets included)
+      const additionalWalletPrice = 100; // $1.00 per extra wallet above 200
       const totalExtraWallets = extraWallets || 0;
 
       lineItems.push({
@@ -43,7 +43,7 @@ export const createCheckoutSession = async (req, res) => {
           currency: 'usd',
           product_data: {
             name: 'Enterprise Custom Plan',
-            description: `Unlimited transactions + ${totalExtraWallets} extra wallets`,
+            description: `Unlimited transactions, 200 wallets included + ${totalExtraWallets} extra wallet account(s) @ $1 each`,
           },
           unit_amount: basePrice + (additionalWalletPrice * totalExtraWallets),
           recurring: { interval: 'month' }

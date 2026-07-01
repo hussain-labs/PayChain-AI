@@ -64,26 +64,22 @@ const UserProfilePopup = ({ user }) => {
     return Math.min(100, (used / (base + bonus)) * 100);
   };
 
-  // Calculate the next 6:00 AM Pakistan Standard Time (UTC+5) reset
+  // Calculate time until 1st of next month (01:00 AM UTC) — when monthly reset fires
   const getNextResetText = () => {
     const now = new Date();
-    // Get current time in PKT (UTC+5)
-    const pktOffsetMs = 5 * 60 * 60 * 1000;
-    const nowPKT = new Date(now.getTime() + pktOffsetMs);
+    const nextReset = new Date(Date.UTC(
+      now.getUTCMonth() === 11 ? now.getUTCFullYear() + 1 : now.getUTCFullYear(),
+      now.getUTCMonth() === 11 ? 0 : now.getUTCMonth() + 1,
+      1, 1, 0, 0, 0   // 1st of next month at 01:00 AM UTC
+    ));
 
-    // Build next 6 AM PKT as a UTC date
-    const nextPKT = new Date(nowPKT);
-    nextPKT.setUTCHours(6, 0, 0, 0);
-    if (nowPKT >= nextPKT) {
-      // Already past 6 AM PKT today → next reset is tomorrow PKT
-      nextPKT.setUTCDate(nextPKT.getUTCDate() + 1);
-    }
-    // Convert back to real UTC by subtracting PKT offset
-    const nextResetUTC = new Date(nextPKT.getTime() - pktOffsetMs);
+    const diffMs = nextReset - now;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffH  = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const diffM  = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
-    const diffMs = nextResetUTC - now;
-    const diffH = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffM = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    if (diffDays > 1) return `Resets in ${diffDays}d ${diffH}h`;
+    if (diffDays === 1) return `Resets in 1d ${diffH}h`;
     if (diffH > 0) return `Resets in ${diffH}h ${diffM}m`;
     return `Resets in ${diffM}m`;
   };
@@ -156,10 +152,10 @@ const UserProfilePopup = ({ user }) => {
           {pct >= 100 && user?.plan !== 'pro_plus' && (
             <p style={{ fontSize: '0.72rem', color: '#ef4444', margin: '0.5rem 0 0' }}>⚠️ Limit reached! Upgrade your plan.</p>
           )}
-          {user?.plan === 'free' && (
+          {(user?.plan === 'free' || user?.plan === 'pro') && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.6rem' }}>
               <i className='bx bx-time-five' style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }} />
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{getNextResetText()} (daily at 6:00 AM)</span>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{getNextResetText()} (resets monthly)</span>
             </div>
           )}
         </div>

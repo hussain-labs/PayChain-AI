@@ -10,18 +10,18 @@ import TopUpModal from '../components/TopUpModal';
 import toast from 'react-hot-toast';
 
 const API = 'http://localhost:5000';
-const fmt = (addr) => addr ? `${addr.slice(0,8)}…${addr.slice(-6)}` : '';
+const fmt = (addr) => addr ? `${addr.slice(0, 8)}…${addr.slice(-6)}` : '';
 
-const WALLET_ICONS  = { MetaMask: '🦊', KuCoin: '🔵', Kraken: '🐙', Coinbase: '🔷', 'Trust Wallet': '🛡️', Binance: '🟡', OKX: '⚫', 'Web3 Wallet': '💎' };
+const WALLET_ICONS = { MetaMask: '🦊', KuCoin: '🔵', Kraken: '🐙', Coinbase: '🔷', 'Trust Wallet': '🛡️', Binance: '🟡', OKX: '⚫', 'Web3 Wallet': '💎' };
 
 const WALLET_COLORS = {
-  MetaMask:      { bg: 'linear-gradient(135deg,#E2761B,#CD6116)', border: '#E2761B' },
-  KuCoin:        { bg: 'linear-gradient(135deg,#23AF91,#1A8A70)', border: '#23AF91' },
-  Kraken:        { bg: 'linear-gradient(135deg,#5741D9,#3D2EBF)', border: '#5741D9' },
-  Coinbase:      { bg: 'linear-gradient(135deg,#0052FF,#003DB3)', border: '#0052FF' },
-  'Trust Wallet':{ bg: 'linear-gradient(135deg,#3375BB,#1A5A9A)', border: '#3375BB' },
-  Binance:       { bg: 'linear-gradient(135deg,#F3BA2F,#D4A017)', border: '#F3BA2F' },
-  OKX:           { bg: 'linear-gradient(135deg,#1E88E5,#0D47A1)', border: '#1E88E5' },
+  MetaMask: { bg: 'linear-gradient(135deg,#E2761B,#CD6116)', border: '#E2761B' },
+  KuCoin: { bg: 'linear-gradient(135deg,#23AF91,#1A8A70)', border: '#23AF91' },
+  Kraken: { bg: 'linear-gradient(135deg,#5741D9,#3D2EBF)', border: '#5741D9' },
+  Coinbase: { bg: 'linear-gradient(135deg,#0052FF,#003DB3)', border: '#0052FF' },
+  'Trust Wallet': { bg: 'linear-gradient(135deg,#3375BB,#1A5A9A)', border: '#3375BB' },
+  Binance: { bg: 'linear-gradient(135deg,#F3BA2F,#D4A017)', border: '#F3BA2F' },
+  OKX: { bg: 'linear-gradient(135deg,#1E88E5,#0D47A1)', border: '#1E88E5' },
   'Web3 Wallet': { bg: 'linear-gradient(135deg,#7B3FBF,#4B1D8F)', border: '#7B3FBF' },
 };
 
@@ -45,7 +45,7 @@ const WalletOverview = () => {
 
   const [user, setUser] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
+
   const [walletDetail, setWalletDetail] = useState(null); // nickname etc
   const [assets, setAssets] = useState(null);
   const [history, setHistory] = useState([]);
@@ -173,7 +173,7 @@ const WalletOverview = () => {
       {/* Main Content */}
       <main className="dashboard-main">
         <div className="dashboard-content-wrapper fade-in">
-          
+
           {/* Header */}
           <header className="dashboard-header">
             <div className="header-toggle" onClick={() => setIsSidebarOpen(true)}><i className='bx bx-menu' /></div>
@@ -185,7 +185,7 @@ const WalletOverview = () => {
               </div>
             </div>
             <div className="header-actions">
-              <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
+              <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize: '1.2rem' }}>
                 <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
               </button>
               <button className="icon-btn"><i className='bx bx-bell' /></button>
@@ -221,7 +221,7 @@ const WalletOverview = () => {
             <div className="wo-actions-card">
               <h3>Quick Actions</h3>
               <div className="wo-actions-grid">
-                <Link to="/transfers" className="wo-action-item">
+                <Link to={`/transfers?from=${address}`} className="wo-action-item">
                   <div className="wo-action-icon" style={{ background: wStyle.border }}><i className='bx bx-send' /></div>
                   <span>Send</span>
                 </Link>
@@ -249,9 +249,9 @@ const WalletOverview = () => {
             </div>
             <div className="wo-activity-list">
               {history.length === 0 && !loading && (
-                <div style={{ textAlign:'center', padding:'2rem', color:'var(--text-muted)' }}>No recent transactions found on Sepolia Testnet.</div>
+                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>No recent transactions found on Sepolia Testnet.</div>
               )}
-              {loading && <div style={{ textAlign:'center', padding:'2rem', color:'var(--text-muted)' }}>Loading history...</div>}
+              {loading && <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Loading history...</div>}
               {history.map((tx, i) => (
                 <div className="wo-activity-item" key={tx.id || i}>
                   <div className="wo-activity-info">
@@ -273,7 +273,7 @@ const WalletOverview = () => {
         </div>
       </main>
 
-      <ConfirmModal 
+      <ConfirmModal
         isOpen={showDisconnectConfirm}
         title="Disconnect Wallet"
         message={`Are you sure you want to remove ${activeName} from your account? You will lose access to its fast-checkout features.`}
@@ -287,7 +287,7 @@ const WalletOverview = () => {
       {showReceiveModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'var(--modal-overlay)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, animation: 'fadeIn 0.2s ease' }}>
           <div style={{ background: 'var(--modal-bg)', border: '1px solid var(--modal-border)', borderRadius: '24px', padding: '2.5rem', width: '90%', maxWidth: '400px', textAlign: 'center', position: 'relative', boxShadow: 'var(--modal-shadow)', animation: 'slideUp 0.3s ease' }}>
-            <button 
+            <button
               onClick={() => setShowReceiveModal(false)}
               style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: 'var(--text-muted)', fontSize: '1.5rem', cursor: 'pointer', transition: '0.2s' }}
               onMouseOver={(e) => e.currentTarget.style.color = 'var(--text-color)'}
@@ -297,14 +297,14 @@ const WalletOverview = () => {
             </button>
             <h3 style={{ marginTop: 0, marginBottom: '0.5rem', fontSize: '1.5rem', color: 'var(--text-color)' }}>Receive Funds</h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem' }}>Scan this QR code or copy the address below to receive assets.</p>
-            
+
             <div style={{ background: '#fff', padding: '1rem', borderRadius: '16px', display: 'inline-block', marginBottom: '2rem', boxShadow: '0 8px 20px rgba(0,0,0,0.1)' }}>
               <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${address}`} alt="QR Code" style={{ display: 'block', borderRadius: '8px' }} />
             </div>
 
             <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
               <span style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: 'var(--text-color)', wordBreak: 'break-all', textAlign: 'left' }}>{address}</span>
-              <button 
+              <button
                 onClick={() => {
                   navigator.clipboard.writeText(address);
                   toast.success("Address copied to clipboard!");

@@ -69,10 +69,10 @@ const Pricing = () => {
       period: "forever",
       description: "Ideal for individuals starting out with digital finance and global transfers.",
       features: [
-        { text: "Up to 3 transactions total", active: true },
-        { text: "Connect 1 wallet maximum", active: true },
+        { text: "3 transactions per month (resets monthly)", active: true },
+        { text: "1 saved wallet account maximum", active: true },
+        { text: "Delete existing wallet to save a new one", active: true },
         { text: "Standard email support", active: true },
-        { text: "Basic AI insights", active: true },
         { text: "Pro Badge", active: false }
       ],
       featured: false,
@@ -86,10 +86,10 @@ const Pricing = () => {
       period: "per month",
       description: "Perfect for growing online businesses and global freelancers needing instant settlements.",
       features: [
-        { text: "Up to 1000 transactions total", active: true },
-        { text: "Connect up to 10 wallets", active: true },
+        { text: "10,000 transactions per month (resets monthly)", active: true },
+        { text: "Up to 60 connected wallet accounts", active: true },
+        { text: "All 60 slots can be from a single wallet type", active: true },
         { text: "24/7 Priority support (chat & call)", active: true },
-        { text: "Advanced AI insights", active: true },
         { text: "Exclusive Pro Badge", active: true }
       ],
       featured: true,
@@ -104,8 +104,9 @@ const Pricing = () => {
       period: "tailored pricing",
       description: "Customized solutions for high-volume companies and financial platforms.",
       features: [
-        { text: "Unlimited transaction volume", active: true },
-        { text: "Custom Wallet Limits", active: true },
+        { text: "Unlimited transactions per month", active: true },
+        { text: "Up to 200 connected wallet accounts included", active: true },
+        { text: "Extra wallet accounts: $1 each", active: true },
         { text: "Dedicated account manager", active: true },
         { text: "Exclusive Pro Plus Badge", active: true }
       ],
@@ -132,7 +133,7 @@ const Pricing = () => {
                 <p>{plan.description}</p>
                 <div className="pricing-price">
                   <span className="price-val">
-                    {plan.isCustom ? `$${99 + (extraWallets * 5)}` : plan.price}
+                    {plan.isCustom ? `$${99 + (extraWallets * 1)}` : plan.price}
                   </span>
                   <span className="price-period">/ {plan.period}</span>
                 </div>
@@ -149,7 +150,7 @@ const Pricing = () => {
               {plan.isCustom && (
                 <div style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
                   <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.5rem', display: 'block' }}>
-                    Additional Wallets ($5/mo each)
+                    Additional Wallet Accounts ($1 each)
                   </label>
                   <input
                     type="number"

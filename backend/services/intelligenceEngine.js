@@ -72,6 +72,9 @@ const buildSystemPrompt = () => `You are PayChain AI, an expert blockchain secur
 ## IMPORTANT CONTEXT RULES:
 - If contextualHints.isSelfTransfer === true → score MUST be 5-20, riskLevel MUST be "Low"
 - If contextualHints.isRecipientKnownPlatformUser === true → reduce score by 15 points
+- Pay extremely close attention to contextualHints.recipientHistorySummary:
+  - If recipient history says "BRAND NEW or completely inactive wallet" AND amount is large, INCREASE score to High Risk (60+).
+  - If recipient history indicates an "active history" and "established address", this is a POSITIVE signal. Reduce score appropriately.
 
 ## RESPONSE FORMAT (strict JSON, no markdown):
 {
@@ -111,7 +114,7 @@ const callGeminiWithRotation = async (payload) => {
       const t0 = Date.now();
       const ai = new GoogleGenAI({ apiKey: key });
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-3.1-flash-lite',
         contents: [
           { role: 'user', parts: [{ text: buildSystemPrompt() + '\n\nTransaction payload:\n' + JSON.stringify(payload) }] }
         ],
@@ -129,25 +132,25 @@ const callGeminiWithRotation = async (payload) => {
       log.rule();
       return parsed;
 
-      } catch (err) {
-        const isQuota = isQuotaError(err);
-        if (isQuota) {
-          log.warn(`🚫 Gemini Key #${currentIndex + 1}`, `Quota/rate-limit exceeded — rotating to next key...`);
-        } else {
-          log.error('❌ Gemini Error', `Invalid Key or Error: ${err.message?.slice(0, 120)} — rotating...`);
-        }
-        
-        const prevIndex = currentIndex;
-        currentIndex = await rotateToNextKey(currentIndex, total);
-        log.rotate(
-          '🔄 Key Rotation',
-          `Key #${prevIndex + 1} → Key #${currentIndex + 1} (saved to MongoDB)`
-        );
-        attempts++;
+    } catch (err) {
+      const isQuota = isQuotaError(err);
+      if (isQuota) {
+        log.warn(`🚫 Gemini Key #${currentIndex + 1}`, `Quota/rate-limit exceeded: ${err.message}`);
+      } else {
+        log.error('❌ Gemini Error', `Invalid Key or Error: ${err.message?.slice(0, 120)} — rotating...`);
       }
-    }
 
-  log.warn('⚠  Gemini', `All ${total} key(s) exhausted — falling back to Groq`);
+      const prevIndex = currentIndex;
+      currentIndex = await rotateToNextKey(currentIndex, total);
+      log.rotate(
+        '🔄 Key Rotation',
+        `Key #${prevIndex + 1} → Key #${currentIndex + 1} (saved to MongoDB)`
+      );
+      attempts++;
+    }
+  }
+
+  log.warn('⚠  Gemini', `All ${total} key(s) exhausted — AI unavailable`);
   log.rule();
   return null;
 };
@@ -202,14 +205,11 @@ export const analyzeTransactionRisk = async (payload) => {
     const geminiResult = await callGeminiWithRotation(payload);
     if (geminiResult) return geminiResult;
 
-    const groqResult = await callGroq(payload);
-    if (groqResult) return groqResult;
-
     log.error('❌ AI Engine', 'All AI services unavailable — returning aiUnavailable');
     log.rule();
     return {
       aiUnavailable: true,
-      aiError: 'All AI services are currently unavailable. Please try again later.',
+      aiError: 'The AI model is currently unavailable due to technical issues. Transaction analysis will resume once the service is restored.',
     };
 
   } catch (error) {

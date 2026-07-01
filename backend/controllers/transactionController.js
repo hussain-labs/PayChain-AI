@@ -28,10 +28,10 @@ export const createTransaction = async (req, res) => {
 
     // Check Plan Limits
     const bonus = user.bonusTransactions || 0;
-    const planMax = user.plan === 'free' ? 3 : user.plan === 'pro' ? 1000 : Infinity;
-    const totalLimit = planMax + bonus;
+    const planMax = user.plan === 'free' ? 3 : user.plan === 'pro' ? 10000 : Infinity;
+    const totalLimit = planMax === Infinity ? Infinity : planMax + bonus;
 
-    if (user.transactionCount >= totalLimit) {
+    if (totalLimit !== Infinity && user.transactionCount >= totalLimit) {
       return res.status(403).json({ error: `Transaction limit reached. You have used all ${totalLimit} transactions for your current plan${bonus > 0 ? ' (including bonuses)' : ''}. Please upgrade for more.` });
     }
 
@@ -47,8 +47,10 @@ export const createTransaction = async (req, res) => {
     });
 
     // Increment transaction count
-    user.transactionCount += 1;
-    await user.save();
+    if (!req.body.aiUnavailable) {
+      user.transactionCount += 1;
+      await user.save();
+    }
 
     // Notify user
     await notifyUser(req.userId, `Transaction processed: ${amount} ${asset} to ${to}`, '/transfers');

@@ -2,12 +2,12 @@ import { useAccount, useConnect, useDisconnect } from 'wagmi'
 import { injected } from 'wagmi/connectors'
 
 export const useWeb3Auth = () => {
-  const { address, isConnected } = useAccount()
-  const { connect, isPending } = useConnect()
+  const { address, addresses, isConnected, connector } = useAccount()
+  const { connect, connectors, isPending } = useConnect()
   const { disconnect } = useDisconnect()
 
-  const handleConnect = () => {
-    connect({ connector: injected() })
+  const handleConnect = (connector) => {
+    connect({ connector: connector || injected() })
   }
 
   const handleDisconnect = () => {
@@ -16,8 +16,11 @@ export const useWeb3Auth = () => {
 
   return {
     address,
+    addresses,
     isConnected,
+    connector,
     isPending,
+    connectors,
     connect: handleConnect,
     disconnect: handleDisconnect,
   }

@@ -79,6 +79,7 @@ export const isQuotaError = (err) => {
     msg.includes('429') ||
     msg.includes('RESOURCE_EXHAUSTED') ||
     msg.includes('quota') ||
-    msg.includes('rate')
+    msg.includes('rate-limit') ||
+    msg.includes('rate limit')
   );
 };
