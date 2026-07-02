@@ -171,19 +171,19 @@ const Support = () => {
                   className={`support-tab-btn ${activeTab === 'faq' ? 'active' : ''}`}
                   onClick={() => setActiveTab('faq')}
                 >
-                  <i className='bx bx-help-circle'></i> FAQs
+                  <i className='bx bx-help-circle'></i> <span className="tab-text">FAQs</span>
                 </button>
                 <button 
                   className={`support-tab-btn ${activeTab === 'message' ? 'active' : ''}`}
                   onClick={() => setActiveTab('message')}
                 >
-                  <i className='bx bx-message-square-edit'></i> Send a Message
+                  <i className='bx bx-message-square-edit'></i> <span className="tab-text">Send a Message</span>
                 </button>
                 <button 
                   className={`support-tab-btn ${activeTab === 'complaints' ? 'active' : ''}`}
                   onClick={() => setActiveTab('complaints')}
                 >
-                  <i className='bx bx-list-ul'></i> Complaints
+                  <i className='bx bx-list-ul'></i> <span className="tab-text">Complaints</span>
                 </button>
               </div>
 

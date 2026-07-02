@@ -95,7 +95,7 @@ const AdminUsers = () => {
             </div>
           </header>
 
-          <div style={{ marginTop: '2rem' }}>
+          <div style={{ marginTop: 0 }}>
             {/* Toolbar */}
             <div className="admin-toolbar">
               <div className="admin-search-wrap">
@@ -200,15 +200,7 @@ const AdminUsers = () => {
                         <td>
                           <button
                             onClick={() => navigate(`/admin/users/${u._id}`)}
-                            style={{
-                              display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
-                              padding: '0.5rem 1.1rem', borderRadius: '10px',
-                              background: 'rgba(99,102,241,0.1)', color: '#6366f1',
-                              border: '1px solid rgba(99,102,241,0.25)', cursor: 'pointer',
-                              fontWeight: 700, fontSize: '0.82rem', transition: 'all 0.2s',
-                            }}
-                            onMouseOver={e => { e.currentTarget.style.background = 'var(--primary)'; e.currentTarget.style.color = '#fff'; }}
-                            onMouseOut={e => { e.currentTarget.style.background = 'rgba(99,102,241,0.1)'; e.currentTarget.style.color = '#6366f1'; }}
+                            className="admin-table-action-btn"
                           >
                             <i className='bx bx-user-circle' style={{ fontSize: '1.05rem' }} /> View Profile
                           </button>

@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   phone: { type: String, default: '' },
+  gender: { type: String, enum: ['Male', 'Female', 'Other', ''], default: '' },
+  address: { type: String, default: '' },
+  city: { type: String, default: '' },
+  country: { type: String, default: '' },
   avatar: { type: String, default: '' },
   currency: { type: String, default: 'USD' },
   language: { type: String, default: 'EN' },

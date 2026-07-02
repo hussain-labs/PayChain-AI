@@ -13,6 +13,8 @@ import {
   getSupportMessages,
   updateSupportMessageStatus,
   addBonusTransactions,
+  getAllTransactions,
+  getReportsData,
 } from '../controllers/adminController.js';
 
 const router = express.Router();
@@ -33,5 +35,11 @@ router.get('/stats', protect, adminProtect, getSystemStats);
 // Support
 router.get('/support', protect, adminProtect, getSupportMessages);
 router.put('/support/:id/status', protect, adminProtect, updateSupportMessageStatus);
+
+// Transactions
+router.get('/transactions', protect, adminProtect, getAllTransactions);
+
+// Reports
+router.get('/reports', protect, adminProtect, getReportsData);
 
 export default router;
