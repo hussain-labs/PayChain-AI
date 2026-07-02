@@ -20,6 +20,8 @@ import AdminSupport from './pages/admin/AdminSupport';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminUserProfile from './pages/admin/AdminUserProfile';
 import AdminPlanDistribution from './pages/admin/AdminPlanDistribution';
+import AdminTransactions from './pages/admin/AdminTransactions';
+import AdminReports from './pages/admin/AdminReports';
 import WalletOverview from './pages/WalletOverview';
 import Upgrade from './pages/Upgrade';
 import POSMode from './pages/POSMode';
@@ -29,7 +31,7 @@ import Chatbot from './components/Chatbot';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import { Toaster } from 'react-hot-toast';
 
-const ADMIN_ROUTES = ['/admin/dashboard', '/admin/users', '/admin/support', '/admin/settings', '/admin/plans'];
+const ADMIN_ROUTES = ['/admin/dashboard', '/admin/users', '/admin/support', '/admin/settings', '/admin/plans', '/admin/transactions', '/admin/reports'];
 const ADMIN_PREFIXES = ['/admin/users/'];
 const USER_ROUTES = ['/dashboard', '/pos', '/statistics', '/transfers', '/cards', '/support', '/upgrade', '/notifications'];
 const SHARED_ROUTES = ['/settings'];
@@ -116,8 +118,10 @@ const MainLayout = () => {
 
           {/* Admin dashboard pages */}
           <Route path="/admin/dashboard" element={<ProtectedRoute allowedRole="admin"><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/reports" element={<ProtectedRoute allowedRole="admin"><AdminReports /></ProtectedRoute>} />
           <Route path="/admin/plans" element={<ProtectedRoute allowedRole="admin"><AdminPlanDistribution /></ProtectedRoute>} />
           <Route path="/admin/users" element={<ProtectedRoute allowedRole="admin"><AdminUsers /></ProtectedRoute>} />
+          <Route path="/admin/transactions" element={<ProtectedRoute allowedRole="admin"><AdminTransactions /></ProtectedRoute>} />
           <Route path="/admin/support" element={<ProtectedRoute allowedRole="admin"><AdminSupport /></ProtectedRoute>} />
           <Route path="/admin/settings" element={<ProtectedRoute allowedRole="admin"><AdminSettings /></ProtectedRoute>} />
           <Route path="/admin/users/:id" element={<ProtectedRoute allowedRole="admin"><AdminUserProfile /></ProtectedRoute>} />

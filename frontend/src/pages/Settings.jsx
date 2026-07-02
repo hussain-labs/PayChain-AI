@@ -11,7 +11,7 @@ const Settings = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   // Profile state
-  const [profile, setProfile] = useState({ name: '', email: '', phone: '', avatar: '', currency: 'USD', language: 'EN' });
+  const [profile, setProfile] = useState({ firstName: '', lastName: '', email: '', phone: '', gender: '', address: '', city: '', country: '', avatar: '', currency: 'USD', language: 'EN' });
   const [profileMsg, setProfileMsg] = useState({ text: '', type: '' });
   const [profileLoading, setProfileLoading] = useState(false);
 
@@ -40,7 +40,23 @@ const Settings = () => {
       .then(res => { if (res.status === 401) { autoLogout(); return null; } return res.json(); })
       .then(data => {
         if (data) {
-          setProfile({ name: data.name || '', email: data.email || '', phone: data.phone || '', avatar: data.avatar || '', currency: data.currency || 'USD', language: data.language || 'EN' });
+          const nameParts = data.name ? data.name.split(' ') : [];
+          const fName = nameParts[0] || '';
+          const lName = nameParts.slice(1).join(' ') || '';
+          
+          setProfile({ 
+            firstName: fName, 
+            lastName: lName, 
+            email: data.email || '', 
+            phone: data.phone || '', 
+            gender: data.gender || '',
+            address: data.address || '',
+            city: data.city || '',
+            country: data.country || '',
+            avatar: data.avatar || '', 
+            currency: data.currency || 'USD', 
+            language: data.language || 'EN' 
+          });
           localStorage.setItem('user', JSON.stringify(data));
         }
       })
@@ -101,10 +117,17 @@ const Settings = () => {
     const token = getToken();
     if (!token) { autoLogout(); return; }
     try {
+      const payload = {
+        ...profile,
+        name: `${profile.firstName} ${profile.lastName}`.trim()
+      };
+      delete payload.firstName;
+      delete payload.lastName;
+
       const res = await fetch('http://localhost:5000/api/user/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(profile)
+        body: JSON.stringify(payload)
       });
       if (res.status === 401) { autoLogout(); return; }
       const data = await res.json();
@@ -162,7 +185,7 @@ const Settings = () => {
     navigate('/');
   };
 
-  const avatarSrc = profile.avatar || `https://ui-avatars.com/api/?name=${profile.name.replace(' ', '+') || 'User'}&background=4B1D8F&color=fff`;
+  const avatarSrc = profile.avatar || `https://ui-avatars.com/api/?name=${(profile.firstName + ' ' + profile.lastName).replace(' ', '+') || 'User'}&background=4B1D8F&color=fff`;
 
   const msgStyle = (type) => ({
     padding: '0.75rem 1rem',
@@ -226,19 +249,44 @@ const Settings = () => {
               </div>
 
               <form onSubmit={handleProfileSubmit} className="modal-form">
-                <div className="form-group">
-                  <label>Full Name</label>
-                  <input type="text" value={profile.name} onChange={e => setProfile({ ...profile, name: e.target.value })} required placeholder="Your full name" />
-                </div>
-                <div className="form-group">
-                  <label>Email Address</label>
-                  <input type="email" value={profile.email} onChange={e => setProfile({ ...profile, email: e.target.value })} required placeholder="you@example.com" />
-                </div>
-                <div className="form-group">
-                  <label>Phone Number</label>
-                  <input type="tel" value={profile.phone} onChange={e => setProfile({ ...profile, phone: e.target.value })} placeholder="+1 (555) 000-0000" />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                  <div className="form-group">
+                    <label>First Name</label>
+                    <input type="text" value={profile.firstName} onChange={e => setProfile({ ...profile, firstName: e.target.value })} required placeholder="First name" />
+                  </div>
+                  <div className="form-group">
+                    <label>Last Name</label>
+                    <input type="text" value={profile.lastName} onChange={e => setProfile({ ...profile, lastName: e.target.value })} required placeholder="Last name" />
+                  </div>
+                  <div className="form-group">
+                    <label>Email Address</label>
+                    <input type="email" value={profile.email} onChange={e => setProfile({ ...profile, email: e.target.value })} required placeholder="you@example.com" />
+                  </div>
+                  <div className="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" value={profile.phone} onChange={e => setProfile({ ...profile, phone: e.target.value })} placeholder="+1 (555) 000-0000" />
+                  </div>
+                  <div className="form-group">
+                    <label>Gender</label>
+                    <select value={profile.gender} onChange={e => setProfile({ ...profile, gender: e.target.value })}>
+                      <option value="">Select...</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Street Address</label>
+                    <input type="text" value={profile.address} onChange={e => setProfile({ ...profile, address: e.target.value })} placeholder="123 Main St" />
+                  </div>
+                  <div className="form-group">
+                    <label>City</label>
+                    <input type="text" value={profile.city} onChange={e => setProfile({ ...profile, city: e.target.value })} placeholder="New York" />
+                  </div>
+                  <div className="form-group">
+                    <label>Country</label>
+                    <input type="text" value={profile.country} onChange={e => setProfile({ ...profile, country: e.target.value })} placeholder="USA" />
+                  </div>
                   <div className="form-group">
                     <label>Currency</label>
                     <select value={profile.currency} onChange={e => setProfile({ ...profile, currency: e.target.value })}>

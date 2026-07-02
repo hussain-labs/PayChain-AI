@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import SupportMessage from '../models/SupportMessage.js';
+import Transaction from '../models/Transaction.js';
 import { notifyUser } from '../utils/notify.js';
 
 const API = 'http://localhost:5000';
@@ -228,5 +229,115 @@ export const updateSupportMessageStatus = async (req, res) => {
     res.json(updated);
   } catch (error) {
     res.status(500).json({ error: 'Server error updating support message status' });
+  }
+};
+
+// @desc    Get all transactions
+// @route   GET /api/admin/transactions
+export const getAllTransactions = async (req, res) => {
+  try {
+    const transactions = await Transaction.find({})
+      .populate('user', 'name email avatar')
+      .sort({ createdAt: -1 });
+    res.json(transactions);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error fetching transactions' });
+  }
+};
+
+// @desc    Get reports data
+// @route   GET /api/admin/reports
+export const getReportsData = async (req, res) => {
+  try {
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+    sixMonthsAgo.setDate(1);
+    sixMonthsAgo.setHours(0,0,0,0);
+
+    // 1. User Growth (Last 6 months)
+    const userGrowth = await User.aggregate([
+      { $match: { createdAt: { $gte: sixMonthsAgo }, isAdmin: false } },
+      { 
+        $group: {
+          _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+          users: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const formattedUserGrowth = userGrowth.map(item => ({
+      name: `${monthNames[item._id.month - 1]}`,
+      users: item.users
+    }));
+
+    // 2. Transaction Volume (Last 6 months)
+    const txVolume = await Transaction.aggregate([
+      { $match: { createdAt: { $gte: sixMonthsAgo } } },
+      { 
+        $group: {
+          _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+          transactions: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+
+    const formattedTxVolume = txVolume.map(item => ({
+      name: `${monthNames[item._id.month - 1]}`,
+      transactions: item.transactions
+    }));
+
+    // 3. Network Distribution
+    const networkDist = await Transaction.aggregate([
+      {
+        $group: {
+          _id: "$network",
+          value: { $sum: 1 }
+        }
+      }
+    ]);
+    const formattedNetworkDist = networkDist.map(item => ({
+      name: item._id,
+      value: item.value
+    }));
+
+    // 4. Plan Distribution
+    const planDist = await User.aggregate([
+      { $match: { isAdmin: false } },
+      {
+        $group: {
+          _id: "$plan",
+          value: { $sum: 1 }
+        }
+      }
+    ]);
+    
+    const planLabels = { 'free': 'Free', 'pro': 'Pro', 'pro_plus': 'Pro+' };
+    const formattedPlanDist = planDist.map(item => ({
+      name: planLabels[item._id] || item._id,
+      value: item.value
+    }));
+
+    // KPIs
+    const paidSubscribers = await User.countDocuments({ plan: { $in: ['pro', 'pro_plus'] }, isAdmin: false, isActive: true });
+    const totalTransactions = await Transaction.countDocuments();
+    const totalUsers = await User.countDocuments({ isAdmin: false });
+
+    res.json({
+      userGrowth: formattedUserGrowth,
+      transactionVolume: formattedTxVolume,
+      networkDistribution: formattedNetworkDist,
+      planDistribution: formattedPlanDist,
+      kpis: {
+        paidSubscribers,
+        totalTransactions,
+        totalUsers
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: 'Server error fetching reports data' });
   }
 };
