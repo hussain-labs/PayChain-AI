@@ -7923,13 +7923,25 @@ body.menu-open .theme-switcher {
 
 /* Stat cards */
 .admin-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  display: flex;
+  overflow-x: auto;
   gap: 1.25rem;
   margin-bottom: 2rem;
+  padding-bottom: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+.admin-stats-grid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.admin-stats-grid::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
 }
 
 .admin-stat-card {
+  flex: 1 0 240px;
   background: var(--glass-bg, var(--surface));
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -8589,16 +8601,9 @@ body.menu-open .theme-switcher {
   .admin-two-col {
     grid-template-columns: 1fr;
   }
-
-  .admin-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 @media (max-width: 500px) {
-  .admin-stats-grid {
-    grid-template-columns: 1fr;
-  }
 
   .admin-content {
     padding: 1rem;

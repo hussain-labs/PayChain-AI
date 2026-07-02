@@ -114,19 +114,22 @@ const AdminSupport = () => {
             </div>
           </header>
 
-          <div style={{ marginTop: '2rem' }}>
-      <div className="admin-tabs">
-        {['all','open','pending','closed'].map(s => (
-          <button
-            key={s}
-            className={`admin-tab ${filter === s ? 'active' : ''}`}
-            onClick={() => setFilter(s)}
-          >
-            {s.charAt(0).toUpperCase() + s.slice(1)}
-            <span className="admin-tab-count">{counts[s]}</span>
-          </button>
-        ))}
-        <button onClick={() => fetchTickets()} className="admin-btn-outline" style={{ marginLeft:'auto' }}>
+          <div style={{ marginTop: 0 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', flex: '1 1 auto' }}>
+          {['all','open','pending','closed'].map(s => (
+            <button
+              key={s}
+              className={`admin-tab ${filter === s ? 'active' : ''}`}
+              onClick={() => setFilter(s)}
+              style={{ flex: '1 1 120px', justifyContent: 'center' }}
+            >
+              {s.charAt(0).toUpperCase() + s.slice(1)}
+              <span className="admin-tab-count">{counts[s]}</span>
+            </button>
+          ))}
+        </div>
+        <button onClick={() => fetchTickets()} className="admin-btn-outline" style={{ whiteSpace: 'nowrap' }}>
           <i className='bx bx-refresh' /> Refresh
         </button>
       </div>
