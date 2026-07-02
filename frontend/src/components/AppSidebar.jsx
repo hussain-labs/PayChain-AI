@@ -99,6 +99,7 @@ const AppSidebar = ({ activeRoute = '/dashboard', user, isOpen, onClose, onLogou
                 Admin
               </div>
               {nav('/admin/users', 'bx bx-user-circle', 'Users')}
+              {nav('/admin/plans', 'bx bx-pie-chart-alt-2', 'Plans')}
               {nav('/admin/support', 'bx bx-message-square-detail', 'Tickets')}
               {nav('/admin/settings', 'bx bx-cog', 'Settings')}
             </>

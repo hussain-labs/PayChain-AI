@@ -117,6 +117,9 @@ const AdminDashboard = () => {
                   </div>
                 ))}
               </div>
+              <button onClick={() => navigate('/admin/plans')} className="admin-view-all-btn">
+                View Plan Details <i className='bx bx-right-arrow-alt' />
+              </button>
             </div>
 
             {/* Recent Sign-ups */}
