@@ -1198,7 +1198,7 @@ footer {
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
-  background: var(--bg);
+  background: var(--background);
 }
 
 .sidebar {
@@ -7111,6 +7111,13 @@ body.menu-open .theme-switcher {
     align-items: center;
     justify-content: flex-start;
     gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--background);
+    margin: -1rem -1rem 1rem -1rem;
+    padding: 1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
   }
 
   .header-greeting h1 {
@@ -8633,9 +8640,9 @@ body.menu-open .theme-switcher {
 }
 
 .support-tab-btn.active {
-  background: rgba(99, 102, 241, 0.1);
-  border-color: rgba(99, 102, 241, 0.3);
-  color: #6366f1;
+  background: rgba(74, 20, 140, 0.1);
+  border-color: rgba(74, 20, 140, 0.3);
+  color: #4a148c;
 }
 
 .faq-list {
