@@ -78,7 +78,7 @@ const AdminDashboard = () => {
             </div>
           </header>
 
-          <div style={{ marginTop: '2rem' }}>
+          <div style={{ marginTop: 0 }}>
       {loading ? (
         <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'60vh', color:'var(--text-muted)', fontSize:'1.1rem' }}>
           <i className='bx bx-loader-alt bx-spin' style={{ marginRight:'0.5rem', fontSize:'1.5rem' }} />
@@ -136,12 +136,12 @@ const AdminDashboard = () => {
                     </div>
                     <div style={{ flex:1, minWidth:0 }}>
                       <div style={{ fontWeight:600, fontSize:'0.9rem', color:'var(--text-color)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{u.name}</div>
-                      <div style={{ fontSize:'0.77rem', color:'var(--text-muted)' }}>{u.email}</div>
+                      <div style={{ fontSize:'0.77rem', color:'var(--text-muted)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{u.email}</div>
                     </div>
-                    <span className={`admin-plan-badge plan-${u.plan}`}>
+                    <span className={`admin-plan-badge plan-${u.plan}`} style={{ flexShrink: 0 }}>
                       {u.plan === 'pro_plus' ? 'PRO+' : u.plan === 'pro' ? 'PRO' : 'FREE'}
                     </span>
-                    <span className={`admin-status-badge ${u.isActive !== false ? 'active' : 'inactive'}`}>
+                    <span className={`admin-status-badge ${u.isActive !== false ? 'active' : 'inactive'}`} style={{ flexShrink: 0 }}>
                       {u.isActive !== false ? 'Active' : 'Inactive'}
                     </span>
                   </div>
