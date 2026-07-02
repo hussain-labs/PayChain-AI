@@ -15,6 +15,20 @@ const Support = () => {
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState(null);
+
+  const faqs = [
+    { question: "How long do international transfers take?", answer: "Most international transfers are completed within 1-2 business days. Some destinations may take up to 3 business days depending on local banking networks." },
+    { question: "Are there any hidden transaction fees?", answer: "No, we pride ourselves on transparency. All fees are clearly displayed before you confirm any transaction. We use real mid-market exchange rates." },
+    { question: "How can I reset my account password?", answer: "You can reset your password by navigating to the Settings page and selecting \"Security\", or by clicking \"Forgot Password\" on the login screen." },
+    { question: "What payment methods do you support?", answer: "We support a variety of payment methods including all major credit/debit cards, direct bank transfers, and selected cryptocurrencies depending on your region." },
+    { question: "Is my personal information and money secure?", answer: "Absolutely. PayChain uses bank-level 256-bit encryption to protect your data. We also employ strict two-factor authentication (2FA) and continuous fraud monitoring." },
+    { question: "How can I upgrade my current plan?", answer: "You can upgrade your plan at any time by navigating to the \"Upgrade\" section in your sidebar menu. From there, you can compare plans and select the one that best fits your needs." }
+  ];
+
+  const toggleFaq = (index) => {
+    setExpandedFaq(expandedFaq === index ? null : index);
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -93,10 +107,10 @@ const Support = () => {
             </div>
           </header>
 
-          <div className="support-page" style={{ width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div className="support-page" style={{ width: '100%', margin: '0 auto', marginTop: '-1rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             
-            <div className="contact-cards-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', width: '100%' }}>
-              <div className="glass-panel contact-info-card fade-in" style={{ animationDelay: '0.1s', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', borderRadius: '12px' }}>
+            <div className="contact-cards-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(280px, 1fr))', gap: '1.5rem', width: '100%', overflowX: 'auto', paddingBottom: '1rem' }}>
+              <div className="glass-panel contact-info-card fade-in" style={{ animationDelay: '0.1s', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', borderRadius: '12px', wordBreak: 'break-word' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
                   <i className='bx bx-envelope'></i>
                 </div>
@@ -105,7 +119,7 @@ const Support = () => {
                 <a href="mailto:support@paychain.com" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: '500', marginTop: '0.5rem' }}>support@paychain.com</a>
               </div>
               
-              <div className="glass-panel contact-info-card fade-in" style={{ animationDelay: '0.2s', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', borderRadius: '12px' }}>
+              <div className="glass-panel contact-info-card fade-in" style={{ animationDelay: '0.2s', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', borderRadius: '12px', wordBreak: 'break-word' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
                   <i className='bx bx-phone-call'></i>
                 </div>
@@ -114,7 +128,7 @@ const Support = () => {
                 <a href="tel:+18001234567" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: '500', marginTop: '0.5rem' }}>+1 (800) 123-4567</a>
               </div>
               
-              <div className="glass-panel contact-info-card fade-in" style={{ animationDelay: '0.3s', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', borderRadius: '12px' }}>
+              <div className="glass-panel contact-info-card fade-in" style={{ animationDelay: '0.3s', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', borderRadius: '12px', wordBreak: 'break-word' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
                   <i className='bx bx-time-five'></i>
                 </div>
@@ -124,8 +138,8 @@ const Support = () => {
               </div>
             </div>
 
-            <div className="glass-panel support-tabs-container fade-in" style={{ animationDelay: '0.4s', borderRadius: '16px', padding: '1.5rem' }}>
-              <div className="support-tabs-header" style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
+            <div className="glass-panel support-tabs-container fade-in" style={{ animationDelay: '0.4s', borderRadius: '16px', padding: '1.5rem', overflow: 'hidden' }}>
+              <div className="support-tabs-header" style={{ display: 'flex', flexWrap: 'nowrap', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem', overflowX: 'auto' }}>
                 <button 
                   className={`support-tab-btn ${activeTab === 'faq' ? 'active' : ''}`}
                   onClick={() => setActiveTab('faq')}
@@ -142,19 +156,25 @@ const Support = () => {
 
               <div className="support-tab-content">
                 {activeTab === 'faq' && (
-                  <div className="faq-list">
-                    <div className="faq-item">
-                      <h4>How long do international transfers take?</h4>
-                      <p>Most international transfers are completed within 1-2 business days. Some destinations may take up to 3 business days depending on local banking networks.</p>
-                    </div>
-                    <div className="faq-item">
-                      <h4>Are there any hidden transaction fees?</h4>
-                      <p>No, we pride ourselves on transparency. All fees are clearly displayed before you confirm any transaction. We use real mid-market exchange rates.</p>
-                    </div>
-                    <div className="faq-item">
-                      <h4>How can I reset my account password?</h4>
-                      <p>You can reset your password by navigating to the Settings page and selecting "Security", or by clicking "Forgot Password" on the login screen.</p>
-                    </div>
+                  <div className="faq-list" style={{ maxWidth: '100%', width: '100%', margin: 0 }}>
+                    {faqs.map((faq, index) => (
+                      <div 
+                        key={index} 
+                        className="faq-item" 
+                        onClick={() => toggleFaq(index)}
+                        style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+                          <h4 style={{ margin: 0, color: expandedFaq === index ? 'var(--primary)' : 'var(--text-color)', transition: 'color 0.2s' }}>{faq.question}</h4>
+                          <i className={`bx ${expandedFaq === index ? 'bx-chevron-up' : 'bx-chevron-down'}`} style={{ fontSize: '1.5rem', color: expandedFaq === index ? 'var(--primary)' : 'var(--text-muted)', transition: 'transform 0.3s ease', transform: expandedFaq === index ? 'rotate(180deg)' : 'rotate(0deg)' }}></i>
+                        </div>
+                        {expandedFaq === index && (
+                          <div style={{ marginTop: '1rem', animation: 'fadeInDown 0.3s ease' }}>
+                            <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.6' }}>{faq.answer}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
 
