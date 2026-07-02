@@ -17,6 +17,9 @@ const Support = () => {
   const [loading, setLoading] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState(null);
 
+  const [complaints, setComplaints] = useState([]);
+  const [loadingComplaints, setLoadingComplaints] = useState(false);
+
   const faqs = [
     { question: "How long do international transfers take?", answer: "Most international transfers are completed within 1-2 business days. Some destinations may take up to 3 business days depending on local banking networks." },
     { question: "Are there any hidden transaction fees?", answer: "No, we pride ourselves on transparency. All fees are clearly displayed before you confirm any transaction. We use real mid-market exchange rates." },
@@ -45,6 +48,30 @@ const Support = () => {
     localStorage.removeItem('user');
     navigate('/');
   };
+
+  const fetchComplaints = async () => {
+    setLoadingComplaints(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:5000/api/support', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if(res.ok) {
+        const data = await res.json();
+        setComplaints(data);
+      }
+    } catch(e) {
+      console.error(e);
+    } finally {
+      setLoadingComplaints(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'complaints') {
+      fetchComplaints();
+    }
+  }, [activeTab]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -152,6 +179,12 @@ const Support = () => {
                 >
                   <i className='bx bx-message-square-edit'></i> Send a Message
                 </button>
+                <button 
+                  className={`support-tab-btn ${activeTab === 'complaints' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('complaints')}
+                >
+                  <i className='bx bx-list-ul'></i> Complaints
+                </button>
               </div>
 
               <div className="support-tab-content">
@@ -223,10 +256,11 @@ const Support = () => {
                         type="submit" 
                         disabled={loading}
                         style={{ 
-                          background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))', 
+                          background: 'linear-gradient(135deg, #4a148c, #311b92)', 
                           color: '#fff', 
                           border: 'none', 
                           padding: '1rem', 
+
                           borderRadius: '8px', 
                           fontSize: '1rem', 
                           fontWeight: 600, 
@@ -245,7 +279,46 @@ const Support = () => {
                     </form>
                   </div>
                 )}
+
+                {activeTab === 'complaints' && (
+                  <div className="complaints-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
+                    {loadingComplaints ? (
+                      <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Loading complaints...</div>
+                    ) : complaints.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>You have no complaints yet.</div>
+                    ) : (
+                      complaints.map(comp => (
+                        <div key={comp._id} style={{ background: 'var(--input-bg, rgba(0,0,0,0.02))', border: '1px solid var(--border)', borderRadius: '12px', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                            <h4 style={{ margin: 0, color: 'var(--text-color)', fontSize: '1.1rem' }}>{comp.subject}</h4>
+                            <span style={{ 
+                              padding: '0.4rem 0.8rem', 
+                              borderRadius: '20px', 
+                              fontSize: '0.8rem', 
+                              fontWeight: 600,
+                              textTransform: 'capitalize',
+                              backgroundColor: (comp.status === 'open' || comp.status === 'pending') ? 'rgba(245, 158, 11, 0.15)' : comp.status === 'process' ? 'rgba(59, 130, 246, 0.15)' : (comp.status === 'cancel' || comp.status === 'cancelled') ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+                              color: (comp.status === 'open' || comp.status === 'pending') ? '#f59e0b' : comp.status === 'process' ? '#3b82f6' : (comp.status === 'cancel' || comp.status === 'cancelled') ? '#ef4444' : '#10b981'
+                            }}>
+                              {comp.status === 'open' ? 'Pending' : comp.status}
+                            </span>
+                          </div>
+                          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{comp.message}</p>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+                            Submitted on {new Date(comp.createdAt).toLocaleDateString()}
+                          </div>
+                          {comp.adminComment && (
+                            <div style={{ marginTop: '0.5rem', padding: '1rem', background: 'rgba(74, 28, 130, 0.05)', borderLeft: '4px solid #4a1c82', borderRadius: '4px' }}>
+                              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-color)' }}><strong>Admin Response:</strong> {comp.adminComment}</p>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
+
             </div>
           </div>
         </div>

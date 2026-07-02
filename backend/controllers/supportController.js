@@ -29,3 +29,16 @@ export const createSupportMessage = async (req, res) => {
     res.status(500).json({ error: 'Server error creating support message' });
   }
 };
+
+// @desc    Get all support messages for a user
+// @route   GET /api/support
+// @access  Private
+export const getSupportMessages = async (req, res) => {
+  try {
+    const messages = await SupportMessage.find({ user: req.userId }).sort({ createdAt: -1 });
+    res.json(messages);
+  } catch (error) {
+    console.error('Error fetching support messages:', error);
+    res.status(500).json({ error: 'Server error fetching support messages' });
+  }
+};
