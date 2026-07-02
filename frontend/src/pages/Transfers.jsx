@@ -43,7 +43,7 @@ const Transfers = () => {
   const { theme, toggleTheme } = useTheme();
   const [user, setUser] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { address: web3Address, addresses: web3Addresses, isConnected, connector } = useWeb3Auth();
+  const { address: web3Address, addresses: web3Addresses, isConnected, connector, chainId, switchChain } = useWeb3Auth();
 
   const { sendTransaction, isPending } = useSendTransaction();
 
@@ -209,7 +209,12 @@ const Transfers = () => {
       return;
     }
 
-    sendTransaction({ to: sendTo, value: parseEther(sendAmount) }, {
+    sendTransaction({ 
+      to: sendTo, 
+      value: parseEther(sendAmount),
+      account: web3Address,
+      chainId: 11155111
+    }, {
       async onSuccess(hash) {
         const newTx = {
           from: fromWallet,
@@ -412,7 +417,13 @@ const Transfers = () => {
                       />
                       <button
                         type="button"
-                        onClick={() => setSendAmount(selectedCoin ? parseFloat(selectedCoin.balance).toFixed(6) : '0')}
+                        onClick={() => {
+                          if (!selectedCoin) return;
+                          let max = parseFloat(selectedCoin.balance);
+                          // Leave a small buffer for gas if sending native ETH
+                          if (sendCoin === 'ETH' && max > 0.0005) max -= 0.0005;
+                          setSendAmount(Math.max(0, max).toFixed(6));
+                        }}
                         style={{ padding: '0 1.2rem', background: 'rgba(123,63,191,0.2)', color: '#a78bfa', border: '1px solid rgba(123,63,191,0.4)', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', fontSize: '0.9rem', transition: 'all 0.2s' }}
                         onMouseEnter={e => { e.currentTarget.style.background = 'rgba(123,63,191,0.4)'; }}
                         onMouseLeave={e => { e.currentTarget.style.background = 'rgba(123,63,191,0.2)'; }}
@@ -578,14 +589,27 @@ const Transfers = () => {
 
                   <div style={{ display: 'flex', gap: '0.75rem' }}>
                     <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setRiskResult(null)}>← Edit</button>
-                    <button
-                      className="btn-primary"
-                      style={{ flex: 1, opacity: (riskResult.riskLevel === 'Critical' || isPending) ? 0.5 : 1 }}
-                      disabled={riskResult.riskLevel === 'Critical' || !!riskResult.error || isPending}
-                      onClick={handleConfirm}
-                    >
-                      {isPending ? <><i className='bx bx-loader-alt bx-spin' /> Awaiting Signature...</> : riskResult.riskLevel === 'Critical' ? <><i className='bx bx-block' /> Blocked</> : <><i className='bx bx-check-circle' /> Confirm Transfer</>}
-                    </button>
+                    {chainId !== 11155111 ? (
+                      <button
+                        className="btn-primary"
+                        style={{ flex: 1, background: 'var(--primary)' }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          switchChain({ chainId: 11155111 });
+                        }}
+                      >
+                        <i className='bx bx-refresh' /> Switch to Sepolia Network
+                      </button>
+                    ) : (
+                      <button
+                        className="btn-primary"
+                        style={{ flex: 1, opacity: (riskResult.riskLevel === 'Critical' || isPending) ? 0.5 : 1 }}
+                        disabled={riskResult.riskLevel === 'Critical' || !!riskResult.error || isPending}
+                        onClick={handleConfirm}
+                      >
+                        {isPending ? <><i className='bx bx-loader-alt bx-spin' /> Awaiting Signature...</> : riskResult.riskLevel === 'Critical' ? <><i className='bx bx-block' /> Blocked</> : <><i className='bx bx-check-circle' /> Confirm Transfer</>}
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
