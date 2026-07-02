@@ -587,7 +587,7 @@ const Transfers = () => {
                     );
                   })()}
 
-                  <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', gap: '0.75rem', position: 'sticky', bottom: '0', padding: '1rem', margin: '1rem 0 0 0', background: 'var(--surface)', borderRadius: '16px', border: '1px solid var(--border)', zIndex: 10, boxShadow: '0 -10px 40px rgba(0,0,0,0.05)' }}>
                     <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setRiskResult(null)}>← Edit</button>
                     {chainId !== 11155111 ? (
                       <button
@@ -616,7 +616,7 @@ const Transfers = () => {
             </div>
 
             {/* ── RIGHT: History ── */}
-            <div style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '100px', height: 'fit-content' }}>
 
               {/* Wallet quick-pick */}
               {allWallets.length > 0 && (
