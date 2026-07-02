@@ -93,7 +93,7 @@ const AdminPlanDistribution = () => {
             </div>
           </header>
 
-          <div style={{ marginTop: '2rem' }}>
+          <div style={{ marginTop: 0 }}>
             {loading ? (
               <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'60vh', color:'var(--text-muted)', fontSize:'1.1rem' }}>
                 <i className='bx bx-loader-alt bx-spin' style={{ marginRight:'0.5rem', fontSize:'1.5rem' }} />
@@ -103,13 +103,15 @@ const AdminPlanDistribution = () => {
               <>
                 <div className="admin-panel" style={{ marginBottom: '2rem' }}>
                   <h3 className="admin-panel-title" style={{ fontSize: '1.2rem', marginBottom: '1.5rem' }}><i className='bx bx-pie-chart-alt-2' /> Overall Plan Distribution</h3>
-                  <div style={{ display:'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap:'2rem' }}>
+                  <div style={{ display:'flex', overflowX: 'auto', gap:'1.5rem', paddingBottom: '1rem', flexWrap: 'nowrap' }}>
                     {[
                       { label:'Starter (Free)', id: 'free', count: stats?.freeUsers,    color:'#6366f1', pct: planPct(stats?.freeUsers) },
                       { label:'Business Pro',   id: 'pro', count: stats?.proUsers,     color:'#10b981', pct: planPct(stats?.proUsers) },
                       { label:'Enterprise',     id: 'pro_plus', count: stats?.proPlusUsers, color:'#f59e0b', pct: planPct(stats?.proPlusUsers) },
                     ].map(p => (
                       <div key={p.label} style={{ 
+                        flex: '0 0 auto',
+                        width: '280px',
                         background: 'var(--surface)', 
                         padding: '1.5rem', 
                         borderRadius: '12px', 
@@ -145,26 +147,30 @@ const AdminPlanDistribution = () => {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                     <h3 className="admin-panel-title" style={{ margin: 0 }}><i className='bx bx-group' /> Users by Plan</h3>
                     
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', flex: '1 1 auto' }}>
                       <button 
+                        style={{ flex: '1 1 110px', justifyContent: 'center' }}
                         onClick={() => setFilterPlan('all')} 
                         className={`admin-tab ${filterPlan === 'all' ? 'active' : ''}`}
                       >
                         All Users <span className="admin-tab-count">{users.length}</span>
                       </button>
                       <button 
+                        style={{ flex: '1 1 110px', justifyContent: 'center' }}
                         onClick={() => setFilterPlan('free')} 
                         className={`admin-tab ${filterPlan === 'free' ? 'active' : ''}`}
                       >
                         Starter <span className="admin-tab-count">{stats?.freeUsers || 0}</span>
                       </button>
                       <button 
+                        style={{ flex: '1 1 110px', justifyContent: 'center' }}
                         onClick={() => setFilterPlan('pro')} 
                         className={`admin-tab ${filterPlan === 'pro' ? 'active' : ''}`}
                       >
                         Pro <span className="admin-tab-count">{stats?.proUsers || 0}</span>
                       </button>
                       <button 
+                        style={{ flex: '1 1 110px', justifyContent: 'center' }}
                         onClick={() => setFilterPlan('pro_plus')} 
                         className={`admin-tab ${filterPlan === 'pro_plus' ? 'active' : ''}`}
                       >
