@@ -371,7 +371,22 @@ const Transfers = () => {
                       type="text"
                       placeholder="0x..."
                       value={sendTo}
-                      onChange={e => setSendTo(e.target.value)}
+                      onChange={e => {
+                        const val = e.target.value;
+                        if (val.toLowerCase().startsWith('ethereum:')) {
+                          const [addressPart, queryPart] = val.substring(9).split('?');
+                          setSendTo(addressPart);
+                          if (queryPart) {
+                            const params = new URLSearchParams(queryPart);
+                            const valueWei = params.get('value');
+                            if (valueWei) {
+                              setSendAmount((Number(valueWei) / 1e18).toString());
+                            }
+                          }
+                        } else {
+                          setSendTo(val);
+                        }
+                      }}
                       style={{ fontFamily: 'monospace', fontSize: '0.9rem' }}
                       required
                     />

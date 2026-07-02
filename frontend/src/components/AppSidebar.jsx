@@ -80,6 +80,7 @@ const AppSidebar = ({ activeRoute = '/dashboard', user, isOpen, onClose, onLogou
           {nav(user?.isAdmin ? '/admin/dashboard' : '/dashboard', 'bx bx-grid-alt', 'Overview')}
           {!user?.isAdmin && (
             <>
+              {nav('/pos', 'bx bx-scan', 'POS Mode')}
               {nav('/transfers', 'bx bx-transfer', 'Transfers')}
               {nav('/cards', 'bx bx-credit-card', 'Cards')}
               {nav('/statistics', 'bx bx-line-chart', 'Statistics')}

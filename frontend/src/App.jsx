@@ -21,6 +21,7 @@ import AdminSettings from './pages/admin/AdminSettings';
 import AdminUserProfile from './pages/admin/AdminUserProfile';
 import WalletOverview from './pages/WalletOverview';
 import Upgrade from './pages/Upgrade';
+import POSMode from './pages/POSMode';
 import { ThemeProvider } from './context/ThemeContext';
 import PricingPage from './pages/PricingPage';
 import Chatbot from './components/Chatbot';
@@ -29,7 +30,7 @@ import { Toaster } from 'react-hot-toast';
 
 const ADMIN_ROUTES = ['/admin/dashboard', '/admin/users', '/admin/support', '/admin/settings'];
 const ADMIN_PREFIXES = ['/admin/users/'];
-const USER_ROUTES = ['/dashboard', '/statistics', '/transfers', '/cards', '/support', '/upgrade', '/notifications'];
+const USER_ROUTES = ['/dashboard', '/pos', '/statistics', '/transfers', '/cards', '/support', '/upgrade', '/notifications'];
 const SHARED_ROUTES = ['/settings'];
 const WALLET_PREFIX = '/wallet/';
 
@@ -102,6 +103,7 @@ const MainLayout = () => {
 
           {/* User dashboard pages */}
           <Route path="/dashboard" element={<ProtectedRoute allowedRole="user"><Dashboard /></ProtectedRoute>} />
+          <Route path="/pos" element={<ProtectedRoute allowedRole="user"><POSMode /></ProtectedRoute>} />
           <Route path="/wallet/:address" element={<ProtectedRoute allowedRole="user"><WalletOverview /></ProtectedRoute>} />
           <Route path="/statistics" element={<ProtectedRoute allowedRole="user"><Statistics /></ProtectedRoute>} />
           <Route path="/transfers" element={<ProtectedRoute allowedRole="user"><Transfers /></ProtectedRoute>} />
