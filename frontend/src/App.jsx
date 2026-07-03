@@ -25,6 +25,7 @@ import AdminReports from './pages/admin/AdminReports';
 import WalletOverview from './pages/WalletOverview';
 import Upgrade from './pages/Upgrade';
 import POSMode from './pages/POSMode';
+import NotFound from './pages/NotFound';
 import { ThemeProvider } from './context/ThemeContext';
 import PricingPage from './pages/PricingPage';
 import Chatbot from './components/Chatbot';
@@ -128,6 +129,9 @@ const MainLayout = () => {
 
           {/* Legacy route fallback */}
           <Route path="/admin/tickets" element={<Navigate to="/admin/support" replace />} />
+          
+          {/* 404 Route */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
 

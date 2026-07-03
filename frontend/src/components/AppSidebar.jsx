@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import ConfirmModal from './ConfirmModal';
 
 /**
  * AppSidebar – shared sidebar used across all dashboard pages.
@@ -15,6 +16,7 @@ const AppSidebar = ({ activeRoute = '/dashboard', user, isOpen, onClose, onLogou
   const [collapsed, setCollapsed] = useState(() => {
     try { return localStorage.getItem('sidebarCollapsed') === 'true'; } catch { return false; }
   });
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
     try { localStorage.setItem('sidebarCollapsed', collapsed); } catch { }
@@ -110,12 +112,23 @@ const AppSidebar = ({ activeRoute = '/dashboard', user, isOpen, onClose, onLogou
 
         {/* Bottom */}
         <div className="sidebar-bottom">
-          <button className="logout-btn" onClick={onLogout}>
+          <button className="logout-btn" onClick={() => setShowLogoutConfirm(true)}>
             <i className='bx bx-log-out' />
             <span className="logout-label"> Log Out</span>
           </button>
         </div>
       </aside>
+
+      <ConfirmModal
+        isOpen={showLogoutConfirm}
+        title="Log Out"
+        message="Are you sure you want to log out?"
+        confirmText="Log Out"
+        cancelText="Cancel"
+        isCritical={true}
+        onConfirm={onLogout}
+        onCancel={() => setShowLogoutConfirm(false)}
+      />
     </>
   );
 };

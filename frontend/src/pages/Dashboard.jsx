@@ -6,6 +6,7 @@ import { useBalance } from 'wagmi';
 import { useTheme } from '../context/ThemeContext';
 import AppSidebar from '../components/AppSidebar';
 import ConfirmModal from '../components/ConfirmModal';
+import Loader from '../components/Loader';
 import toast from 'react-hot-toast';
 import NotificationBell from '../components/NotificationBell';
 
@@ -75,7 +76,7 @@ const isRelatedWallet = (nickname, connectorName) => {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const { address: web3Address, addresses: web3Addresses, isConnected, connect, connectors, disconnect, connector } = useWeb3Auth();
+  const { address: web3Address, addresses: web3Addresses, isConnected, connect, connectors, disconnect, connector, isPending } = useWeb3Auth();
   const { data: web3Balance } = useBalance({ address: web3Address });
 
   // core state
@@ -200,8 +201,14 @@ const Dashboard = () => {
             {!isConnected ? (
               <div className="fade-in">
                 <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, marginBottom: '2rem' }}>Connect a Wallet to Continue</h2>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1.25rem' }}>
-                  {['MetaMask', 'KuCoin', 'Kraken', 'Coinbase', 'Trust Wallet', 'Binance', 'OKX'].map(walletName => {
+                
+                {isPending ? (
+                  <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem 0' }}>
+                    <Loader text="Waiting for wallet confirmation..." />
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1.25rem' }}>
+                    {['MetaMask', 'KuCoin', 'Kraken', 'Coinbase', 'Trust Wallet', 'Binance', 'OKX'].map(walletName => {
                     // Try to find the live EIP-6963 connector for this wallet if they have it installed
                     const normalized = walletName.toLowerCase().replace(' wallet', '');
                     const liveConnector = connectors?.find(c => c.name.toLowerCase().includes(normalized));
@@ -236,7 +243,8 @@ const Dashboard = () => {
                       </div>
                     );
                   })}
-                </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="fade-in">

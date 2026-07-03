@@ -23,7 +23,7 @@ const isRelatedWallet = (nickname, connectorName) => {
   if (!connectorName || !nickname) return true;
   const n = nickname.toLowerCase().replace(/\s/g, '');
   const c = connectorName.toLowerCase().replace(/\s/g, '');
-  
+
   if (c.includes('metamask') && n.includes('metamask')) return true;
   if (c.includes('okx') && n.includes('okx')) return true;
   if (c.includes('binance') && n.includes('binance')) return true;
@@ -31,7 +31,7 @@ const isRelatedWallet = (nickname, connectorName) => {
   if (c.includes('kucoin') && n.includes('kucoin')) return true;
   if (c.includes('kraken') && n.includes('kraken')) return true;
   if (c.includes('coinbase') && n.includes('coinbase')) return true;
-  
+
   if (!['metamask', 'okx', 'binance', 'trust', 'kucoin', 'kraken', 'coinbase'].some(key => c.includes(key))) {
     return true;
   }
@@ -81,16 +81,16 @@ const Transfers = () => {
     // Load saved wallets
     fetch(`${API}/api/wallets`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
-      .then(d => { 
-        if (Array.isArray(d)) { 
-          setSavedWallets(d); 
+      .then(d => {
+        if (Array.isArray(d)) {
+          setSavedWallets(d);
           // Do not overwrite fromWallet if it was already set by URL params or web3Address
           setFromWallet(prev => {
             if (prev) return prev;
             if (d.length > 0) return d[0].address;
             return '';
           });
-        } 
+        }
       })
       .catch(console.error);
 
@@ -122,7 +122,7 @@ const Transfers = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const fromAddress = params.get('from');
-    
+
     const getExactCase = (addr) => {
       if (!addr) return addr;
       const found = savedWallets.find(w => w.address.toLowerCase() === addr.toLowerCase());
@@ -209,8 +209,8 @@ const Transfers = () => {
       return;
     }
 
-    sendTransaction({ 
-      to: sendTo, 
+    sendTransaction({
+      to: sendTo,
       value: parseEther(sendAmount),
       account: web3Address,
       chainId: 11155111
@@ -587,7 +587,7 @@ const Transfers = () => {
                     );
                   })()}
 
-                  <div style={{ display: 'flex', gap: '0.75rem', position: 'sticky', bottom: '0', padding: '1rem', margin: '1rem 0 0 0', background: 'var(--surface)', borderRadius: '16px', border: '1px solid var(--border)', zIndex: 10, boxShadow: '0 -10px 40px rgba(0,0,0,0.05)' }}>
+                  <div style={{ display: 'flex', gap: '0.75rem', position: 'sticky', bottom: '1rem', padding: '1rem', margin: '1rem 0 0', background: 'var(--surface)', borderRadius: '16px', border: '1px solid var(--border)', zIndex: 10, boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.05)' }}>
                     <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setRiskResult(null)}>← Edit</button>
                     {chainId !== 11155111 ? (
                       <button

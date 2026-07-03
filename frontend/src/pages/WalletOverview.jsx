@@ -7,6 +7,7 @@ import AppSidebar from '../components/AppSidebar';
 import ConfirmModal from '../components/ConfirmModal';
 import QRScannerModal from '../components/QRScannerModal';
 import TopUpModal from '../components/TopUpModal';
+import Loader from '../components/Loader';
 import toast from 'react-hot-toast';
 
 const API = 'http://localhost:5000';
@@ -251,7 +252,7 @@ const WalletOverview = () => {
               {history.length === 0 && !loading && (
                 <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>No recent transactions found on Sepolia Testnet.</div>
               )}
-              {loading && <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Loading history...</div>}
+              {loading && <Loader text="Loading history..." />}
               {history.map((tx, i) => (
                 <div className="wo-activity-item" key={tx.id || i}>
                   <div className="wo-activity-info">
