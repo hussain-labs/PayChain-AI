@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema({
   plan: { type: String, enum: ['free', 'pro', 'pro_plus'], default: 'free' },
   isActive: { type: Boolean, default: true },
   transactionCount: { type: Number, default: 0 },
+  historyLookups: { type: Number, default: 0 },
   lastResetAt: { type: Date, default: null },
   stripeCustomerId: { type: String, default: null },
   stripeSubscriptionId: { type: String, default: null },

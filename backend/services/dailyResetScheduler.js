@@ -19,6 +19,7 @@ const startDailyResetScheduler = () => {
         {
           $set: {
             transactionCount: 0,
+            historyLookups: 0,
             lastResetAt: new Date(),
           },
         }

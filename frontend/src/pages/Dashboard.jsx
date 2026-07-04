@@ -55,7 +55,7 @@ const isRelatedWallet = (nickname, connectorName) => {
   if (!connectorName || !nickname) return true;
   const n = nickname.toLowerCase().replace(/\s/g, '');
   const c = connectorName.toLowerCase().replace(/\s/g, '');
-  
+
   if (c.includes('metamask') && n.includes('metamask')) return true;
   if (c.includes('okx') && n.includes('okx')) return true;
   if (c.includes('binance') && n.includes('binance')) return true;
@@ -63,7 +63,7 @@ const isRelatedWallet = (nickname, connectorName) => {
   if (c.includes('kucoin') && n.includes('kucoin')) return true;
   if (c.includes('kraken') && n.includes('kraken')) return true;
   if (c.includes('coinbase') && n.includes('coinbase')) return true;
-  
+
   // If the connector isn't one of the major ones recognized above, 
   // we fallback to showing all, or matching by substring
   if (!['metamask', 'okx', 'binance', 'trust', 'kucoin', 'kraken', 'coinbase'].some(key => c.includes(key))) {
@@ -201,7 +201,7 @@ const Dashboard = () => {
             {!isConnected ? (
               <div className="fade-in">
                 <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, marginBottom: '2rem' }}>Connect a Wallet to Continue</h2>
-                
+
                 {isPending ? (
                   <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem 0' }}>
                     <Loader text="Waiting for wallet confirmation..." />
@@ -209,40 +209,40 @@ const Dashboard = () => {
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1.25rem' }}>
                     {['MetaMask', 'KuCoin', 'Kraken', 'Coinbase', 'Trust Wallet', 'Binance', 'OKX'].map(walletName => {
-                    // Try to find the live EIP-6963 connector for this wallet if they have it installed
-                    const normalized = walletName.toLowerCase().replace(' wallet', '');
-                    const liveConnector = connectors?.find(c => c.name.toLowerCase().includes(normalized));
+                      // Try to find the live EIP-6963 connector for this wallet if they have it installed
+                      const normalized = walletName.toLowerCase().replace(' wallet', '');
+                      const liveConnector = connectors?.find(c => c.name.toLowerCase().includes(normalized));
 
-                    return (
-                      <div
-                        key={walletName}
-                        onClick={() => {
-                          if (liveConnector) {
-                            connect(liveConnector);
-                          } else if (walletName === 'KuCoin' && window.kucoin) {
-                            // Manual fallback for KuCoin if EIP-6963 fails but extension is injected
-                            const kucoinConnector = connectors?.find(c => c.name === 'Injected') || connectors[0];
-                            connect(kucoinConnector); // Just try the generic injected provider
-                          } else {
-                            toast.error(`Please install the ${walletName} browser extension to connect.`);
-                          }
-                        }}
-                        style={{ border: '2px dashed #7B3FBF', borderRadius: '16px', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', cursor: 'pointer', minHeight: '160px', opacity: 0.75, transition: 'opacity 0.2s,transform 0.2s' }}
-                        onMouseEnter={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
-                        onMouseLeave={e => { e.currentTarget.style.opacity = '0.75'; e.currentTarget.style.transform = ''; }}
-                      >
-                        {liveConnector?.icon ? (
-                          <img src={liveConnector.icon} alt={liveConnector.name} style={{ width: '48px', height: '48px', borderRadius: '12px' }} />
-                        ) : (
-                          <div style={{ fontSize: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{getIcon(walletName)}</div>
-                        )}
-                        <p style={{ margin: 0, fontWeight: 600, color: '#a78bfa' }}>Connect {walletName}</p>
-                        <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-muted)', textAlign: 'center' }}>
-                          {liveConnector || (walletName === 'KuCoin' && window.kucoin) ? `Use your ${walletName} browser extension` : `Browser extension not detected`}
-                        </p>
-                      </div>
-                    );
-                  })}
+                      return (
+                        <div
+                          key={walletName}
+                          onClick={() => {
+                            if (liveConnector) {
+                              connect(liveConnector);
+                            } else if (walletName === 'KuCoin' && window.kucoin) {
+                              // Manual fallback for KuCoin if EIP-6963 fails but extension is injected
+                              const kucoinConnector = connectors?.find(c => c.name === 'Injected') || connectors[0];
+                              connect(kucoinConnector); // Just try the generic injected provider
+                            } else {
+                              toast.error(`Please install the ${walletName} browser extension to connect.`);
+                            }
+                          }}
+                          style={{ border: '2px dashed #7B3FBF', borderRadius: '16px', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', cursor: 'pointer', minHeight: '160px', opacity: 0.75, transition: 'opacity 0.2s,transform 0.2s' }}
+                          onMouseEnter={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
+                          onMouseLeave={e => { e.currentTarget.style.opacity = '0.75'; e.currentTarget.style.transform = ''; }}
+                        >
+                          {liveConnector?.icon ? (
+                            <img src={liveConnector.icon} alt={liveConnector.name} style={{ width: '48px', height: '48px', borderRadius: '12px' }} />
+                          ) : (
+                            <div style={{ fontSize: '2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{getIcon(walletName)}</div>
+                          )}
+                          <p style={{ margin: 0, fontWeight: 600, color: '#a78bfa' }}>Connect {walletName}</p>
+                          <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+                            {liveConnector || (walletName === 'KuCoin' && window.kucoin) ? `Use your ${walletName} browser extension` : `Browser extension not detected`}
+                          </p>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -281,111 +281,111 @@ const Dashboard = () => {
                 {/* Wallet grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.25rem' }}>
 
-              {savedWallets.filter(w => isRelatedWallet(w.nickname, connector?.name)).map(w => {
-                const style = getWS(w.nickname);
-                return (
-                  <div key={w._id || w.address} style={{ position: 'relative' }}>
-                    {/* Remove button */}
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setWalletToRemove(w.address); }}
-                      title="Remove wallet"
-                      style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', zIndex: 2, background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171', borderRadius: '8px', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '0.9rem', flexShrink: 0 }}
-                    >
-                      <i className='bx bx-trash' />
-                    </button>
+                  {savedWallets.filter(w => isRelatedWallet(w.nickname, connector?.name)).map(w => {
+                    const style = getWS(w.nickname);
+                    return (
+                      <div key={w._id || w.address} style={{ position: 'relative' }}>
+                        {/* Remove button */}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setWalletToRemove(w.address); }}
+                          title="Remove wallet"
+                          style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', zIndex: 2, background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171', borderRadius: '8px', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '0.9rem', flexShrink: 0 }}
+                        >
+                          <i className='bx bx-trash' />
+                        </button>
 
-                    {/* Card */}
-                    <div
-                      className="glass-panel"
-                      onClick={() => navigate('/wallet/' + w.address)}
-                      style={{ border: `1px solid ${style.border}33`, borderRadius: '16px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem', cursor: 'pointer', transition: 'transform 0.2s,box-shadow 0.2s', background: theme === 'dark' ? 'var(--glass-bg, rgba(255,255,255,0.05))' : '#FFFFFF', overflow: 'hidden' }}
-                      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = `0 8px 24px ${style.border}44`; }}
-                      onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
-                    >
-                      {/* Top row: icon + name + badge */}
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', paddingRight: '2rem', overflow: 'hidden' }}>
-                        <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: style.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>
-                          {getIcon(w.nickname)}
-                        </div>
-                        <div style={{ minWidth: 0, flex: 1 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'nowrap', overflow: 'hidden' }}>
-                            <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{w.nickname}</h3>
-                            {web3Addresses?.some(addr => addr.toLowerCase() === w.address.toLowerCase()) && (
-                              <span style={{ fontSize: '0.6rem', background: 'rgba(74,222,128,0.15)', color: '#4ade80', border: '1px solid #4ade8066', borderRadius: '20px', padding: '0.15rem 0.45rem', whiteSpace: 'nowrap', flexShrink: 0 }}>● Live</span>
-                            )}
+                        {/* Card */}
+                        <div
+                          className="glass-panel"
+                          onClick={() => navigate('/wallet/' + w.address)}
+                          style={{ border: `1px solid ${style.border}33`, borderRadius: '16px', padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem', cursor: 'pointer', transition: 'transform 0.2s,box-shadow 0.2s', background: theme === 'dark' ? 'var(--glass-bg, rgba(255,255,255,0.05))' : '#FFFFFF', overflow: 'hidden' }}
+                          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = `0 8px 24px ${style.border}44`; }}
+                          onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
+                        >
+                          {/* Top row: icon + name + badge */}
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', paddingRight: '2rem', overflow: 'hidden' }}>
+                            <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: style.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>
+                              {getIcon(w.nickname)}
+                            </div>
+                            <div style={{ minWidth: 0, flex: 1 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'nowrap', overflow: 'hidden' }}>
+                                <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{w.nickname}</h3>
+                                {web3Addresses?.some(addr => addr.toLowerCase() === w.address.toLowerCase()) && (
+                                  <span style={{ fontSize: '0.6rem', background: 'rgba(74,222,128,0.15)', color: '#4ade80', border: '1px solid #4ade8066', borderRadius: '20px', padding: '0.15rem 0.45rem', whiteSpace: 'nowrap', flexShrink: 0 }}>● Live</span>
+                                )}
+                              </div>
+                              <p style={{ margin: '0.15rem 0 0', fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fmt(w.address)}</p>
+                            </div>
                           </div>
-                          <p style={{ margin: '0.15rem 0 0', fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fmt(w.address)}</p>
+                          {/* Bottom row */}
+                          <div style={{ borderTop: '1px solid var(--border)', paddingTop: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+                            <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Click to view balance</p>
+                            <span style={{ background: `${style.border}22`, color: style.border, padding: '0.3rem 0.7rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                              <i className='bx bx-link-external' /> View
+                            </span>
+                          </div>
                         </div>
                       </div>
-                      {/* Bottom row */}
-                      <div style={{ borderTop: '1px solid var(--border)', paddingTop: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
-                        <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Click to view balance</p>
-                        <span style={{ background: `${style.border}22`, color: style.border, padding: '0.3rem 0.7rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600, whiteSpace: 'nowrap', flexShrink: 0 }}>
-                          <i className='bx bx-link-external' /> View
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+                    );
+                  })}
 
-              {/* Web3 live card (only if NOT saved in DB) */}
-              {isConnected && web3Addresses?.filter(addr => !savedWallets.some(w => w.address.toLowerCase() === addr.toLowerCase())).map((addr) => (
-                <div key={addr} style={{ position: 'relative' }}>
-                  {/* Save to Profile button */}
-                  <button
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      try {
-                        const token = localStorage.getItem('token');
-                        const res = await fetch(`${API}/api/wallets`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                          body: JSON.stringify({ nickname: 'Web3 Wallet', address: addr })
-                        });
-                        const data = await res.json();
-                        if (res.ok) {
-                          setSavedWallets(data);
-                          toast.success("Web3 wallet saved successfully");
-                        }
-                        else toast.error(data.error || 'Failed to save wallet');
-                      } catch { toast.error('Cannot reach server.'); }
-                    }}
-                    style={{ position: 'absolute', top: '-12px', right: '-12px', zIndex: 2, background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '20px', padding: '0.4rem 0.8rem', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(123,63,191,0.4)', transition: 'transform 0.2s' }}
-                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
-                    onMouseLeave={e => e.currentTarget.style.transform = ''}
-                  >
-                    <i className='bx bx-save' /> Save to Profile
-                  </button>
+                  {/* Web3 live card (only if NOT saved in DB) */}
+                  {isConnected && web3Addresses?.filter(addr => !savedWallets.some(w => w.address.toLowerCase() === addr.toLowerCase())).map((addr) => (
+                    <div key={addr} style={{ position: 'relative' }}>
+                      {/* Save to Profile button */}
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          try {
+                            const token = localStorage.getItem('token');
+                            const res = await fetch(`${API}/api/wallets`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                              body: JSON.stringify({ nickname: 'Web3 Wallet', address: addr })
+                            });
+                            const data = await res.json();
+                            if (res.ok) {
+                              setSavedWallets(data);
+                              toast.success("Web3 wallet saved successfully");
+                            }
+                            else toast.error(data.error || 'Failed to save wallet');
+                          } catch { toast.error('Cannot reach server.'); }
+                        }}
+                        style={{ position: 'absolute', top: '-12px', right: '-12px', zIndex: 2, background: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '20px', padding: '0.4rem 0.8rem', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 12px rgba(123,63,191,0.4)', transition: 'transform 0.2s' }}
+                        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+                        onMouseLeave={e => e.currentTarget.style.transform = ''}
+                      >
+                        <i className='bx bx-save' /> Save to Profile
+                      </button>
 
-                  <div
-                    className="glass-panel"
-                    onClick={() => navigate('/wallet/' + addr)}
-                    style={{ border: `1px solid #7B3FBF33`, borderRadius: '16px', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', cursor: 'pointer', transition: 'transform 0.2s,box-shadow 0.2s', background: theme === 'dark' ? 'var(--glass-bg, rgba(255,255,255,0.05))' : '#FFFFFF' }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = `0 8px 24px #7B3FBF44`; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                      <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'linear-gradient(135deg,#7B3FBF,#4B1D8F)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className='bx bx-cube' style={{ fontSize: '1.4rem', color: '#fff' }} /></div>
-                      <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <div>
-                          <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Connected Wallet</h3>
-                          <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{fmt(addr)}</p>
+                      <div
+                        className="glass-panel"
+                        onClick={() => navigate('/wallet/' + addr)}
+                        style={{ border: `1px solid #7B3FBF33`, borderRadius: '16px', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', cursor: 'pointer', transition: 'transform 0.2s,box-shadow 0.2s', background: theme === 'dark' ? 'var(--glass-bg, rgba(255,255,255,0.05))' : '#FFFFFF' }}
+                        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = `0 8px 24px #7B3FBF44`; }}
+                        onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = ''; }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                          <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'linear-gradient(135deg,#7B3FBF,#4B1D8F)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className='bx bx-cube' style={{ fontSize: '1.4rem', color: '#fff' }} /></div>
+                          <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <div>
+                              <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Connected Wallet</h3>
+                              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{fmt(addr)}</p>
+                            </div>
+                            <span style={{ fontSize: '0.65rem', background: 'rgba(74,222,128,0.15)', color: '#4ade80', border: '1px solid #4ade8066', borderRadius: '20px', padding: '0.15rem 0.4rem', whiteSpace: 'nowrap' }}>● Live</span>
+                          </div>
                         </div>
-                        <span style={{ fontSize: '0.65rem', background: 'rgba(74,222,128,0.15)', color: '#4ade80', border: '1px solid #4ade8066', borderRadius: '20px', padding: '0.15rem 0.4rem', whiteSpace: 'nowrap' }}>● Live</span>
+                        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div>
+                            <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>Click to view balance</p>
+                          </div>
+                          <span style={{ background: `#7B3FBF22`, color: '#7B3FBF', padding: '0.3rem 0.7rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600 }}>
+                            <i className='bx bx-link-external' /> View
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div>
-                        <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>Click to view balance</p>
-                      </div>
-                      <span style={{ background: `#7B3FBF22`, color: '#7B3FBF', padding: '0.3rem 0.7rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600 }}>
-                        <i className='bx bx-link-external' /> View
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  ))}
                 </div>
               </div>
             )}
@@ -421,8 +421,8 @@ const Dashboard = () => {
                     .filter(k => k !== 'Web3 Wallet')
                     .filter(k => !isConnected || isRelatedWallet(k, connector?.name))
                     .map(k => (
-                    <option key={k} value={k}>{WALLET_ICONS[k]} {k}</option>
-                  ))}
+                      <option key={k} value={k}>{WALLET_ICONS[k]} {k}</option>
+                    ))}
                 </select>
               </div>
               <div className="form-group">

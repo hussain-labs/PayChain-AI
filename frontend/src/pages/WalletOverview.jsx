@@ -51,6 +51,7 @@ const WalletOverview = () => {
   const [assets, setAssets] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingOnChain, setLoadingOnChain] = useState(false);
   const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
   const [showReceiveModal, setShowReceiveModal] = useState(false);
   const [showTopUp, setShowTopUp] = useState(false);
@@ -86,7 +87,7 @@ const WalletOverview = () => {
       .catch(console.error)
       .finally(() => setLoading(false));
 
-    // Fetch history
+    // Fetch history (local DB only initially)
     fetch(`${API}/api/wallets/${address}/history`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(data => {
@@ -95,6 +96,35 @@ const WalletOverview = () => {
       .catch(console.error);
 
   }, [address, navigate]);
+
+  const fetchOnChainHistory = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    setLoadingOnChain(true);
+    try {
+      const res = await fetch(`${API}/api/wallets/${address}/history?onchain=true`, { 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (data.code === 'LIMIT_REACHED') {
+          toast.error(data.error, { duration: 6000 });
+        } else {
+          toast.error(data.error || 'Failed to fetch on-chain data');
+        }
+        return;
+      }
+      if (Array.isArray(data)) {
+        setHistory(data);
+        toast.success('Live on-chain data loaded!');
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error('Network error fetching on-chain data');
+    } finally {
+      setLoadingOnChain(false);
+    }
+  };
 
   const handleLogout = () => { localStorage.clear(); navigate('/'); };
 
@@ -245,14 +275,29 @@ const WalletOverview = () => {
           {/* Recent Activity */}
           <div className="wo-activity-card">
             <div className="wo-activity-header">
-              <h3>Recent Activity</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <h3>Recent Activity</h3>
+                <button 
+                  onClick={fetchOnChainHistory} 
+                  disabled={loadingOnChain}
+                  style={{ 
+                    background: 'var(--primary)', color: '#fff', border: 'none', 
+                    borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.8rem', 
+                    cursor: loadingOnChain ? 'not-allowed' : 'pointer', opacity: loadingOnChain ? 0.7 : 1,
+                    display: 'flex', alignItems: 'center', gap: '0.4rem'
+                  }}
+                >
+                  <i className='bx bx-cloud-download' />
+                  Load Live Data
+                </button>
+              </div>
               <Link to="/transfers">View All</Link>
             </div>
             <div className="wo-activity-list">
-              {history.length === 0 && !loading && (
+              {history.length === 0 && !loading && !loadingOnChain && (
                 <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>No recent transactions found on Sepolia Testnet.</div>
               )}
-              {loading && <Loader text="Loading history..." />}
+              {(loading || loadingOnChain) && <Loader text="Loading on-chain data..." />}
               {history.map((tx, i) => (
                 <div className="wo-activity-item" key={tx.id || i}>
                   <div className="wo-activity-info">

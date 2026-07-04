@@ -11,7 +11,7 @@ import { GoogleGenAI } from '@google/genai';
 import {
   loadGeminiKeys,
   getActiveGeminiKey,
-  rotateToNextKey,
+  rotateToNextGeminiKey,
   isQuotaError,
 } from './keyRotationService.js';
 
@@ -141,7 +141,7 @@ const callGeminiWithRotation = async (payload) => {
       }
 
       const prevIndex = currentIndex;
-      currentIndex = await rotateToNextKey(currentIndex, total);
+      currentIndex = await rotateToNextGeminiKey(currentIndex, total);
       log.rotate(
         '🔄 Key Rotation',
         `Key #${prevIndex + 1} → Key #${currentIndex + 1} (saved to MongoDB)`

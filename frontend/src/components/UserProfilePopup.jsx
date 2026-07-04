@@ -143,6 +143,15 @@ const UserProfilePopup = ({ user }) => {
                 +{user.bonusTransactions} Bonus Transactions
               </div>
             )}
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.4rem' }}>
+              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-color)' }}>
+                Live Data
+              </span>
+              <span style={{ fontSize: '0.78rem', color: user?.plan === 'free' && (user?.historyLookups || 0) >= 3 ? '#ef4444' : 'var(--text-color)', fontWeight: 700 }}>
+                {user?.historyLookups || 0} / {user?.plan === 'free' ? 3 : '∞'} Lookups
+              </span>
+            </div>
           </div>
 
           {user?.plan !== 'pro_plus' && (

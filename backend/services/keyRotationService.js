@@ -8,8 +8,6 @@
 
 import ApiKeyState from '../models/ApiKeyState.js';
 
-const SERVICE = 'gemini';
-
 // ── 1. Collect all GEMINI_API_KEY_N keys from environment ──────────────────
 export const loadGeminiKeys = () => {
   const keys = [];
@@ -26,12 +24,12 @@ export const loadGeminiKeys = () => {
 };
 
 // ── 2. Read current active index from MongoDB ──────────────────────────────
-export const getActiveIndex = async () => {
+export const getActiveIndex = async (serviceName) => {
   try {
     const state = await ApiKeyState.findOneAndUpdate(
-      { service: SERVICE },
-      { $setOnInsert: { service: SERVICE, currentIndex: 0 } },
-      { upsert: true, new: true }
+      { service: serviceName },
+      { $setOnInsert: { service: serviceName, currentIndex: 0 } },
+      { upsert: true, returnDocument: 'after' }
     );
     return state.currentIndex ?? 0;
   } catch {
@@ -40,15 +38,15 @@ export const getActiveIndex = async () => {
 };
 
 // ── 3. Save new active index to MongoDB ───────────────────────────────────
-export const saveActiveIndex = async (index) => {
+export const saveActiveIndex = async (serviceName, index) => {
   try {
     await ApiKeyState.findOneAndUpdate(
-      { service: SERVICE },
+      { service: serviceName },
       { currentIndex: index, lastUpdated: new Date() },
       { upsert: true }
     );
   } catch (err) {
-    console.error('[KeyRotation] Failed to save index to DB:', err.message);
+    console.error(`[KeyRotation] Failed to save index for ${serviceName} to DB:`, err.message);
   }
 };
 
@@ -57,16 +55,16 @@ export const getActiveGeminiKey = async () => {
   const keys = loadGeminiKeys();
   if (!keys.length) return null;
 
-  const savedIndex = await getActiveIndex();
+  const savedIndex = await getActiveIndex('gemini');
   const safeIndex = savedIndex % keys.length; // guard against stale index
 
   return { key: keys[safeIndex], index: safeIndex, total: keys.length };
 };
 
 // ── 5. Rotate to next key and persist ─────────────────────────────────────
-export const rotateToNextKey = async (currentIndex, totalKeys) => {
+export const rotateToNextGeminiKey = async (currentIndex, totalKeys) => {
   const nextIndex = (currentIndex + 1) % totalKeys;
-  await saveActiveIndex(nextIndex);
+  await saveActiveIndex('gemini', nextIndex);
   console.log(`[KeyRotation] Rotated Gemini key: ${currentIndex} → ${nextIndex} (of ${totalKeys})`);
   return nextIndex;
 };
@@ -82,4 +80,35 @@ export const isQuotaError = (err) => {
     msg.includes('rate-limit') ||
     msg.includes('rate limit')
   );
+};
+
+// ── 7. Alchemy Logic ────────────────────────────────────────────────────────
+export const loadAlchemyKeys = () => {
+  const keys = [];
+  let i = 1;
+  while (process.env[`ALCHEMY_API_KEY_${i}`]) {
+    keys.push(process.env[`ALCHEMY_API_KEY_${i}`].trim());
+    i++;
+  }
+  if (keys.length === 0 && process.env.ALCHEMY_API_KEY) {
+    keys.push(process.env.ALCHEMY_API_KEY.trim());
+  }
+  return keys;
+};
+
+export const getActiveAlchemyKey = async () => {
+  const keys = loadAlchemyKeys();
+  if (!keys.length) return null;
+
+  const savedIndex = await getActiveIndex('alchemy');
+  const safeIndex = savedIndex % keys.length;
+
+  return { key: keys[safeIndex], index: safeIndex, total: keys.length };
+};
+
+export const rotateToNextAlchemyKey = async (currentIndex, totalKeys) => {
+  const nextIndex = (currentIndex + 1) % totalKeys;
+  await saveActiveIndex('alchemy', nextIndex);
+  console.log(`[KeyRotation] Rotated Alchemy key: ${currentIndex} → ${nextIndex} (of ${totalKeys})`);
+  return nextIndex;
 };

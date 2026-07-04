@@ -189,10 +189,10 @@ const Transfers = () => {
     setRiskResult(null);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${API}/api/v1/checkout/verify`, {
+      const res = await fetch(`${API}/api/fraud/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ buyerWallet: fromWallet, targetContract: sendTo, valueRequested: sendAmount, asset: sendCoin }),
+        body: JSON.stringify({ from: fromWallet, to: sendTo, amount: sendAmount, asset: sendCoin, network: 'Sepolia' }),
       });
       setRiskResult(await res.json());
     } catch { setRiskResult({ error: 'AI engine unavailable.' }); }
@@ -207,6 +207,11 @@ const Transfers = () => {
     if (!isConnected) {
       toast.error("Please connect your Web3 wallet first.");
       return;
+    }
+
+    if (riskResult?.isSelfTransfer) {
+      const confirmed = window.confirm("You are sending a payment to your own wallet. Are you sure you want to execute this self-transfer transaction?");
+      if (!confirmed) return;
     }
 
     sendTransaction({
@@ -449,12 +454,14 @@ const Transfers = () => {
                     </div>
                   </div>
 
-                  <button type="submit" className="btn-primary" style={{ width: '100%', padding: '1rem', fontSize: '1rem' }} disabled={riskLoading || coinList.length === 0}>
-                    {riskLoading
-                      ? <><i className='bx bx-loader-alt bx-spin' /> Analyzing Risk…</>
-                      : <><i className='bx bx-shield-quarter' /> Analyze & Review Transfer</>
-                    }
-                  </button>
+                  <div style={{ position: 'sticky', bottom: '1rem', zIndex: 10, background: 'var(--surface, #1e1e2d)', padding: '0', borderRadius: '12px' }}>
+                    <button type="submit" className="btn-primary" style={{ width: '100%', padding: '1rem', fontSize: '1rem', boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }} disabled={riskLoading || coinList.length === 0}>
+                      {riskLoading
+                        ? <><i className='bx bx-loader-alt bx-spin' /> Analyzing Risk…</>
+                        : <><i className='bx bx-shield-quarter' /> Analyze & Review Transfer</>
+                      }
+                    </button>
+                  </div>
                 </form>
 
               ) : (

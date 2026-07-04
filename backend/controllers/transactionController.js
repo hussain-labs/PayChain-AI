@@ -1,6 +1,8 @@
 import User from '../models/User.js';
 import Transaction from '../models/Transaction.js';
 import { notifyUser } from '../utils/notify.js';
+import { getPineconeIndex } from '../utils/pineconeClient.js';
+import { transactionToText, getTransactionEmbedding } from '../services/embeddingService.js';
 
 // GET /api/transactions
 // Get all internal transactions for the logged in user
@@ -56,6 +58,37 @@ export const createTransaction = async (req, res) => {
     await notifyUser(req.userId, `Transaction processed: ${amount} ${asset} to ${to}`, '/transfers');
 
     res.status(201).json(transaction);
+
+    // ==========================================
+    // BACKGROUND SYNC: Pinecone Vectorization
+    // ==========================================
+    try {
+      const pineconeIndex = getPineconeIndex();
+      if (pineconeIndex) {
+        const text = transactionToText(transaction);
+        const vector = await getTransactionEmbedding(text);
+        
+        await pineconeIndex.upsert({
+          records: [{
+            id: transaction._id.toString(),
+            values: vector,
+            metadata: {
+              from: transaction.from,
+              to: transaction.to,
+              amount: transaction.amount,
+              asset: transaction.asset,
+              network: transaction.network,
+              createdAt: transaction.createdAt.toISOString(),
+              status: transaction.status
+            }
+          }]
+        });
+        console.log(`✅ Upserted transaction ${transaction._id} vector to Pinecone`);
+      }
+    } catch (pcError) {
+      console.error(`⚠️ Failed to upsert transaction ${transaction._id} to Pinecone:`, pcError.message);
+    }
+    
   } catch (error) {
     console.error('Create transaction error:', error);
     res.status(500).json({ error: 'Failed to save transaction', details: error.message });
