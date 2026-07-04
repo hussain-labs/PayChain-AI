@@ -126,6 +126,7 @@ export const analyzeRisk = async (req, res) => {
     const pineconeIndex = getPineconeIndex();
     let historicalContext = 'No similar historical transactions found.';
     
+    let pineconeMatches = [];
     if (pineconeIndex) {
       try {
         const queryResponse = await pineconeIndex.query({
@@ -135,6 +136,7 @@ export const analyzeRisk = async (req, res) => {
         });
 
         if (queryResponse.matches && queryResponse.matches.length > 0) {
+          pineconeMatches = queryResponse.matches.map(m => m.metadata);
           historicalContext = queryResponse.matches.map((match, idx) => {
             return `--- Past Transaction ${idx + 1} (Similarity: ${match.score.toFixed(3)}) ---\n` +
                    `Sender: ${match.metadata?.from}\n` +
@@ -246,6 +248,7 @@ Respond ONLY with a valid JSON object strictly matching this schema:
 
     // 4. Return risk score with the live transfers attached
     parsedResponse.recipientTransfers = recipientData.transfers;
+    parsedResponse.pineconeMatches = pineconeMatches;
     res.json(parsedResponse);
     
   } catch (error) {

@@ -94,3 +94,80 @@ export const createTransaction = async (req, res) => {
     res.status(500).json({ error: 'Failed to save transaction', details: error.message });
   }
 };
+
+// GET /api/transactions/stats
+// Get aggregated statistics for the logged in user
+export const getTransactionStats = async (req, res) => {
+  try {
+    const transactions = await Transaction.find({ user: req.userId });
+
+    const totalTransactions = transactions.length;
+    let totalVolumeUSD = 0;
+    const activeAssets = new Set();
+    const monthlyData = {};
+    const assetAllocation = {};
+
+    // For testnet demo purposes, assume ETH = $3500, others roughly equivalent or zero.
+    const ETH_PRICE = 3500;
+
+    transactions.forEach(tx => {
+      const amt = parseFloat(tx.amount) || 0;
+      let usdVal = 0;
+      if (tx.asset.toLowerCase().includes('eth')) usdVal = amt * ETH_PRICE;
+      else if (tx.asset.toLowerCase().includes('usd')) usdVal = amt; // USDT, USDC
+      else usdVal = amt * 10; // Dummy fallback
+
+      totalVolumeUSD += usdVal;
+      activeAssets.add(tx.asset);
+
+      // Monthly Chart Data (Format: YYYY-MM)
+      const date = new Date(tx.createdAt);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = { volume: 0, count: 0 };
+      }
+      monthlyData[monthKey].volume += usdVal;
+      monthlyData[monthKey].count += 1;
+
+      // Asset Allocation (Total volume by asset)
+      if (!assetAllocation[tx.asset]) {
+        assetAllocation[tx.asset] = 0;
+      }
+      assetAllocation[tx.asset] += usdVal;
+    });
+
+    // Format chart data for frontend (last 12 months)
+    const now = new Date();
+    const chartData = [];
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      chartData.push({
+        label: monthNames[d.getMonth()],
+        volume: monthlyData[key]?.volume || 0,
+        count: monthlyData[key]?.count || 0
+      });
+    }
+
+    // Format asset allocation
+    const allocationArr = Object.keys(assetAllocation).map(asset => ({
+      asset,
+      volumeUSD: assetAllocation[asset],
+      percentage: totalVolumeUSD > 0 ? (assetAllocation[asset] / totalVolumeUSD) * 100 : 0
+    })).sort((a, b) => b.volumeUSD - a.volumeUSD);
+
+    res.json({
+      totalVolumeUSD,
+      totalTransactions,
+      activeAssetsCount: activeAssets.size,
+      chartData,
+      allocation: allocationArr
+    });
+
+  } catch (error) {
+    console.error('Stats error:', error);
+    res.status(500).json({ error: 'Failed to fetch transaction stats' });
+  }
+};

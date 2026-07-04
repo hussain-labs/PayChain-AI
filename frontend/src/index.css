@@ -1626,7 +1626,7 @@ footer {
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: #6b7280;
+  color: var(--text-main);
   cursor: pointer;
   transition: var(--transition);
   line-height: 1;
@@ -4410,7 +4410,7 @@ footer {
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: var(--text-muted);
+  color: var(--text-main);
   cursor: pointer;
   transition: var(--transition);
 }

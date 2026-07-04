@@ -8,6 +8,7 @@ import AppSidebar from '../components/AppSidebar';
 import { useSendTransaction } from 'wagmi';
 import { parseEther } from 'viem';
 import toast from 'react-hot-toast';
+import RiskAnalysisModal from '../components/RiskAnalysisModal';
 
 const API = 'http://localhost:5000';
 const fmt = (addr) => addr ? `${addr.slice(0, 8)}…${addr.slice(-6)}` : '';
@@ -61,6 +62,7 @@ const Transfers = () => {
   // Risk
   const [riskResult, setRiskResult] = useState(null);
   const [riskLoading, setRiskLoading] = useState(false);
+  const [showSelfTransferModal, setShowSelfTransferModal] = useState(false);
 
   // Transfer history
   const [history, setHistory] = useState([]);
@@ -210,9 +212,15 @@ const Transfers = () => {
     }
 
     if (riskResult?.isSelfTransfer) {
-      const confirmed = window.confirm("You are sending a payment to your own wallet. Are you sure you want to execute this self-transfer transaction?");
-      if (!confirmed) return;
+      setShowSelfTransferModal(true);
+      return;
     }
+
+    executeTransaction();
+  };
+
+  const executeTransaction = () => {
+    setShowSelfTransferModal(false);
 
     sendTransaction({
       to: sendTo,
@@ -590,6 +598,27 @@ const Transfers = () => {
                             <i className='bx bx-error' /> <strong>Warning:</strong> This recipient address has <strong>0 prior transactions</strong>. It is a brand new wallet.
                           </div>
                         )}
+
+                        {/* Pinecone Matches */}
+                        {riskResult.pineconeMatches && riskResult.pineconeMatches.length > 0 && (
+                          <div style={{ marginTop: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '1rem' }}>
+                            <div style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--primary)', marginBottom: '0.8rem' }}><i className='bx bx-network-chart' /> Similar Past Transactions (Vector DB)</div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                              {riskResult.pineconeMatches.map((match, i) => (
+                                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', paddingBottom: '0.4rem', borderBottom: i < riskResult.pineconeMatches.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+                                  <div style={{ color: 'var(--text-color)' }}>
+                                    <span style={{ color: '#a78bfa', marginRight: '0.5rem', fontWeight: 600 }}>{fmt(match.to)}</span>
+                                    <span style={{ opacity: 0.8 }}>{match.amount} {match.asset}</span>
+                                  </div>
+                                  <div style={{ opacity: 0.8, color: match.status === 'Success' ? '#10b981' : match.status === 'Canceled' ? '#f87171' : '#fb923c' }}>
+                                    <i className={`bx ${match.status === 'Success' ? 'bx-check-circle' : match.status === 'Canceled' ? 'bx-x-circle' : 'bx-time'}`} style={{ marginRight: '3px' }} />
+                                    {match.status}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     );
                   })()}
@@ -675,6 +704,32 @@ const Transfers = () => {
           </div>
         </div>
       </main>
+
+      {/* Loading Modal overlay */}
+      <RiskAnalysisModal isOpen={riskLoading} />
+
+      {/* Custom Self-Transfer Confirm Modal */}
+      {showSelfTransferModal && (
+        <div className="modal-overlay" style={{ zIndex: 10000 }}>
+          <div className="modal-content glass-panel fade-in visible" style={{ maxWidth: '400px', textAlign: 'center', padding: '2.5rem' }}>
+            <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(74, 222, 128, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+              <i className='bx bx-recycle' style={{ fontSize: '2rem', color: '#4ade80' }} />
+            </div>
+            <h2 style={{ fontSize: '1.4rem', color: 'var(--text-main)', marginBottom: '0.75rem' }}>Self-Transfer Detected</h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.5, marginBottom: '2rem' }}>
+              You are about to send a payment to your own wallet address. Are you sure you want to proceed and pay network gas fees for this internal transfer?
+            </p>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setShowSelfTransferModal(false)}>
+                Cancel
+              </button>
+              <button className="btn-primary" style={{ flex: 1, background: '#4ade80', color: '#166534', border: 'none' }} onClick={executeTransaction}>
+                Yes, Proceed
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
