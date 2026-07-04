@@ -212,6 +212,9 @@ const Dashboard = () => {
                       // Try to find the live EIP-6963 connector for this wallet if they have it installed
                       const normalized = walletName.toLowerCase().replace(' wallet', '');
                       const liveConnector = connectors?.find(c => c.name.toLowerCase().includes(normalized));
+                      
+                      // Count saved wallets for this type
+                      const savedCount = savedWallets.filter(w => isRelatedWallet(w.nickname || '', walletName)).length;
 
                       return (
                         <div
@@ -227,10 +230,15 @@ const Dashboard = () => {
                               toast.error(`Please install the ${walletName} browser extension to connect.`);
                             }
                           }}
-                          style={{ border: '2px dashed #7B3FBF', borderRadius: '16px', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', cursor: 'pointer', minHeight: '160px', opacity: 0.75, transition: 'opacity 0.2s,transform 0.2s' }}
+                          style={{ position: 'relative', border: '2px dashed #7B3FBF', borderRadius: '16px', padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', cursor: 'pointer', minHeight: '160px', opacity: 0.75, transition: 'opacity 0.2s,transform 0.2s' }}
                           onMouseEnter={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
                           onMouseLeave={e => { e.currentTarget.style.opacity = '0.75'; e.currentTarget.style.transform = ''; }}
                         >
+                          {savedCount > 0 && (
+                            <div style={{ position: 'absolute', top: '-10px', right: '-10px', background: 'var(--primary)', color: '#fff', fontSize: '0.75rem', fontWeight: 'bold', padding: '4px 10px', borderRadius: '12px', border: '3px solid var(--background)', zIndex: 10, boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
+                              {savedCount} Saved
+                            </div>
+                          )}
                           {liveConnector?.icon ? (
                             <img src={liveConnector.icon} alt={liveConnector.name} style={{ width: '48px', height: '48px', borderRadius: '12px' }} />
                           ) : (

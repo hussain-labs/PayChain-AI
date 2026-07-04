@@ -25,6 +25,7 @@ import AdminReports from './pages/admin/AdminReports';
 import WalletOverview from './pages/WalletOverview';
 import Upgrade from './pages/Upgrade';
 import POSMode from './pages/POSMode';
+import AIAdvisor from './pages/AIAdvisor';
 import NotFound from './pages/NotFound';
 import { ThemeProvider } from './context/ThemeContext';
 import PricingPage from './pages/PricingPage';
@@ -34,7 +35,7 @@ import { Toaster } from 'react-hot-toast';
 
 const ADMIN_ROUTES = ['/admin/dashboard', '/admin/users', '/admin/support', '/admin/settings', '/admin/plans', '/admin/transactions', '/admin/reports'];
 const ADMIN_PREFIXES = ['/admin/users/'];
-const USER_ROUTES = ['/dashboard', '/pos', '/statistics', '/transfers', '/cards', '/support', '/upgrade', '/notifications'];
+const USER_ROUTES = ['/dashboard', '/pos', '/statistics', '/transfers', '/cards', '/support', '/upgrade', '/notifications', '/ai-advisor'];
 const SHARED_ROUTES = ['/settings'];
 const WALLET_PREFIX = '/wallet/';
 
@@ -116,6 +117,7 @@ const MainLayout = () => {
           <Route path="/support" element={<ProtectedRoute allowedRole="user"><Support /></ProtectedRoute>} />
           <Route path="/upgrade" element={<ProtectedRoute allowedRole="user"><Upgrade /></ProtectedRoute>} />
           <Route path="/notifications" element={<ProtectedRoute allowedRole="user"><Notifications /></ProtectedRoute>} />
+          <Route path="/ai-advisor" element={<ProtectedRoute allowedRole="user"><AIAdvisor /></ProtectedRoute>} />
 
           {/* Admin dashboard pages */}
           <Route path="/admin/dashboard" element={<ProtectedRoute allowedRole="admin"><AdminDashboard /></ProtectedRoute>} />
@@ -129,13 +131,13 @@ const MainLayout = () => {
 
           {/* Legacy route fallback */}
           <Route path="/admin/tickets" element={<Navigate to="/admin/support" replace />} />
-          
+
           {/* 404 Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
 
-      {!isAuthPage && !isAdminRoute && <Chatbot />}
+      {!isAuthPage && !isAdminRoute && path !== '/ai-advisor' && <Chatbot />}
       {!isAuthPage && !isDashboardLayout && <ThemeSwitcher />}
       {!isDashboardLayout && <Footer />}
     </>

@@ -73,6 +73,7 @@ export const createTransaction = async (req, res) => {
             id: transaction._id.toString(),
             values: vector,
             metadata: {
+              userId: transaction.user.toString(),
               from: transaction.from,
               to: transaction.to,
               amount: transaction.amount,
