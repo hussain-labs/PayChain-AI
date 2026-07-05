@@ -110,14 +110,21 @@ export const getTransactionStats = async (req, res) => {
 
     // For testnet demo purposes, assume ETH = $3500, others roughly equivalent or zero.
     const ETH_PRICE = 3500;
+    let dayOfWeekData = { Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0, Sun: 0 };
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    transactions.forEach(tx => {
+    // For Top 5 Transactions
+    const enrichedTransactions = transactions.map(tx => {
       const amt = parseFloat(tx.amount) || 0;
       let usdVal = 0;
       if (tx.asset.toLowerCase().includes('eth')) usdVal = amt * ETH_PRICE;
       else if (tx.asset.toLowerCase().includes('usd')) usdVal = amt; // USDT, USDC
       else usdVal = amt * 10; // Dummy fallback
+      return { ...tx.toObject(), usdVal };
+    });
 
+    enrichedTransactions.forEach(tx => {
+      const usdVal = tx.usdVal;
       totalVolumeUSD += usdVal;
       activeAssets.add(tx.asset);
 
@@ -136,6 +143,10 @@ export const getTransactionStats = async (req, res) => {
         assetAllocation[tx.asset] = 0;
       }
       assetAllocation[tx.asset] += usdVal;
+
+      // Day of Week
+      const day = dayNames[date.getDay()];
+      dayOfWeekData[day] += usdVal;
     });
 
     // Format chart data for frontend (last 12 months)
@@ -148,9 +159,35 @@ export const getTransactionStats = async (req, res) => {
       chartData.push({
         label: monthNames[d.getMonth()],
         volume: monthlyData[key]?.volume || 0,
-        count: monthlyData[key]?.count || 0
+        count: monthlyData[key]?.count || 0,
+        key
       });
     }
+
+    // Month over Month Growth
+    let growthPct = 0;
+    if (chartData.length >= 2) {
+      const currentMonthVolume = chartData[11].volume;
+      const previousMonthVolume = chartData[10].volume;
+      if (previousMonthVolume > 0) {
+        growthPct = ((currentMonthVolume - previousMonthVolume) / previousMonthVolume) * 100;
+      } else if (currentMonthVolume > 0) {
+        growthPct = 100;
+      }
+    }
+
+    // Top 5 Transactions
+    const topTransactions = enrichedTransactions
+      .sort((a, b) => b.usdVal - a.usdVal)
+      .slice(0, 5)
+      .map(tx => ({
+        id: tx._id,
+        date: tx.createdAt,
+        asset: tx.asset,
+        amount: tx.amount,
+        usdVal: tx.usdVal,
+        fromAddress: tx.fromAddress || tx.sender
+      }));
 
     // Format asset allocation
     const allocationArr = Object.keys(assetAllocation).map(asset => ({
@@ -162,9 +199,13 @@ export const getTransactionStats = async (req, res) => {
     res.json({
       totalVolumeUSD,
       totalTransactions,
+      averageOrderValue: totalTransactions > 0 ? totalVolumeUSD / totalTransactions : 0,
       activeAssetsCount: activeAssets.size,
       chartData,
-      allocation: allocationArr
+      allocation: allocationArr,
+      growthPct,
+      topTransactions,
+      dayOfWeekData
     });
 
   } catch (error) {

@@ -86,7 +86,7 @@ const AppSidebar = ({ activeRoute = '/dashboard', user, isOpen, onClose, onLogou
               {nav('/transfers', 'bx bx-transfer', 'Transfers')}
               {nav('/cards', 'bx bx-credit-card', 'Cards')}
               {nav('/statistics', 'bx bx-line-chart', 'Statistics')}
-              {nav('/ai-advisor', 'bx bx-sparkles', 'AI Advisor')}
+              {nav('/ai-advisor', 'bx bx-bot', 'AI Advisor')}
               {nav('/upgrade', 'bx bx-up-arrow-circle', 'Upgrade')}
               {nav('/notifications', 'bx bx-bell', 'Notifications')}
               {nav('/settings', 'bx bx-cog', 'Settings')}

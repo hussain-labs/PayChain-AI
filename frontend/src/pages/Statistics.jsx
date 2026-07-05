@@ -153,7 +153,10 @@ const Statistics = () => {
                 <div className="stat-card">
                   <div className="stat-card-title"><i className='bx bx-line-chart' style={{ color: 'var(--primary)' }}></i> Total Volume</div>
                   <h3 className="stat-card-val">{formatCurrency(stats?.totalVolumeUSD || 0)}</h3>
-                  <div className="stat-card-sub" style={{ color: '#10B981' }}>Est. Total Transacted</div>
+                  <div className={`growth-badge ${stats?.growthPct >= 0 ? 'positive' : 'negative'}`}>
+                    <i className={`bx ${stats?.growthPct >= 0 ? 'bx-trending-up' : 'bx-trending-down'}`}></i>
+                    {Math.abs(stats?.growthPct || 0).toFixed(1)}% vs Last Month
+                  </div>
                 </div>
                 <div className="stat-card">
                   <div className="stat-card-title"><i className='bx bx-transfer-alt' style={{ color: 'var(--primary)' }}></i> Transactions</div>
@@ -161,14 +164,14 @@ const Statistics = () => {
                   <div className="stat-card-sub" style={{ color: 'var(--text-muted)' }}>Recorded on PayChain</div>
                 </div>
                 <div className="stat-card">
+                  <div className="stat-card-title"><i className='bx bx-purchase-tag-alt' style={{ color: 'var(--primary)' }}></i> Avg. Order Value</div>
+                  <h3 className="stat-card-val">{formatCurrency(stats?.averageOrderValue || 0)}</h3>
+                  <div className="stat-card-sub" style={{ color: 'var(--text-muted)' }}>Per Transaction</div>
+                </div>
+                <div className="stat-card">
                   <div className="stat-card-title"><i className='bx bx-wallet' style={{ color: 'var(--primary)' }}></i> Active Assets</div>
                   <h3 className="stat-card-val">{stats?.activeAssetsCount || 0}</h3>
                   <div className="stat-card-sub" style={{ color: 'var(--text-muted)' }}>Distinct currencies used</div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-card-title"><i className='bx bx-receipt' style={{ color: 'var(--primary)' }}></i> Platform Fees</div>
-                  <h3 className="stat-card-val">$0.00</h3>
-                  <div className="stat-card-sub" style={{ color: '#10B981' }}><i className='bx bx-check-shield'></i> 100% Fee-Free</div>
                 </div>
               </div>
 
@@ -199,29 +202,80 @@ const Statistics = () => {
                 </div>
               </div>
 
-              {/* Asset Allocation */}
-              <div style={{ marginBottom: '2rem' }}>
-                <h3 style={{ marginBottom: '1rem', color: 'var(--text-color)', fontSize: '1.2rem' }}>Asset Volume Breakdown</h3>
-                {stats?.allocation?.length === 0 ? (
-                  <div style={{ background: 'var(--glass-bg)', border: '1px dashed var(--border)', padding: '3rem', textAlign: 'center', borderRadius: '16px', color: 'var(--text-muted)' }}>
-                    No assets transacted yet.
-                  </div>
-                ) : (
-                  <div className="stat-alloc-grid">
-                    {stats?.allocation?.map((alloc, i) => {
-                      const style = getAssetColor(alloc.asset);
-                      return (
-                        <div className="stat-alloc-card" key={i}>
-                          <div className="stat-alloc-icon" style={{ background: style.bg, color: style.color }}><i className={style.icon}></i></div>
-                          <div className="stat-alloc-info">
-                            <h4 className="stat-alloc-name">{style.name} ({alloc.asset})</h4>
-                            <p className="stat-alloc-pct">{alloc.percentage.toFixed(1)}% of total volume</p>
+              {/* Analytics Splits */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
+                {/* Asset Allocation */}
+                <div>
+                  <h3 style={{ marginBottom: '1rem', color: 'var(--text-color)', fontSize: '1.2rem' }}>Asset Breakdown</h3>
+                  {stats?.allocation?.length === 0 ? (
+                    <div style={{ background: 'var(--glass-bg)', border: '1px dashed var(--border)', padding: '3rem', textAlign: 'center', borderRadius: '16px', color: 'var(--text-muted)' }}>
+                      No assets transacted yet.
+                    </div>
+                  ) : (
+                    <div className="stat-alloc-grid" style={{ gridTemplateColumns: '1fr' }}>
+                      {stats?.allocation?.map((alloc, i) => {
+                        const style = getAssetColor(alloc.asset);
+                        return (
+                          <div className="stat-alloc-card" key={i}>
+                            <div className="stat-alloc-icon" style={{ background: style.bg, color: style.color }}><i className={style.icon}></i></div>
+                            <div className="stat-alloc-info">
+                              <h4 className="stat-alloc-name">{style.name} ({alloc.asset})</h4>
+                              <p className="stat-alloc-pct">{alloc.percentage.toFixed(1)}% of volume</p>
+                            </div>
+                            <div className="stat-alloc-val">{formatCurrency(alloc.volumeUSD)}</div>
                           </div>
-                          <div className="stat-alloc-val">{formatCurrency(alloc.volumeUSD)}</div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Day of Week Activity */}
+                <div style={{ background: 'var(--glass-bg)', border: '1px solid var(--border)', borderRadius: '16px', padding: '1.5rem' }}>
+                  <h3 style={{ marginBottom: '0.5rem', color: 'var(--text-color)', fontSize: '1.2rem', marginTop: 0 }}>Activity by Day</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 1rem' }}>When your business peaks</p>
+                  <div className="dow-grid">
+                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => {
+                      const maxDOW = Math.max(...Object.values(stats?.dayOfWeekData || {a:1})) || 1;
+                      const val = stats?.dayOfWeekData?.[day] || 0;
+                      const h = Math.max(5, (val / maxDOW) * 100);
+                      return (
+                        <div className="dow-col" key={i}>
+                          <div className="dow-bar" style={{ height: `${h}%` }} title={formatCurrency(val)}></div>
+                          <div className="dow-label">{day}</div>
                         </div>
                       );
                     })}
                   </div>
+                </div>
+              </div>
+
+              {/* VIP Transactions */}
+              <div style={{ background: 'var(--glass-bg)', border: '1px solid var(--border)', borderRadius: '20px', padding: '1.5rem 2rem', marginBottom: '3rem', overflowX: 'auto' }}>
+                <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--text-color)', fontSize: '1.2rem' }}>Top VIP Transactions (Whales)</h3>
+                {stats?.topTransactions?.length > 0 ? (
+                  <table className="vip-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Sender Address</th>
+                        <th>Asset</th>
+                        <th>Est. USD Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {stats.topTransactions.map((tx, i) => (
+                        <tr key={i}>
+                          <td>{new Date(tx.date).toLocaleDateString()}</td>
+                          <td><span className="vip-hash">{tx.fromAddress ? `${tx.fromAddress.slice(0,6)}...${tx.fromAddress.slice(-4)}` : 'Unknown Wallet'}</span></td>
+                          <td style={{ fontWeight: 600 }}>{tx.amount} {tx.asset}</td>
+                          <td style={{ color: '#10B981', fontWeight: 600 }}>{formatCurrency(tx.usdVal)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No transactions available.</div>
                 )}
               </div>
             </>

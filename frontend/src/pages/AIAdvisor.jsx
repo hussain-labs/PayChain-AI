@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
@@ -28,6 +29,8 @@ const AIAdvisor = () => {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('Analyzing your sales data...');
+  const abortControllerRef = useRef(null);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -50,6 +53,12 @@ const AIAdvisor = () => {
     navigate('/');
   };
 
+  const stopAnalysis = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+  };
+
   const sendMessage = async (text) => {
     const userMessage = text.trim();
     if (!userMessage) return;
@@ -57,6 +66,22 @@ const AIAdvisor = () => {
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
+
+    abortControllerRef.current = new AbortController();
+
+    const loadingTexts = [
+      'Analyzing your sales data...',
+      'Searching Vector Database...',
+      'Getting data...',
+      'Recognizing patterns...',
+      'Generating insights...'
+    ];
+    let textIndex = 0;
+    setLoadingText(loadingTexts[0]);
+    const textInterval = setInterval(() => {
+      textIndex = (textIndex + 1) % loadingTexts.length;
+      setLoadingText(loadingTexts[textIndex]);
+    }, 1500);
 
     try {
       const token = localStorage.getItem('token');
@@ -66,7 +91,8 @@ const AIAdvisor = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ message: userMessage })
+        body: JSON.stringify({ message: userMessage }),
+        signal: abortControllerRef.current.signal
       });
 
       const data = await res.json();
@@ -78,9 +104,14 @@ const AIAdvisor = () => {
         setMessages(prev => [...prev, { role: 'assistant', content: "I'm sorry, I encountered an error. Please try again." }]);
       }
     } catch (err) {
-      toast.error("Network error");
-      setMessages(prev => [...prev, { role: 'assistant', content: "I'm currently unreachable. Please try again later." }]);
+      if (err.name === 'AbortError') {
+        setMessages(prev => [...prev, { role: 'assistant', content: "Analysis stopped by user. What else can I help you with?" }]);
+      } else {
+        toast.error("Network error");
+        setMessages(prev => [...prev, { role: 'assistant', content: "I'm currently unreachable. Please try again later." }]);
+      }
     } finally {
+      clearInterval(textInterval);
       setIsLoading(false);
     }
   };
@@ -90,15 +121,13 @@ const AIAdvisor = () => {
     sendMessage(input);
   };
 
-  const showSuggested = messages.length === 1;
-
   return (
     <div className="dashboard-layout">
       <AppSidebar activeRoute="/ai-advisor" user={user} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} onLogout={handleLogout} />
 
-      <main className="dashboard-main fade-in">
+      <main className="dashboard-main fade-in" style={{ display: 'flex', flexDirection: 'column' }}>
         {/* Scrollable content area with bottom padding for fixed input */}
-        <div className="dashboard-content-wrapper" style={{ paddingBottom: '90px' }}>
+        <div className="dashboard-content-wrapper" style={{ paddingBottom: '90px', flex: 1 }}>
 
           {/* Header */}
           <header className="dashboard-header">
@@ -119,24 +148,6 @@ const AIAdvisor = () => {
 
           {/* Messages — full width, scrolls freely with the page */}
           <div style={{ padding: '1.5rem 0', display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
-
-            {/* Suggested prompts */}
-            {showSuggested && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                {SUGGESTED_PROMPTS.map((p, i) => (
-                  <button key={i} onClick={() => sendMessage(p)} style={{
-                    background: 'var(--glass-bg)', border: '1px solid var(--border)',
-                    borderRadius: '14px', padding: '1rem', textAlign: 'left',
-                    cursor: 'pointer', color: 'var(--text-color)', fontSize: '0.88rem',
-                    display: 'flex', alignItems: 'center', gap: '0.75rem',
-                    transition: 'all 0.2s', lineHeight: 1.4
-                  }}>
-                    <i className='bx bx-sparkles' style={{ color: 'var(--primary)', fontSize: '1.2rem', flexShrink: 0 }}></i>
-                    {p}
-                  </button>
-                ))}
-              </div>
-            )}
 
             {messages.map((msg, idx) => (
               <div key={idx} style={{
@@ -161,7 +172,7 @@ const AIAdvisor = () => {
                   maxWidth: '90%', lineHeight: '1.65', fontSize: '0.93rem'
                 }} className={msg.role === 'assistant' ? 'markdown-body full-width-markdown' : ''}>
                   {msg.role === 'assistant' ? (
-                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                   ) : (
                     msg.content
                   )}
@@ -182,31 +193,49 @@ const AIAdvisor = () => {
                 <div style={{
                   background: 'var(--glass-bg)', padding: '1rem 1.25rem',
                   borderRadius: '4px 18px 18px 18px', border: '1px solid var(--border)',
-                  color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem'
+                  color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '1rem',
+                  fontSize: '0.93rem'
                 }}>
-                  <i className="bx bx-loader-alt bx-spin" style={{ fontSize: '1.1rem', color: 'var(--primary)' }}></i>
-                  Analyzing your sales data...
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <i className="bx bx-loader-alt bx-spin" style={{ fontSize: '1.1rem', color: 'var(--primary)' }}></i>
+                    {loadingText}
+                  </div>
                 </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
-
         </div>
-      </main>
 
-      {/* INPUT BAR — truly fixed at viewport bottom, offset for sidebar */}
-      <div style={{
-        position: 'fixed',
-        bottom: 0,
-        left: '280px',
-        right: 0,
-        padding: '1rem 3rem 1.25rem',
-        borderTop: '1px solid var(--border)',
-        background: 'var(--background)',
-        zIndex: 200,
-      }}>
-        <div style={{ width: '100%' }}>
+        {/* INPUT BAR — sticky at bottom of scroll container, takes exact width of parent automatically */}
+        <div style={{
+          position: 'sticky',
+          bottom: 0,
+          padding: '1rem 3rem 1.25rem',
+          borderTop: '1px solid var(--border)',
+          background: 'var(--background)',
+          zIndex: 200,
+          width: '100%',
+        }}>
+          {/* Permanent Suggested Chips */}
+          <div style={{
+            display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.75rem',
+            marginBottom: '0.5rem', scrollbarWidth: 'none', msOverflowStyle: 'none'
+          }}>
+            {SUGGESTED_PROMPTS.map((p, i) => (
+              <button key={i} onClick={() => sendMessage(p)} style={{
+                background: 'var(--glass-bg)', border: '1px solid var(--border)',
+                borderRadius: '20px', padding: '0.5rem 1rem', whiteSpace: 'nowrap',
+                cursor: 'pointer', color: 'var(--text-color)', fontSize: '0.82rem',
+                display: 'flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0,
+                transition: 'all 0.2s'
+              }} className="hover-brightness">
+                <i className='bx bx-sparkles' style={{ color: 'var(--primary)', fontSize: '1rem' }}></i>
+                {p}
+              </button>
+            ))}
+          </div>
+
           <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '0.75rem' }}>
             <input
               type="text"
@@ -220,17 +249,29 @@ const AIAdvisor = () => {
               }}
               disabled={isLoading}
             />
-            <button
-              type="submit"
-              disabled={isLoading || !input.trim()}
-              className="btn-primary"
-              style={{ padding: '0 1.5rem', borderRadius: '12px', flexShrink: 0 }}
-            >
-              <i className="bx bx-send" style={{ fontSize: '1.2rem' }}></i>
-            </button>
+            {isLoading ? (
+              <button
+                type="button"
+                onClick={stopAnalysis}
+                className="btn-primary"
+                style={{ padding: '0 1.5rem', borderRadius: '12px', flexShrink: 0, background: 'var(--surface)', color: 'var(--text-color)', border: '1px solid var(--border)' }}
+                title="Stop Analysis"
+              >
+                <i className="bx bx-stop" style={{ fontSize: '1.4rem' }}></i>
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={!input.trim()}
+                className="btn-primary"
+                style={{ padding: '0 1.5rem', borderRadius: '12px', flexShrink: 0 }}
+              >
+                <i className="bx bx-send" style={{ fontSize: '1.2rem' }}></i>
+              </button>
+            )}
           </form>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
