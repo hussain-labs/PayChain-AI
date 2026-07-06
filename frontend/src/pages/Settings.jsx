@@ -216,7 +216,7 @@ const Settings = () => {
             </div>
             <div className="header-greeting">
               <h1>Settings</h1>
-              <p>Manage your account preferences and security.</p>
+              
             </div>
             <div className="header-actions">
             <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
@@ -227,10 +227,14 @@ const Settings = () => {
           </div>
         </header>
 
-          <div className="dashboard-grid" style={{ gridTemplateColumns: '1fr 1fr', padding: '1rem', marginTop: '-1rem' }}>
+          <div className="page-header-description" style={{ margin: "-1rem 0 0.5rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p style={{ margin: 0 }}>Manage your account preferences and security.</p>
+          </div>
+
+          <div className="dashboard-grid settings-grid" style={{ padding: '1rem', marginTop: '-1rem', gap: '1.5rem' }}>
 
             {/* Profile Information */}
-            <div className="glass-panel" style={{ gridColumn: 'span 1' }}>
+            <div className="glass-panel">
               <div className="section-header"><h3>Profile Information</h3></div>
 
               {/* Avatar Upload */}
@@ -249,7 +253,7 @@ const Settings = () => {
               </div>
 
               <form onSubmit={handleProfileSubmit} className="modal-form">
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                <div className="form-grid-2">
                   <div className="form-group">
                     <label>First Name</label>
                     <input type="text" value={profile.firstName} onChange={e => setProfile({ ...profile, firstName: e.target.value })} required placeholder="First name" />
@@ -317,7 +321,7 @@ const Settings = () => {
             </div>
 
             {/* Right column */}
-            <div style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
               {/* Security */}
               <div className="glass-panel">

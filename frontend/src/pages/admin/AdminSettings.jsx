@@ -185,7 +185,7 @@ const AdminSettings = () => {
             </div>
             <div className="header-greeting">
               <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>System Settings</h1>
-              <p style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>Manage your platform configurations and preferences.</p>
+              
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem', background: 'var(--surface)' }}>
@@ -195,6 +195,10 @@ const AdminSettings = () => {
               <UserProfilePopup user={adminUser} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>Manage your platform configurations and preferences.</p>
+          </div>
 
           <div style={{ display: 'flex', gap: '2rem', flexDirection: 'column' }}>
             

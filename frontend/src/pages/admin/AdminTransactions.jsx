@@ -119,7 +119,7 @@ const AdminTransactions = () => {
             </div>
             <div className="header-greeting">
               <h1>Transactions Hub</h1>
-              <p>{filtered.length} transaction{filtered.length !== 1 ? 's' : ''} found</p>
+              
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme} style={{ fontSize: '1.2rem' }}>
@@ -129,6 +129,10 @@ const AdminTransactions = () => {
               <UserProfilePopup user={adminUser} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>{filtered.length} transaction{filtered.length !== 1 ? 's' : ''} found</p>
+          </div>
 
           <div style={{ marginTop: 0 }}>
             {/* Quick Stats Grid - uses responsive horizontal scroll flex from index.css */}

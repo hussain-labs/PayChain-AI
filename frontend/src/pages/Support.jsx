@@ -123,7 +123,7 @@ const Support = () => {
             </div>
             <div className="header-greeting">
               <h1>Contact Support</h1>
-              <p>Need help? Send a message directly to our admin team.</p>
+              
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize: '1.2rem' }}>
@@ -133,6 +133,10 @@ const Support = () => {
               <UserProfilePopup user={user} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>Need help? Send a message directly to our admin team.</p>
+          </div>
 
           <div className="support-page" style={{ width: '100%', margin: '0 auto', marginTop: '-1rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             

@@ -67,7 +67,7 @@ const AdminDashboard = () => {
             </div>
             <div className="header-greeting">
               <h1>Admin Dashboard</h1>
-              <p>System overview and analytics</p>
+              
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
@@ -77,6 +77,10 @@ const AdminDashboard = () => {
               <UserProfilePopup user={user} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>System overview and analytics</p>
+          </div>
 
           <div style={{ marginTop: 0 }}>
       {loading ? (

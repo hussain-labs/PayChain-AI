@@ -135,28 +135,31 @@ const Statistics = () => {
             <div className="header-toggle" onClick={() => setIsSidebarOpen(true)}><i className='bx bx-menu'></i></div>
             <div className="header-greeting">
               <h1>Financial Statistics</h1>
-              <p>Analyze your transaction history and portfolio growth.</p>
+              
             </div>
             <div className="header-actions">
-              <button className="icon-btn" onClick={toggleTheme}><i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} /></button>
-              <button className="icon-btn"><i className='bx bx-bell' /></button>
-              <UserProfilePopup user={user} />
-            </div>
-          </header>
+            <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
+              <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
+            </button>
+            <button className="icon-btn"><i className='bx bx-bell' /></button>
+            <UserProfilePopup user={user} />
+          </div>
+        </header>
 
-          {loading ? (
-            <div style={{ padding: '4rem 0' }}><Loader text="Crunching your numbers..." /></div>
-          ) : (
-            <>
-              {/* KPI Grid */}
-              <div className="stat-kpi-grid">
-                <div className="stat-card">
-                  <div className="stat-card-title"><i className='bx bx-line-chart' style={{ color: 'var(--primary)' }}></i> Total Volume</div>
-                  <h3 className="stat-card-val">{formatCurrency(stats?.totalVolumeUSD || 0)}</h3>
-                  <div className={`growth-badge ${stats?.growthPct >= 0 ? 'positive' : 'negative'}`}>
-                    <i className={`bx ${stats?.growthPct >= 0 ? 'bx-trending-up' : 'bx-trending-down'}`}></i>
-                    {Math.abs(stats?.growthPct || 0).toFixed(1)}% vs Last Month
-                  </div>
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>Analyze your transaction history and portfolio growth.</p>
+          </div>
+
+          {/* Statistics Grid */}
+          <div className="dashboard-grid">
+
+            {/* KPI Cards */}
+            <div className="quick-actions glass-panel" style={{ gridColumn: '1 / -1' }}>
+              <div className="action-buttons" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', width: '100%' }}>
+                <div className="action-btn" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '1.5rem', background: 'rgba(255,255,255,0.5)' }}>
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Total Volume</span>
+                  <h3 style={{ fontSize: '1.5rem', color: 'var(--primary-dark)', margin: 0 }}>$2.4M</h3>
+                  <span style={{ color: '#10B981', fontSize: '0.75rem', marginTop: '0.5rem' }}><i className='bx bx-trending-up'></i> +12.5%</span>
                 </div>
                 <div className="stat-card">
                   <div className="stat-card-title"><i className='bx bx-transfer-alt' style={{ color: 'var(--primary)' }}></i> Transactions</div>

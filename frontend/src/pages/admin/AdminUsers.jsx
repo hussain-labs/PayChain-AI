@@ -84,7 +84,7 @@ const AdminUsers = () => {
             </div>
             <div className="header-greeting">
               <h1>User Management</h1>
-              <p>{filtered.length} user{filtered.length !== 1 ? 's' : ''} found</p>
+              
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme} style={{ fontSize: '1.2rem' }}>
@@ -94,6 +94,10 @@ const AdminUsers = () => {
               <UserProfilePopup user={adminUser} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>{filtered.length} user{filtered.length !== 1 ? 's' : ''} found</p>
+          </div>
 
           <div style={{ marginTop: 0 }}>
             {/* Toolbar */}

@@ -47,7 +47,7 @@ const Cards = () => {
             </div>
             <div className="header-greeting">
               <h1>Virtual Cards</h1>
-              <p>Manage your crypto debit cards and spending limits.</p>
+              
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize: '1.2rem' }}>
@@ -57,6 +57,10 @@ const Cards = () => {
               <UserProfilePopup user={user} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>Manage your crypto debit cards and spending limits.</p>
+          </div>
 
           <div className="dashboard-grid" style={{ gridTemplateColumns: '1fr 1.5fr' }}>
 

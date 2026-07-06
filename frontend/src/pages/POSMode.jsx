@@ -133,7 +133,7 @@ const POSMode = () => {
             </div>
             <div className="header-greeting">
               <h1>Point of Sale</h1>
-              <p>Turn your device into a Web3 cash register.</p>
+              
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize: '1.2rem' }}>
@@ -143,6 +143,10 @@ const POSMode = () => {
               <UserProfilePopup user={user} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>Turn your device into a Web3 cash register.</p>
+          </div>
 
           <div style={{ padding: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem', alignItems: 'stretch' }}>
             

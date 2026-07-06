@@ -197,7 +197,7 @@ const AdminUserProfile = () => {
             <div className="header-toggle" onClick={() => setIsSidebarOpen(true)}><i className='bx bx-menu' /></div>
             <div className="header-greeting">
               <h1>User Profile</h1>
-              <p>{loading || !user ? 'Loading...' : `Manage ${user?.name}'s account`}</p>
+              
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme} style={{ fontSize: '1.2rem' }}>
@@ -207,6 +207,10 @@ const AdminUserProfile = () => {
               <UserProfilePopup user={adminUser} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>{loading || !user ? 'Loading...' : `Manage ${user?.name}'s account`}</p>
+          </div>
 
           {(loading || !user) ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', color: 'var(--text-muted)', gap: '0.75rem', fontSize: '1.1rem' }}>

@@ -302,7 +302,7 @@ const Transfers = () => {
             <div className="header-toggle" onClick={() => setIsSidebarOpen(true)}><i className='bx bx-menu' /></div>
             <div className="header-greeting">
               <h1>Transfers</h1>
-              <p>Send crypto from any of your saved wallets.</p>
+              
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize: '1.2rem' }}>
@@ -312,6 +312,10 @@ const Transfers = () => {
               <UserProfilePopup user={user} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>Send crypto from any of your saved wallets.</p>
+          </div>
 
           <div className="dashboard-grid">
 
