@@ -54,11 +54,11 @@ const Upgrade = () => {
             </div>
           </header>
 
-          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
-            <p>Unlock higher limits, instant settlements, and priority support.</p>
+          <div className="page-header-description" style={{ margin: "-1rem 0 0 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p style={{ margin: 0 }}>Unlock higher limits, instant settlements, and priority support.</p>
           </div>
 
-          <div style={{ padding: '0 0 2rem 0' }}>
+          <div style={{ padding: '0 0 2rem 0', marginTop: '-2rem' }}>
             <Pricing />
           </div>
         </div>

@@ -1431,6 +1431,10 @@ footer {
   gap: 2rem;
 }
 
+.dashboard-grid > * {
+  min-width: 0;
+}
+
 .dashboard-balance-card {
   padding: 2rem;
   display: flex;
@@ -4528,6 +4532,9 @@ footer {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
+  .dashboard-grid > * {
+    min-width: 0;
+  }
 }
 
 @media (max-width: 768px) {
@@ -4545,7 +4552,20 @@ footer {
   }
 
   .header-actions {
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+  .header-actions > button.icon-btn:first-child {
     display: none;
+  }
+}
+
+.mobile-theme-toggle {
+  display: none;
+}
+@media (max-width: 768px) {
+  .mobile-theme-toggle {
+    display: flex !important;
   }
 }
 
@@ -4647,9 +4667,59 @@ footer {
 
 .pricing-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 2.5rem;
   align-items: stretch;
+}
+
+@media (max-width: 1200px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .pricing-card {
+    padding: 1.5rem 1rem !important;
+  }
+  .pricing-header h3 {
+    font-size: 1.25rem !important;
+  }
+  .pricing-header p {
+    font-size: 0.85rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  .price-val {
+    font-size: 2rem !important;
+  }
+  .price-period {
+    font-size: 0.8rem !important;
+  }
+  .pricing-features {
+    margin-bottom: 1rem !important;
+  }
+  .pricing-features li {
+    font-size: 0.8rem !important;
+    margin-bottom: 0.5rem !important;
+    gap: 0.5rem !important;
+  }
+  .pricing-badge {
+    font-size: 0.6rem !important;
+    padding: 0.2rem 0.4rem !important;
+    top: 1rem !important;
+    right: 1rem !important;
+  }
+  .pricing-card .btn-primary,
+  .pricing-card .btn-secondary {
+    padding: 0.6rem !important;
+    font-size: 0.85rem !important;
+  }
+  .pricing-card input[type="number"] {
+    padding: 0.5rem !important;
+    font-size: 0.85rem !important;
+  }
 }
 
 .pricing-card {
@@ -4739,6 +4809,47 @@ footer {
 .pricing-card .btn-primary,
 .pricing-card .btn-secondary {
   width: 100%;
+}
+
+/* AI Advisor Responsive */
+.ai-advisor-footer {
+  position: sticky;
+  bottom: 0;
+  padding: 1rem 3rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: var(--background);
+  z-index: 200;
+  width: 100%;
+}
+
+.ai-advisor-input {
+  flex: 1;
+  background: var(--glass-bg);
+  border: 1px solid var(--border);
+  padding: 0.9rem 1.25rem;
+  border-radius: 12px;
+  color: var(--text-main);
+  outline: none;
+  font-size: 0.95rem;
+}
+
+.ai-advisor-btn {
+  padding: 0 1.5rem;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .ai-advisor-footer {
+    padding: 1rem;
+  }
+  .ai-advisor-input {
+    padding: 0.8rem 1rem;
+    font-size: 0.9rem;
+  }
+  .ai-advisor-btn {
+    padding: 0 1rem;
+  }
 }
 
 /* FAQ Section */
@@ -7127,7 +7238,7 @@ body.menu-open .theme-switcher {
   .dashboard-header {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     gap: 1rem;
     position: sticky;
     top: 0;
@@ -7135,7 +7246,7 @@ body.menu-open .theme-switcher {
     background: var(--background);
     margin: -1rem -1rem 1rem -1rem;
     padding: 0.75rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
   }
 
   .header-greeting h1 {
@@ -9000,6 +9111,7 @@ body.menu-open .theme-switcher {
     grid-template-columns: 1fr;
   }
 }
+
 @keyframes pulse {
   0% {
     transform: translate(-50%, -50%) scale(0.8);
@@ -9278,4 +9390,142 @@ select.form-input {
   background-size: 0.65rem auto;
   padding-right: 2.5rem;
   cursor: pointer;
+}
+
+/* Responsive adjustments for Transfers Page */
+.transfers-right-col {
+  grid-column: span 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: sticky;
+  top: 100px;
+  height: fit-content;
+}
+
+.transfers-btn-group {
+  display: flex;
+  gap: 0.75rem;
+  position: sticky;
+  bottom: 1rem;
+  padding: 1rem;
+  margin: 1rem 0 0;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  z-index: 10;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.05);
+}
+
+.transfers-amount-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.transfers-amount-label {
+  display: flex;
+  justify-content: space-between;
+}
+
+.transfers-fee-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  background: rgba(75,29,143,0.06);
+  border: 1px solid rgba(75,29,143,0.15);
+  border-radius: 10px;
+}
+
+@media (max-width: 1200px) {
+  .transfers-right-col {
+    position: static;
+    height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .transfers-btn-group {
+    flex-direction: column;
+  }
+  .transfers-amount-row {
+    flex-direction: column;
+  }
+  .transfers-amount-label {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .transfers-amount-label span {
+    margin-bottom: 0.2rem;
+  }
+  .transfers-fee-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .transfers-fee-row > div {
+    text-align: left !important;
+  }
+  .dashboard-header {
+    margin: -1rem -1rem 0 -1rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+  .dashboard-content-wrapper {
+    padding: 1rem !important;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+}
+
+select {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* POS Page Adjustments */
+.pos-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
+.pos-panel {
+  padding: 2.5rem;
+}
+
+@media (max-width: 992px) {
+  .pos-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .pos-panel {
+    padding: 1.5rem;
+  }
+}
+
+.dashboard-section-wallets {
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .dashboard-section-wallets {
+    padding: 0;
+  }
+}
+
+.wallets-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 1200px) {
+  .wallets-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .wallets-grid {
+    grid-template-columns: 1fr;
+  }
 }

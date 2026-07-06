@@ -201,7 +201,7 @@ const Dashboard = () => {
           </div>
 
           {/* ── Wallets Section ── */}
-          <div style={{ padding: '2rem' }}>
+          <div className="dashboard-section-wallets">
             {!isConnected ? (
               <div className="fade-in">
                 <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, marginBottom: '2rem' }}>Connect a Wallet to Continue</h2>
@@ -211,7 +211,7 @@ const Dashboard = () => {
                     <Loader text="Waiting for wallet confirmation..." />
                   </div>
                 ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1.25rem' }}>
+                  <div className="wallets-grid">
                     {['MetaMask', 'KuCoin', 'Kraken', 'Coinbase', 'Trust Wallet', 'Binance', 'OKX'].map(walletName => {
                       // Try to find the live EIP-6963 connector for this wallet if they have it installed
                       const normalized = walletName.toLowerCase().replace(' wallet', '');
@@ -267,7 +267,7 @@ const Dashboard = () => {
                       {savedWallets.length} saved wallet{savedWallets.length !== 1 ? 's' : ''} • Click to view real balance
                     </p>
                   </div>
-                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexShrink: 0 }}>
+                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexShrink: 0, flexWrap: 'wrap' }}>
                     <button
                       onClick={() => {
                         setShowAddModal(true);
@@ -291,7 +291,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Wallet grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1.25rem' }}>
+                <div className="wallets-grid">
 
                   {savedWallets.filter(w => isRelatedWallet(w.nickname, connector?.name)).map(w => {
                     const style = getWS(w.nickname);

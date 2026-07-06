@@ -137,7 +137,6 @@ const AIAdvisor = () => {
                 <i className='bx bx-sparkles' style={{ color: 'var(--primary)' }}></i>
                 Predictive AI Advisor
               </h1>
-              <p>Chat with our AI model to get personalized business insights from your sales data.</p>
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme}><i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} /></button>
@@ -145,6 +144,10 @@ const AIAdvisor = () => {
               <UserProfilePopup user={user} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 0 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p style={{ margin: 0 }}>Chat with our AI model to get personalized business insights from your sales data.</p>
+          </div>
 
           {/* Messages — full width, scrolls freely with the page */}
           <div style={{ padding: '1.5rem 0', display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
@@ -208,15 +211,7 @@ const AIAdvisor = () => {
         </div>
 
         {/* INPUT BAR — sticky at bottom of scroll container, takes exact width of parent automatically */}
-        <div style={{
-          position: 'sticky',
-          bottom: 0,
-          padding: '1rem 3rem 1.25rem',
-          borderTop: '1px solid var(--border)',
-          background: 'var(--background)',
-          zIndex: 200,
-          width: '100%',
-        }}>
+        <div className="ai-advisor-footer">
           {/* Permanent Suggested Chips */}
           <div style={{
             display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.75rem',
@@ -242,19 +237,15 @@ const AIAdvisor = () => {
               value={input}
               onChange={e => setInput(e.target.value)}
               placeholder="Ask about your sales trends, peak times, or revenue strategies..."
-              style={{
-                flex: 1, background: 'var(--glass-bg)', border: '1px solid var(--border)',
-                padding: '0.9rem 1.25rem', borderRadius: '12px',
-                color: 'var(--text-main)', outline: 'none', fontSize: '0.95rem'
-              }}
+              className="ai-advisor-input"
               disabled={isLoading}
             />
             {isLoading ? (
               <button
                 type="button"
                 onClick={stopAnalysis}
-                className="btn-primary"
-                style={{ padding: '0 1.5rem', borderRadius: '12px', flexShrink: 0, background: 'var(--surface)', color: 'var(--text-color)', border: '1px solid var(--border)' }}
+                className="btn-primary ai-advisor-btn"
+                style={{ background: 'var(--surface)', color: 'var(--text-color)', border: '1px solid var(--border)' }}
                 title="Stop Analysis"
               >
                 <i className="bx bx-stop" style={{ fontSize: '1.4rem' }}></i>
@@ -263,8 +254,7 @@ const AIAdvisor = () => {
               <button
                 type="submit"
                 disabled={!input.trim()}
-                className="btn-primary"
-                style={{ padding: '0 1.5rem', borderRadius: '12px', flexShrink: 0 }}
+                className="btn-primary ai-advisor-btn"
               >
                 <i className="bx bx-send" style={{ fontSize: '1.2rem' }}></i>
               </button>

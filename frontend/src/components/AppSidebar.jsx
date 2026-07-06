@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import ConfirmModal from './ConfirmModal';
+import { useTheme } from '../context/ThemeContext';
 
 /**
  * AppSidebar – shared sidebar used across all dashboard pages.
@@ -12,6 +13,7 @@ import ConfirmModal from './ConfirmModal';
  *   onLogout     : fn     – logout handler
  */
 const AppSidebar = ({ activeRoute = '/dashboard', user, isOpen, onClose, onLogout }) => {
+  const { theme, toggleTheme } = useTheme();
   // Persist collapsed state in localStorage so it survives navigation
   const [collapsed, setCollapsed] = useState(() => {
     try { return localStorage.getItem('sidebarCollapsed') === 'true'; } catch { return false; }
@@ -113,10 +115,29 @@ const AppSidebar = ({ activeRoute = '/dashboard', user, isOpen, onClose, onLogou
         </nav>
 
         {/* Bottom */}
-        <div className="sidebar-bottom">
-          <button className="logout-btn" onClick={() => setShowLogoutConfirm(true)}>
+        <div className="sidebar-bottom" style={{ display: 'flex', gap: '0.5rem' }}>
+          <button className="logout-btn" onClick={() => setShowLogoutConfirm(true)} style={{ flex: 1 }}>
             <i className='bx bx-log-out' />
             <span className="logout-label"> Log Out</span>
+          </button>
+
+          <button 
+            className="mobile-theme-toggle" 
+            onClick={toggleTheme} 
+            title="Toggle theme" 
+            style={{ 
+              fontSize: '1.2rem', 
+              padding: '0.85rem', 
+              justifyContent: 'center', 
+              alignItems: 'center',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--surface)',
+              color: 'var(--text-main)',
+              cursor: 'pointer'
+            }}
+          >
+            <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
           </button>
         </div>
       </aside>
