@@ -210,6 +210,12 @@ const Transfers = () => {
       toast.error("Please connect your Web3 wallet first.");
       return;
     }
+    if (web3Address && fromWallet && web3Address.toLowerCase() !== fromWallet.toLowerCase()) {
+      const matchedWallet = savedWallets.find(w => w.address.toLowerCase() === fromWallet.toLowerCase());
+      const walletName = matchedWallet ? matchedWallet.nickname : fmt(fromWallet);
+      toast.error(`Please open MetaMask and switch to your selected sender wallet: ${walletName}`);
+      return;
+    }
 
     if (riskResult?.isSelfTransfer) {
       setShowSelfTransferModal(true);

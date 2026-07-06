@@ -10,8 +10,9 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Statistics from './pages/Statistics';
 import Transfers from './pages/Transfers';
-import Cards from './pages/Cards';
-import Settings from './pages/Settings';
+import Cards from './pages/Cards.jsx';
+import Escrow from './pages/Escrow.jsx';
+import Settings from './pages/Settings.jsx';
 import Support from './pages/Support';
 import Notifications from './pages/Notifications';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -35,7 +36,7 @@ import { Toaster } from 'react-hot-toast';
 
 const ADMIN_ROUTES = ['/admin/dashboard', '/admin/users', '/admin/support', '/admin/settings', '/admin/plans', '/admin/transactions', '/admin/reports'];
 const ADMIN_PREFIXES = ['/admin/users/'];
-const USER_ROUTES = ['/dashboard', '/pos', '/statistics', '/transfers', '/cards', '/support', '/upgrade', '/notifications', '/ai-advisor'];
+const USER_ROUTES = ['/dashboard', '/pos', '/statistics', '/transfers', '/cards', '/escrow', '/support', '/upgrade', '/notifications', '/ai-advisor'];
 const SHARED_ROUTES = ['/settings'];
 const WALLET_PREFIX = '/wallet/';
 
@@ -113,6 +114,7 @@ const MainLayout = () => {
           <Route path="/statistics" element={<ProtectedRoute allowedRole="user"><Statistics /></ProtectedRoute>} />
           <Route path="/transfers" element={<ProtectedRoute allowedRole="user"><Transfers /></ProtectedRoute>} />
           <Route path="/cards" element={<ProtectedRoute allowedRole="user"><Cards /></ProtectedRoute>} />
+          <Route path="/escrow" element={<ProtectedRoute allowedRole="user"><Escrow /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute allowedRole="shared"><Settings /></ProtectedRoute>} />
           <Route path="/support" element={<ProtectedRoute allowedRole="user"><Support /></ProtectedRoute>} />
           <Route path="/upgrade" element={<ProtectedRoute allowedRole="user"><Upgrade /></ProtectedRoute>} />
