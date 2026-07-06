@@ -5,6 +5,9 @@ import { ethers } from 'ethers';
 
 // Helper to get the Platform Wallet connected to Sepolia
 const getPlatformWallet = () => {
+  if (!process.env.PLATFORM_PRIVATE_KEY) {
+    throw new Error("PLATFORM_PRIVATE_KEY is not defined in environment variables. Please check your .env file and restart the server.");
+  }
   const provider = new ethers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com');
   return new ethers.Wallet(process.env.PLATFORM_PRIVATE_KEY, provider);
 };
@@ -71,7 +74,7 @@ export const createEscrow = async (req, res) => {
     res.status(201).json(newEscrow);
   } catch (error) {
     console.error('Error creating escrow:', error);
-    res.status(500).json({ error: 'Failed to deploy Escrow smart contract' });
+    res.status(500).json({ error: 'Failed to deploy Escrow smart contract', details: error.message, stack: error.stack });
   }
 };
 

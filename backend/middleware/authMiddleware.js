@@ -18,8 +18,8 @@ export const protect = (req, res, next) => {
       // Verify token
       const decoded = jwt.verify(token, JWT_SECRET);
 
-      // Attach user ID to the request
-      req.userId = decoded.userId;
+      // Attach user ID to the request (support both new and old token formats)
+      req.userId = decoded.userId || decoded.id;
 
       next();
     } catch (error) {

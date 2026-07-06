@@ -18,7 +18,7 @@ const Statistics = () => {
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
-    
+
     if (storedUser && token) {
       setUser(JSON.parse(storedUser));
       fetchStats(token);
@@ -135,16 +135,16 @@ const Statistics = () => {
             <div className="header-toggle" onClick={() => setIsSidebarOpen(true)}><i className='bx bx-menu'></i></div>
             <div className="header-greeting">
               <h1>Financial Statistics</h1>
-              
+
             </div>
             <div className="header-actions">
-            <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
-              <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
-            </button>
-            <button className="icon-btn"><i className='bx bx-bell' /></button>
-            <UserProfilePopup user={user} />
-          </div>
-        </header>
+              <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize: '1.2rem' }}>
+                <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
+              </button>
+              <button className="icon-btn"><i className='bx bx-bell' /></button>
+              <UserProfilePopup user={user} />
+            </div>
+          </header>
 
           <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
             <p>Analyze your transaction history and portfolio growth.</p>
@@ -192,7 +192,7 @@ const Statistics = () => {
                       <div className="stat-bar-wrapper" key={i}>
                         <div className="stat-bar" style={{ height: `${heightPct}%`, background: isCurrent ? 'var(--primary)' : '', opacity: isCurrent ? 1 : '' }}>
                           <div className="stat-tooltip">
-                            {formatCurrency(data.volume)}<br/>
+                            {formatCurrency(data.volume)}<br />
                             <span style={{ fontSize: '0.65rem', fontWeight: 500, opacity: 0.8 }}>{data.count} txs</span>
                           </div>
                         </div>
@@ -239,7 +239,7 @@ const Statistics = () => {
                   <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0 0 1rem' }}>When your business peaks</p>
                   <div className="dow-grid">
                     {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => {
-                      const maxDOW = Math.max(...Object.values(stats?.dayOfWeekData || {a:1})) || 1;
+                      const maxDOW = Math.max(...Object.values(stats?.dayOfWeekData || { a: 1 })) || 1;
                       const val = stats?.dayOfWeekData?.[day] || 0;
                       const h = Math.max(5, (val / maxDOW) * 100);
                       return (
@@ -270,7 +270,7 @@ const Statistics = () => {
                       {stats.topTransactions.map((tx, i) => (
                         <tr key={i}>
                           <td>{new Date(tx.date).toLocaleDateString()}</td>
-                          <td><span className="vip-hash">{tx.fromAddress ? `${tx.fromAddress.slice(0,6)}...${tx.fromAddress.slice(-4)}` : 'Unknown Wallet'}</span></td>
+                          <td><span className="vip-hash">{tx.fromAddress ? `${tx.fromAddress.slice(0, 6)}...${tx.fromAddress.slice(-4)}` : 'Unknown Wallet'}</span></td>
                           <td style={{ fontWeight: 600 }}>{tx.amount} {tx.asset}</td>
                           <td style={{ color: '#10B981', fontWeight: 600 }}>{formatCurrency(tx.usdVal)}</td>
                         </tr>
@@ -281,10 +281,11 @@ const Statistics = () => {
                   <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No transactions available.</div>
                 )}
               </div>
-            </>
-          )}
-
+            </div>
+          </div>
         </div>
+
+        {/* </div> */}
       </main>
     </div>
   );
