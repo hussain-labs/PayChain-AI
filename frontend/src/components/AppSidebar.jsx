@@ -84,8 +84,8 @@ const AppSidebar = ({ activeRoute = '/dashboard', user, isOpen, onClose, onLogou
             <>
               {nav('/pos', 'bx bx-scan', 'POS Mode')}
               {nav('/transfers', 'bx bx-transfer', 'Transfers')}
-              {nav('/cards', 'bx bx-credit-card', 'Cards')}
-              {nav('/escrow', 'bx bx-lock-alt', 'Escrow')}
+              {/* {nav('/cards', 'bx bx-credit-card', 'Cards')} */}
+              {nav('/escrow', 'bx bx-shield-quarter', 'Escrow')}
               {nav('/statistics', 'bx bx-line-chart', 'Statistics')}
               {nav('/ai-advisor', 'bx bx-bot', 'AI Advisor')}
               {nav('/upgrade', 'bx bx-up-arrow-circle', 'Upgrade')}
