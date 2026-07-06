@@ -103,7 +103,7 @@ const AdminSupport = () => {
             </div>
             <div className="header-greeting">
               <h1>Support Tickets</h1>
-              <p>{filtered.length} tickets</p>
+              
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
@@ -113,6 +113,10 @@ const AdminSupport = () => {
               <UserProfilePopup user={adminUser} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>{filtered.length} tickets</p>
+          </div>
 
           <div style={{ marginTop: 0 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>

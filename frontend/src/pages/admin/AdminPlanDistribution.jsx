@@ -82,7 +82,7 @@ const AdminPlanDistribution = () => {
             </div>
             <div className="header-greeting">
               <h1>Plan Distribution</h1>
-              <p>Detailed analysis of user subscription plans</p>
+              
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
@@ -92,6 +92,10 @@ const AdminPlanDistribution = () => {
               <UserProfilePopup user={user} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>Detailed analysis of user subscription plans</p>
+          </div>
 
           <div style={{ marginTop: 0 }}>
             {loading ? (

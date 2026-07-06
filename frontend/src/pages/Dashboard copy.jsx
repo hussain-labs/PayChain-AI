@@ -58,7 +58,7 @@ const Dashboard = () => {
             </div>
             <div className="header-greeting">
               <h1>Hello, Alex!</h1>
-              <p>Here's your financial overview for today.</p>
+              
             </div>
             <div className="header-actions">
             <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
@@ -81,6 +81,10 @@ const Dashboard = () => {
             </div>
           </div>
         </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>Here's your financial overview for today.</p>
+          </div>
 
           {/* Dashboard Grid */}
           <div className="dashboard-grid">

@@ -46,7 +46,7 @@ const Statistics = () => {
             </div>
             <div className="header-greeting">
               <h1>Financial Statistics</h1>
-              <p>Analyze your transaction history and portfolio growth.</p>
+              
             </div>
             <div className="header-actions">
             <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
@@ -56,6 +56,10 @@ const Statistics = () => {
             <UserProfilePopup user={user} />
           </div>
         </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>Analyze your transaction history and portfolio growth.</p>
+          </div>
 
           {/* Statistics Grid */}
           <div className="dashboard-grid">

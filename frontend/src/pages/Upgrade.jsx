@@ -43,7 +43,7 @@ const Upgrade = () => {
             </div>
             <div className="header-greeting">
               <h1>Upgrade Your Plan</h1>
-              <p>Unlock higher limits, instant settlements, and priority support.</p>
+              
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize:'1.2rem' }}>
@@ -53,6 +53,10 @@ const Upgrade = () => {
               <UserProfilePopup user={user} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>Unlock higher limits, instant settlements, and priority support.</p>
+          </div>
 
           <div style={{ padding: '0 0 2rem 0' }}>
             <Pricing />

@@ -90,7 +90,7 @@ const AdminReports = () => {
             </div>
             <div className="header-greeting">
               <h1>Reports & Analytics</h1>
-              <p>Platform growth and transaction metrics</p>
+              
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme} style={{ fontSize: '1.2rem' }}>
@@ -100,6 +100,10 @@ const AdminReports = () => {
               <UserProfilePopup user={adminUser} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p>Platform growth and transaction metrics</p>
+          </div>
 
           <div style={{ marginTop: 0 }}>
             {loading ? (
