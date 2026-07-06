@@ -7,7 +7,10 @@ import AppSidebar from '../components/AppSidebar';
 import ConfirmModal from '../components/ConfirmModal';
 import QRScannerModal from '../components/QRScannerModal';
 import TopUpModal from '../components/TopUpModal';
+import Loader from '../components/Loader';
 import toast from 'react-hot-toast';
+import { useSendTransaction } from 'wagmi';
+import { parseEther } from 'viem';
 
 const API = 'http://localhost:5000';
 const fmt = (addr) => addr ? `${addr.slice(0, 8)}…${addr.slice(-6)}` : '';
@@ -42,6 +45,7 @@ const WalletOverview = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const { address: web3Address } = useWeb3Auth();
+  const { sendTransactionAsync } = useSendTransaction();
 
   const [user, setUser] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -49,7 +53,10 @@ const WalletOverview = () => {
   const [walletDetail, setWalletDetail] = useState(null); // nickname etc
   const [assets, setAssets] = useState(null);
   const [history, setHistory] = useState([]);
+  const [escrows, setEscrows] = useState([]);
+  const [visibleEscrowsCount, setVisibleEscrowsCount] = useState(3);
   const [loading, setLoading] = useState(true);
+  const [loadingOnChain, setLoadingOnChain] = useState(false);
   const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
   const [showReceiveModal, setShowReceiveModal] = useState(false);
   const [showTopUp, setShowTopUp] = useState(false);
@@ -85,7 +92,7 @@ const WalletOverview = () => {
       .catch(console.error)
       .finally(() => setLoading(false));
 
-    // Fetch history
+    // Fetch history (local DB only initially)
     fetch(`${API}/api/wallets/${address}/history`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json())
       .then(data => {
@@ -93,7 +100,110 @@ const WalletOverview = () => {
       })
       .catch(console.error);
 
+    // Fetch related escrows
+    fetch(`${API}/api/escrows`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          const relevantEscrows = data.filter(e => 
+            e.buyerWallet?.toLowerCase() === address.toLowerCase() || 
+            e.sellerWallet?.toLowerCase() === address.toLowerCase()
+          );
+          setEscrows(relevantEscrows);
+        }
+      })
+      .catch(console.error);
+
   }, [address, navigate]);
+
+  const fetchOnChainHistory = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    setLoadingOnChain(true);
+    try {
+      const res = await fetch(`${API}/api/wallets/${address}/history?onchain=true`, { 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (data.code === 'LIMIT_REACHED') {
+          toast.error(data.error, { duration: 6000 });
+        } else {
+          toast.error(data.error || 'Failed to fetch on-chain data');
+        }
+        return;
+      }
+      if (Array.isArray(data)) {
+        setHistory(data);
+        toast.success('Live on-chain data loaded!');
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error('Network error fetching on-chain data');
+    } finally {
+      setLoadingOnChain(false);
+    }
+  };
+
+  const fetchEscrows = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const r = await fetch(`${API}/api/escrows`, { headers: { Authorization: `Bearer ${token}` } });
+      const data = await r.json();
+      if (Array.isArray(data)) {
+        const relevantEscrows = data.filter(e => 
+          e.buyerWallet?.toLowerCase() === address.toLowerCase() || 
+          e.sellerWallet?.toLowerCase() === address.toLowerCase()
+        );
+        setEscrows(relevantEscrows);
+      }
+    } catch (e) {}
+  };
+
+  const updateStatus = async (id, status) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API}/api/escrows/${id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status })
+      });
+      if (res.ok) {
+        fetchEscrows();
+      } else {
+        const data = await res.json();
+        toast.error(`Error: ${data.error || 'Failed to update escrow status'}`);
+      }
+    } catch (err) {
+      console.error('Failed to update status', err);
+      toast.error('Network error occurred.');
+    }
+  };
+
+  const handleFund = async (escrow) => {
+    try {
+      if (web3Address && escrow.buyerWallet && web3Address.toLowerCase() !== escrow.buyerWallet.toLowerCase()) {
+        toast.error(`Your active MetaMask account is ${web3Address.slice(0,6)}... Please open your MetaMask extension and switch to the correct account to fund this escrow.`);
+        return;
+      }
+
+      // Trigger MetaMask to actually transfer the amount to the contract address
+      const txHash = await sendTransactionAsync({
+        to: escrow.contractAddress,
+        value: parseEther(escrow.amount.toString()),
+      });
+      console.log('Transaction sent:', txHash);
+      
+      // Once the user approves and the tx is sent, update backend state
+      updateStatus(escrow._id, 'funded');
+    } catch (err) {
+      console.error('Funding failed', err);
+      toast.error('Transaction failed or was rejected.');
+    }
+  };
 
   const handleLogout = () => { localStorage.clear(); navigate('/'); };
 
@@ -241,17 +351,105 @@ const WalletOverview = () => {
             </div>
           </div>
 
+          {/* Active Escrows for this Wallet */}
+          {escrows.length > 0 && (
+            <div className="wo-activity-card" style={{ marginBottom: '1.5rem', padding: '1.5rem', background: 'var(--background)', borderRadius: '16px', border: '1px solid var(--border)' }}>
+              <div className="wo-activity-header" style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 600 }}>Active Escrow Contracts</h3>
+                <Link to="/escrow" style={{ color: 'var(--primary)', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none' }}>Manage Escrows</Link>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+                {escrows.slice(0, visibleEscrowsCount).map(escrow => {
+                  const isBuyer = escrow.buyerWallet?.toLowerCase() === address.toLowerCase();
+                  return (
+                    <div key={escrow._id} style={{ padding: '1rem', background: 'var(--sidebar-bg)', border: '1px solid var(--border)', borderRadius: '12px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                        <h4 style={{ fontSize: '1rem', fontWeight: 600, margin: 0 }}>{escrow.title}</h4>
+                        <span style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem', borderRadius: '50px', background: 'var(--primary)', color: '#fff', textTransform: 'uppercase', fontWeight: 600 }}>
+                          {escrow.status.replace('_', ' ')}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                        Role: <strong style={{ color: 'var(--text)' }}>{isBuyer ? 'Buyer' : 'Seller'}</strong>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: '0.8rem', paddingBottom: '0.8rem' }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Amount Locked</span>
+                        <span style={{ fontWeight: 700, fontSize: '1.1rem', color: isBuyer ? '#ef4444' : '#10b981' }}>
+                          {isBuyer ? '-' : '+'}{escrow.amount} {escrow.asset}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                        {escrow.status === 'awaiting_funds' && isBuyer && (
+                          <button className="btn-primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }} onClick={() => handleFund(escrow)}>Fund Escrow</button>
+                        )}
+                        {escrow.status === 'funded' && !isBuyer && (
+                          <button className="btn-primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }} onClick={() => updateStatus(escrow._id, 'delivered')}>Mark as Delivered</button>
+                        )}
+                        {(escrow.status === 'delivered' || escrow.status === 'funded') && isBuyer && (
+                          <button className="btn-primary" style={{ background: '#22c55e', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }} onClick={() => updateStatus(escrow._id, 'released')}>Approve & Release</button>
+                        )}
+                        {(escrow.status === 'funded' || escrow.status === 'delivered') && !isBuyer && (
+                          <button className="btn-secondary" style={{ color: '#ef4444', borderColor: '#ef4444', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }} onClick={() => updateStatus(escrow._id, 'refunded')}>Cancel & Refund</button>
+                        )}
+                        {(escrow.status === 'funded' || escrow.status === 'delivered') && (
+                          <button className="btn-secondary" style={{ color: '#f59e0b', borderColor: '#f59e0b', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }} onClick={() => updateStatus(escrow._id, 'disputed')}>Dispute</button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{ textAlign: 'center', marginTop: '1.5rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                {visibleEscrowsCount < escrows.length && (
+                  <button 
+                    onClick={() => setVisibleEscrowsCount(prev => prev + 3)}
+                    style={{ background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '0.5rem 1.5rem', borderRadius: '50px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s ease' }}
+                    onMouseOver={(e) => { e.target.style.background = 'var(--primary)'; e.target.style.color = '#fff'; }}
+                    onMouseOut={(e) => { e.target.style.background = 'transparent'; e.target.style.color = 'var(--primary)'; }}
+                  >
+                    View More Escrows
+                  </button>
+                )}
+                {visibleEscrowsCount > 3 && (
+                  <button 
+                    onClick={() => setVisibleEscrowsCount(3)}
+                    style={{ background: 'transparent', border: '1px solid var(--text-muted)', color: 'var(--text-muted)', padding: '0.5rem 1.5rem', borderRadius: '50px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s ease' }}
+                    onMouseOver={(e) => { e.target.style.background = 'var(--text-muted)'; e.target.style.color = '#fff'; }}
+                    onMouseOut={(e) => { e.target.style.background = 'transparent'; e.target.style.color = 'var(--text-muted)'; }}
+                  >
+                    View Less
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Recent Activity */}
           <div className="wo-activity-card">
             <div className="wo-activity-header">
-              <h3>Recent Activity</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <h3>Recent Activity</h3>
+                <button 
+                  onClick={fetchOnChainHistory} 
+                  disabled={loadingOnChain}
+                  style={{ 
+                    background: 'var(--primary)', color: '#fff', border: 'none', 
+                    borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.8rem', 
+                    cursor: loadingOnChain ? 'not-allowed' : 'pointer', opacity: loadingOnChain ? 0.7 : 1,
+                    display: 'flex', alignItems: 'center', gap: '0.4rem'
+                  }}
+                >
+                  <i className='bx bx-cloud-download' />
+                  Load Live Data
+                </button>
+              </div>
               <Link to="/transfers">View All</Link>
             </div>
             <div className="wo-activity-list">
-              {history.length === 0 && !loading && (
+              {history.length === 0 && !loading && !loadingOnChain && (
                 <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>No recent transactions found on Sepolia Testnet.</div>
               )}
-              {loading && <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Loading history...</div>}
+              {(loading || loadingOnChain) && <Loader text="Loading on-chain data..." />}
               {history.map((tx, i) => (
                 <div className="wo-activity-item" key={tx.id || i}>
                   <div className="wo-activity-info">

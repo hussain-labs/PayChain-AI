@@ -70,6 +70,7 @@ const Pricing = () => {
       description: "Ideal for individuals starting out with digital finance and global transfers.",
       features: [
         { text: "3 transactions per month (resets monthly)", active: true },
+        { text: "3 Live Data Lookups /mo (10 txs)", active: true },
         { text: "1 saved wallet account maximum", active: true },
         { text: "Delete existing wallet to save a new one", active: true },
         { text: "Standard email support", active: true },
@@ -87,6 +88,7 @@ const Pricing = () => {
       description: "Perfect for growing online businesses and global freelancers needing instant settlements.",
       features: [
         { text: "10,000 transactions per month (resets monthly)", active: true },
+        { text: "Unlimited Live Data Lookups (30 txs)", active: true },
         { text: "Up to 60 connected wallet accounts", active: true },
         { text: "All 60 slots can be from a single wallet type", active: true },
         { text: "24/7 Priority support (chat & call)", active: true },
@@ -105,6 +107,7 @@ const Pricing = () => {
       description: "Customized solutions for high-volume companies and financial platforms.",
       features: [
         { text: "Unlimited transactions per month", active: true },
+        { text: "Unlimited Live Data Lookups (50 txs)", active: true },
         { text: "Up to 200 connected wallet accounts included", active: true },
         { text: "Extra wallet accounts: $1 each", active: true },
         { text: "Dedicated account manager", active: true },

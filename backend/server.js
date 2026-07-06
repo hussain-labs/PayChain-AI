@@ -10,6 +10,9 @@ import supportRoutes from './routes/supportRoutes.js';
 import walletRoutes from './routes/walletRoutes.js';
 import transactionRoutes from './routes/transactionRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
+import fraudRoutes from './routes/fraudRoutes.js';
+import analyticsRoutes from './routes/analyticsRoutes.js';
+import escrowRoutes from './routes/escrowRoutes.js';
 import { stripeWebhook } from './controllers/subscriptionController.js';
 import { connectDb } from './database.js';
 import startDailyResetScheduler from './services/dailyResetScheduler.js';
@@ -38,6 +41,9 @@ app.use('/api/support', supportRoutes);
 app.use('/api/wallets', walletRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/subscription', subscriptionRoutes);
+app.use('/api/fraud', fraudRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/escrows', escrowRoutes);
 
 // Connect to MongoDB and start server
 async function startServer() {

@@ -70,7 +70,7 @@ export const updateUserPlan = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { plan },
-      { new: true, select: '-password' }
+      { returnDocument: 'after', select: '-password' }
     );
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.json(user);
@@ -90,7 +90,7 @@ export const updateUserLimit = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { transactionCount: Number(transactionCount) },
-      { new: true, select: '-password' }
+      { returnDocument: 'after', select: '-password' }
     );
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.json(user);
@@ -107,7 +107,7 @@ export const updateUser = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { name, email, phone },
-      { new: true, select: '-password' }
+      { returnDocument: 'after', select: '-password' }
     );
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.json(user);

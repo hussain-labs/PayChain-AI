@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import ConfirmModal from './ConfirmModal';
 
 const UserProfilePopup = ({ user }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,6 +9,7 @@ const UserProfilePopup = ({ user }) => {
   const triggerRef = useRef(null);
   const popupRef = useRef(null);
   const navigate = useNavigate();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   // Calculate popup position based on the avatar button position
   const openPopup = () => {
@@ -42,6 +44,11 @@ const UserProfilePopup = ({ user }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/');
+  };
+
+  const handleLogoutClick = () => {
+    setIsOpen(false);
+    setShowLogoutConfirm(true);
   };
 
   const getLimitText = () => {
@@ -136,6 +143,15 @@ const UserProfilePopup = ({ user }) => {
                 +{user.bonusTransactions} Bonus Transactions
               </div>
             )}
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.4rem' }}>
+              <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-color)' }}>
+                Live Data
+              </span>
+              <span style={{ fontSize: '0.78rem', color: user?.plan === 'free' && (user?.historyLookups || 0) >= 3 ? '#ef4444' : 'var(--text-color)', fontWeight: 700 }}>
+                {user?.historyLookups || 0} / {user?.plan === 'free' ? 3 : '∞'} Lookups
+              </span>
+            </div>
           </div>
 
           {user?.plan !== 'pro_plus' && (
@@ -194,7 +210,7 @@ const UserProfilePopup = ({ user }) => {
       </button>
 
       <button
-        onClick={handleLogout}
+        onClick={handleLogoutClick}
         style={{ width: '100%', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', padding: '0.7rem', borderRadius: '8px', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontWeight: 600, fontSize: '0.88rem', transition: 'background 0.2s' }}
         onMouseOver={e => e.currentTarget.style.background = 'rgba(239,68,68,0.15)'}
         onMouseOut={e => e.currentTarget.style.background = 'rgba(239,68,68,0.08)'}
@@ -236,6 +252,17 @@ const UserProfilePopup = ({ user }) => {
 
       {/* Popup rendered via portal directly at body level to escape overflow clipping */}
       {isOpen && createPortal(popupContent, document.body)}
+
+      <ConfirmModal
+        isOpen={showLogoutConfirm}
+        title="Log Out"
+        message="Are you sure you want to log out?"
+        confirmText="Log Out"
+        cancelText="Cancel"
+        isCritical={true}
+        onConfirm={handleLogout}
+        onCancel={() => setShowLogoutConfirm(false)}
+      />
     </>
   );
 };

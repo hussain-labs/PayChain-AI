@@ -1194,12 +1194,7 @@ footer {
   }
 }
 
-/* Dashboard Layout */
-.dashboard-layout {
-  display: flex;
-  min-height: 100vh;
-  background: var(--background);
-}
+
 
 .sidebar {
   width: 280px;
@@ -1303,11 +1298,15 @@ footer {
   flex: 1;
   overflow-y: auto;
   /* Hide scrollbar for a cleaner look while keeping functionality */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
 }
+
 .sidebar-nav::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera */
+  display: none;
+  /* Chrome, Safari and Opera */
 }
 
 .sidebar-nav a {
@@ -1367,13 +1366,12 @@ footer {
 }
 
 .dashboard-content-wrapper {
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   padding: 2rem 3rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  width: 100%;
 }
 
 .dashboard-header {
@@ -1626,7 +1624,7 @@ footer {
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: #6b7280;
+  color: var(--text-main);
   cursor: pointer;
   transition: var(--transition);
   line-height: 1;
@@ -1636,7 +1634,7 @@ footer {
 
 .close-btn:hover {
   color: var(--primary);
-  background: rgba(123,63,191,0.08);
+  background: rgba(123, 63, 191, 0.08);
 }
 
 .modal-form .form-group {
@@ -4044,13 +4042,9 @@ footer {
 /* Dashboard Layout */
 .dashboard-layout {
   display: flex;
-  height: 94vh;
-  max-height: 1600px;
-  background: var(--bg);
+  min-height: 100vh;
+  background: var(--background);
   overflow: hidden;
-  max-width: 1920px;
-  margin: 0 auto;
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
 }
 
 .sidebar {
@@ -4410,7 +4404,7 @@ footer {
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: var(--text-muted);
+  color: var(--text-main);
   cursor: pointer;
   transition: var(--transition);
 }
@@ -6896,6 +6890,24 @@ footer {
 }
 
 /* Full responsive on mobile devices */
+@media (max-width: 1200px) {
+  .chatbot-toggle-btn .toggle-text {
+    display: none;
+  }
+
+  .chatbot-toggle-btn {
+    padding: 1.15rem;
+    border-radius: 50%;
+    aspect-ratio: 1/1;
+    justify-content: center;
+  }
+
+  .chatbot-toggle-btn i {
+    font-size: 1.6rem;
+    margin: 0;
+  }
+}
+
 @media (max-width: 480px) {
   .chatbot-wrapper {
     bottom: 20px;
@@ -8110,9 +8122,9 @@ body.menu-open .theme-switcher {
   gap: 0.45rem;
   padding: 0.5rem 1.1rem;
   border-radius: 10px;
-  background: rgba(99,102,241,0.1);
+  background: rgba(99, 102, 241, 0.1);
   color: #6366f1;
-  border: 1px solid rgba(99,102,241,0.25);
+  border: 1px solid rgba(99, 102, 241, 0.25);
   cursor: pointer;
   font-weight: 700;
   font-size: 0.82rem;
@@ -8129,6 +8141,7 @@ body.menu-open .theme-switcher {
   .admin-table-action-btn i {
     display: none;
   }
+
   .admin-table-action-btn {
     padding: 0.4rem 0.75rem;
     font-size: 0.78rem;
@@ -8650,7 +8663,7 @@ body.menu-open .theme-switcher {
 
 .contact-info-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
 }
 
 .contact-info-card i {
@@ -8710,7 +8723,7 @@ body.menu-open .theme-switcher {
 
 .faq-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .faq-item h4 {
@@ -8780,6 +8793,7 @@ body.menu-open .theme-switcher {
   .pagination-container {
     gap: 0.25rem;
   }
+
   .pagination-btn {
     padding: 0.3rem 0.5rem;
     font-size: 0.75rem;
@@ -8790,18 +8804,18 @@ body.menu-open .theme-switcher {
 
 .profile-stat-box {
   flex: 1;
-  background: rgba(255,255,255,0.12);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 14px;
   padding: 0.7rem 0.5rem;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   text-align: center;
   min-width: 0;
 }
 
 .profile-stat-icon {
   font-size: 1.2rem;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
   display: block;
   margin-bottom: 0.3rem;
 }
@@ -8817,7 +8831,7 @@ body.menu-open .theme-switcher {
 
 .profile-stat-label {
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -8828,12 +8842,15 @@ body.menu-open .theme-switcher {
     padding: 0.5rem 0.3rem;
     border-radius: 10px;
   }
+
   .profile-stat-value {
     font-size: 0.85rem;
   }
+
   .profile-stat-label {
     font-size: 0.6rem;
   }
+
   .profile-stat-icon {
     font-size: 1rem;
     margin-bottom: 0.15rem;
@@ -8847,7 +8864,7 @@ body.menu-open .theme-switcher {
   padding: 2.5rem;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 12px 40px rgba(99,102,241,0.35);
+  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.35);
 }
 
 .profile-hero-content {
@@ -8862,7 +8879,7 @@ body.menu-open .theme-switcher {
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  border: 4px solid rgba(255,255,255,0.4);
+  border: 4px solid rgba(255, 255, 255, 0.4);
   object-fit: cover;
   display: block;
 }
@@ -8874,7 +8891,7 @@ body.menu-open .theme-switcher {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  border: 3px solid rgba(255,255,255,0.6);
+  border: 3px solid rgba(255, 255, 255, 0.6);
 }
 
 .profile-hero-name {
@@ -8885,7 +8902,7 @@ body.menu-open .theme-switcher {
 }
 
 .profile-hero-email {
-  color: rgba(255,255,255,0.8);
+  color: rgba(255, 255, 255, 0.8);
   margin: 0 0 0.75rem;
   font-size: 0.92rem;
 }
@@ -8910,31 +8927,38 @@ body.menu-open .theme-switcher {
     padding: 1.25rem;
     border-radius: 18px;
   }
+
   .profile-hero-content {
     gap: 1rem;
     flex-direction: column;
     text-align: center;
   }
+
   .profile-hero-avatar {
     width: 72px;
     height: 72px;
     border-width: 3px;
   }
+
   .profile-hero-status-dot {
     width: 18px;
     height: 18px;
     border-width: 2px;
   }
+
   .profile-hero-name {
     font-size: 1.25rem;
   }
+
   .profile-hero-email {
     font-size: 0.8rem;
     margin-bottom: 0.5rem;
   }
+
   .profile-hero-badges {
     justify-content: center;
   }
+
   .profile-hero-stats-wrap {
     margin-top: 0.5rem;
   }
@@ -8945,12 +8969,14 @@ body.menu-open .theme-switcher {
   .support-tab-btn .tab-text {
     display: none;
   }
+
   .support-tab-btn {
     padding: 0.7rem;
     display: flex;
     justify-content: center;
     align-items: center;
   }
+
   .support-tab-btn i {
     font-size: 1.25rem;
     margin: 0;

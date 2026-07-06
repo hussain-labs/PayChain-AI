@@ -1,12 +1,12 @@
 import { ethers } from 'ethers';
 import User from '../models/User.js';
+import Transaction from '../models/Transaction.js';
+import { getActiveAlchemyKey, rotateToNextAlchemyKey, isQuotaError } from '../services/keyRotationService.js';
 
-// ─── Providers ───────────────────────────────────────────────────────────────
-// We try Alchemy first (full token support), fall back to public RPC for ETH only
-const ALCHEMY_KEY = process.env.ALCHEMY_API_KEY;
-const ALCHEMY_BASE = ALCHEMY_KEY && ALCHEMY_KEY !== 'your_key_here'
-  ? (ALCHEMY_KEY.startsWith('http') ? ALCHEMY_KEY.replace('mainnet', 'sepolia') : `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_KEY}`)
-  : null;
+const formatAlchemyBaseUrl = (key) => {
+  if (!key || key === 'your_key_here') return null;
+  return key.startsWith('http') ? key.replace('mainnet', 'sepolia') : `https://eth-sepolia.g.alchemy.com/v2/${key}`;
+};
 
 // Public fallback – reads ETH balance only (Sepolia Testnet)
 const publicProvider = new ethers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com');
@@ -29,14 +29,31 @@ async function fetchEthPrice() {
 }
 
 async function alchemyPost(method, params) {
-  const res = await fetch(ALCHEMY_BASE, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
-  });
-  const json = await res.json();
-  if (json.error) throw new Error(json.error.message);
-  return json.result;
+  for (let attempts = 0; attempts < 3; attempts++) {
+    const activeAlchemy = await getActiveAlchemyKey();
+    if (!activeAlchemy) throw new Error("No Alchemy key configured.");
+    
+    const alchemyBase = formatAlchemyBaseUrl(activeAlchemy.key);
+    
+    try {
+      const res = await fetch(alchemyBase, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
+      });
+      const json = await res.json();
+      if (json.error) throw new Error(json.error.message);
+      return json.result;
+    } catch (err) {
+      if (isQuotaError(err) || String(err.message).toLowerCase().includes('rate limit') || String(err.message).toLowerCase().includes('capacity')) {
+        console.warn(`[Alchemy Rate Limit] Key ${activeAlchemy.index} hit limit in wallet assets. Rotating...`);
+        await rotateToNextAlchemyKey(activeAlchemy.index, activeAlchemy.total);
+      } else {
+        throw err;
+      }
+    }
+  }
+  throw new Error("Alchemy fetch failed after retries.");
 }
 
 // ─── Controllers ─────────────────────────────────────────────────────────────
@@ -162,8 +179,11 @@ export const getWalletAssets = async (req, res) => {
     let tokens = [];
     let totalUsd = parseFloat(ethUsd);
 
-    // 3. ERC-20 tokens via Alchemy (only if key is configured)
-    if (ALCHEMY_BASE) {
+    let hasAlchemy = false;
+    // 3. ERC-20 tokens via Alchemy
+    const activeAlchemyForAssets = await getActiveAlchemyKey();
+    if (activeAlchemyForAssets) {
+      hasAlchemy = true;
       try {
         // Get all token balances
         const balancesResult = await alchemyPost('alchemy_getTokenBalances', [address, 'erc20']);
@@ -224,7 +244,7 @@ export const getWalletAssets = async (req, res) => {
       },
       tokens,
       totalUsd: totalUsd.toFixed(2),
-      hasAlchemy: !!ALCHEMY_BASE,
+      hasAlchemy,
     });
   } catch (err) {
     console.error('getWalletAssets error:', err.message);
@@ -235,38 +255,108 @@ export const getWalletAssets = async (req, res) => {
 // GET /api/wallets/:address/history
 export const getWalletHistory = async (req, res) => {
   const { address } = req.params;
+  const onchain = req.query.onchain === 'true';
 
   if (!isValidEthAddress(address)) {
     return res.status(400).json({ error: 'Invalid Ethereum address.' });
   }
 
   try {
-    if (!ALCHEMY_BASE) {
-      console.warn('No Alchemy key found, returning empty history.');
-      return res.json([]);
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+
+    // 1. DEFAULT BEHAVIOR: Load internal MongoDB transactions (Free, no rate limit)
+    if (!onchain) {
+      const internalTxs = await Transaction.find({
+        $or: [
+          { from: { $regex: new RegExp("^" + address + "$", "i") } },
+          { to: { $regex: new RegExp("^" + address + "$", "i") } }
+        ]
+      })
+      .sort({ createdAt: -1 })
+      .limit(15);
+
+      const formatted = internalTxs.map(tx => ({
+        id: tx.hash || tx._id,
+        hash: tx.hash || tx._id,
+        timestamp: new Date(tx.createdAt).getTime(),
+        isReceive: tx.to.toLowerCase() === address.toLowerCase(),
+        value: parseFloat(tx.amount) || 0,
+        symbol: tx.asset,
+        from: tx.from,
+        to: tx.to,
+        status: tx.status
+      }));
+
+      return res.json(formatted);
+    }
+
+    // 2. ON-CHAIN BEHAVIOR: Check Plan Limits
+    const plan = user.plan || 'free';
+    let maxCountHex = "0xA"; // Default 10
+    let fetchLimit = 10;
+
+    if (plan === 'free') {
+      if (user.historyLookups >= 3) {
+        return res.status(403).json({
+          error: 'You have reached your 3 free on-chain data lookups for this month. Upgrade to Pro to unlock unlimited history.',
+          code: 'LIMIT_REACHED'
+        });
+      }
+      maxCountHex = "0xA"; // 10 txs
+      fetchLimit = 10;
+    } else if (plan === 'pro') {
+      maxCountHex = "0x1E"; // 30 txs
+      fetchLimit = 30;
+    } else if (plan === 'pro_plus') {
+      maxCountHex = "0x32"; // 50 txs
+      fetchLimit = 50;
+    }
+
+    // Fetch from Alchemy
+    const activeAlchemy = await getActiveAlchemyKey();
+    if (!activeAlchemy) {
+      console.warn('No Alchemy key found, returning 503.');
+      return res.status(503).json({ error: 'Live on-chain data is currently unavailable. Please try again later.' });
     }
 
     const fetchTransfers = async (isFrom) => {
-      const payload = {
-        jsonrpc: "2.0",
-        id: 1,
-        method: "alchemy_getAssetTransfers",
-        params: [{
-          fromBlock: "0x0",
-          toBlock: "latest",
-          [isFrom ? "fromAddress" : "toAddress"]: address,
-          category: ["external", "internal", "erc20"],
-          maxCount: "0x15"
-        }]
-      };
+      for (let attempts = 0; attempts < 3; attempts++) {
+        const currentAlchemy = await getActiveAlchemyKey();
+        const alchemyBase = formatAlchemyBaseUrl(currentAlchemy.key);
+        
+        const payload = {
+          jsonrpc: "2.0",
+          id: 1,
+          method: "alchemy_getAssetTransfers",
+          params: [{
+            fromBlock: "0x0",
+            toBlock: "latest",
+            [isFrom ? "fromAddress" : "toAddress"]: address,
+            category: ["external", "internal", "erc20"],
+            maxCount: maxCountHex
+          }]
+        };
 
-      const r = await fetch(ALCHEMY_BASE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await r.json();
-      return data?.result?.transfers || [];
+        try {
+          const r = await fetch(alchemyBase, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          const data = await r.json();
+          if (data.error) throw new Error(data.error.message);
+          return data?.result?.transfers || [];
+        } catch (err) {
+          if (isQuotaError(err) || String(err.message).toLowerCase().includes('rate limit') || String(err.message).toLowerCase().includes('capacity')) {
+            console.warn(`[Alchemy Rate Limit] Key ${currentAlchemy.index} hit limit in history. Rotating...`);
+            await rotateToNextAlchemyKey(currentAlchemy.index, currentAlchemy.total);
+          } else {
+            throw err;
+          }
+        }
+      }
+      return []; // Return empty if all retries fail
     };
 
     const [sentTxs, rcvTxs] = await Promise.all([
@@ -275,12 +365,8 @@ export const getWalletHistory = async (req, res) => {
     ]);
 
     let combined = [...sentTxs, ...rcvTxs];
-
-    // Sort by blockNum descending
     combined.sort((a, b) => parseInt(b.blockNum, 16) - parseInt(a.blockNum, 16));
-
-    // Take top 15 recent
-    combined = combined.slice(0, 15);
+    combined = combined.slice(0, fetchLimit);
 
     // Fetch block timestamps
     const blockCache = {};
@@ -308,6 +394,12 @@ export const getWalletHistory = async (req, res) => {
         status: 'Success'
       };
     }));
+
+    // Increment lookup count for free users ONLY after successful fetch
+    if (plan === 'free' && onchain) {
+      user.historyLookups += 1;
+      await user.save();
+    }
 
     res.json(txs);
   } catch (err) {
