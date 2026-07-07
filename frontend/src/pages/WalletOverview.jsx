@@ -105,8 +105,8 @@ const WalletOverview = () => {
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data)) {
-          const relevantEscrows = data.filter(e => 
-            e.buyerWallet?.toLowerCase() === address.toLowerCase() || 
+          const relevantEscrows = data.filter(e =>
+            e.buyerWallet?.toLowerCase() === address.toLowerCase() ||
             e.sellerWallet?.toLowerCase() === address.toLowerCase()
           );
           setEscrows(relevantEscrows);
@@ -121,8 +121,8 @@ const WalletOverview = () => {
     if (!token) return;
     setLoadingOnChain(true);
     try {
-      const res = await fetch(`${API}/api/wallets/${address}/history?onchain=true`, { 
-        headers: { Authorization: `Bearer ${token}` } 
+      const res = await fetch(`${API}/api/wallets/${address}/history?onchain=true`, {
+        headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
       if (!res.ok) {
@@ -151,13 +151,13 @@ const WalletOverview = () => {
       const r = await fetch(`${API}/api/escrows`, { headers: { Authorization: `Bearer ${token}` } });
       const data = await r.json();
       if (Array.isArray(data)) {
-        const relevantEscrows = data.filter(e => 
-          e.buyerWallet?.toLowerCase() === address.toLowerCase() || 
+        const relevantEscrows = data.filter(e =>
+          e.buyerWallet?.toLowerCase() === address.toLowerCase() ||
           e.sellerWallet?.toLowerCase() === address.toLowerCase()
         );
         setEscrows(relevantEscrows);
       }
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const updateStatus = async (id, status) => {
@@ -186,7 +186,7 @@ const WalletOverview = () => {
   const handleFund = async (escrow) => {
     try {
       if (web3Address && escrow.buyerWallet && web3Address.toLowerCase() !== escrow.buyerWallet.toLowerCase()) {
-        toast.error(`Your active MetaMask account is ${web3Address.slice(0,6)}... Please open your MetaMask extension and switch to the correct account to fund this escrow.`);
+        toast.error(`Your active MetaMask account is ${web3Address.slice(0, 6)}... Please open your MetaMask extension and switch to the correct account to fund this escrow.`);
         return;
       }
 
@@ -196,7 +196,7 @@ const WalletOverview = () => {
         value: parseEther(escrow.amount.toString()),
       });
       console.log('Transaction sent:', txHash);
-      
+
       // Once the user approves and the tx is sent, update backend state
       updateStatus(escrow._id, 'funded');
     } catch (err) {
@@ -303,13 +303,26 @@ const WalletOverview = () => {
           <header className="dashboard-header">
             <div className="header-toggle" onClick={() => setIsSidebarOpen(true)}><i className='bx bx-menu' /></div>
             <div className="header-greeting" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <Link to="/dashboard" className="wo-back-btn"><i className='bx bx-left-arrow-alt' /></Link>
               <div>
                 <h1>{walletDetail?.nickname || (address.toLowerCase() === web3Address?.toLowerCase() ? 'Web3 Wallet' : 'Wallet')}</h1>
                 <p>Wallet Overview</p>
               </div>
             </div>
             <div className="header-actions">
+              <Link
+                to="/dashboard"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '0.4rem',
+                  background: 'var(--primary)', color: '#fff',
+                  padding: '0.5rem 1rem', borderRadius: '50px',
+                  textDecoration: 'none', fontWeight: 600, fontSize: '0.85rem',
+                  transition: 'opacity 0.2s', border: 'none'
+                }}
+                onMouseOver={e => e.currentTarget.style.opacity = '0.85'}
+                onMouseOut={e => e.currentTarget.style.opacity = '1'}
+              >
+                <i className='bx bx-left-arrow-alt' style={{ fontSize: '1.2rem' }} /> Back
+              </Link>
               <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize: '1.2rem' }}>
                 <i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} />
               </button>
@@ -416,7 +429,7 @@ const WalletOverview = () => {
               </div>
               <div style={{ textAlign: 'center', marginTop: '1.5rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                 {visibleEscrowsCount < escrows.length && (
-                  <button 
+                  <button
                     onClick={() => setVisibleEscrowsCount(prev => prev + 2)}
                     style={{ background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '0.5rem 1.5rem', borderRadius: '50px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s ease' }}
                     onMouseOver={(e) => { e.target.style.background = 'var(--primary)'; e.target.style.color = '#fff'; }}
@@ -426,7 +439,7 @@ const WalletOverview = () => {
                   </button>
                 )}
                 {visibleEscrowsCount > 2 && (
-                  <button 
+                  <button
                     onClick={() => setVisibleEscrowsCount(2)}
                     style={{ background: 'transparent', border: '1px solid var(--text-muted)', color: 'var(--text-muted)', padding: '0.5rem 1.5rem', borderRadius: '50px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s ease' }}
                     onMouseOver={(e) => { e.target.style.background = 'var(--text-muted)'; e.target.style.color = '#fff'; }}
@@ -444,12 +457,12 @@ const WalletOverview = () => {
             <div className="wo-activity-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <h3>Recent Activity</h3>
-                <button 
-                  onClick={fetchOnChainHistory} 
+                <button
+                  onClick={fetchOnChainHistory}
                   disabled={loadingOnChain}
-                  style={{ 
-                    background: 'var(--primary)', color: '#fff', border: 'none', 
-                    borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.8rem', 
+                  style={{
+                    background: 'var(--primary)', color: '#fff', border: 'none',
+                    borderRadius: '8px', padding: '0.4rem 0.8rem', fontSize: '0.8rem',
                     cursor: loadingOnChain ? 'not-allowed' : 'pointer', opacity: loadingOnChain ? 0.7 : 1,
                     display: 'flex', alignItems: 'center', gap: '0.4rem'
                   }}

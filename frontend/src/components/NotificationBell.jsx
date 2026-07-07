@@ -88,9 +88,10 @@ const NotificationBell = ({ user }) => {
       {isOpen && (
         <div style={{
           position: 'absolute',
-          top: 'calc(100% + 10px)',
-          right: 0,
+          top: 'calc(100% + 15px)',
+          right: '-10px',
           width: '320px',
+          maxWidth: 'calc(100vw - 2rem)',
           background: 'var(--glass-bg, rgba(255,255,255,0.85))',
           backdropFilter: 'blur(16px)',
           border: '1px solid var(--border)',
@@ -132,8 +133,8 @@ const NotificationBell = ({ user }) => {
                   >
                     <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'flex-start' }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: n.isRead ? 'transparent' : 'var(--primary)', marginTop: '6px', flexShrink: 0 }} />
-                      <div>
-                        <div style={{ fontSize: '0.85rem', color: 'var(--text-color)', fontWeight: n.isRead ? 500 : 700, lineHeight: 1.4 }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--text-color)', fontWeight: n.isRead ? 500 : 700, lineHeight: 1.4, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
                           {n.message}
                         </div>
                         <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.3rem' }}>
