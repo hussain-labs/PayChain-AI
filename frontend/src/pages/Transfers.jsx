@@ -302,7 +302,7 @@ const Transfers = () => {
             <div className="header-toggle" onClick={() => setIsSidebarOpen(true)}><i className='bx bx-menu' /></div>
             <div className="header-greeting">
               <h1>Transfers</h1>
-              
+
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme} title="Toggle theme" style={{ fontSize: '1.2rem' }}>
@@ -422,11 +422,11 @@ const Transfers = () => {
 
                   {/* Amount + MAX */}
                   <div className="form-group">
-                    <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <label className="transfers-amount-label">
                       <span>Amount</span>
                       {selectedCoin && <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>Available: {parseFloat(selectedCoin.balance).toFixed(6)} {sendCoin}</span>}
                     </label>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <div className="transfers-amount-row">
                       <input
                         type="number"
                         step="any"
@@ -435,7 +435,7 @@ const Transfers = () => {
                         placeholder="0.00"
                         value={sendAmount}
                         onChange={e => setSendAmount(e.target.value)}
-                        style={{ flex: 1, fontSize: '1.1rem', fontWeight: 600 }}
+                        style={{ flex: 1, minWidth: 0, fontSize: '1.1rem', fontWeight: 600 }}
                         required
                       />
                       <button
@@ -461,7 +461,7 @@ const Transfers = () => {
                   </div>
 
                   {/* Fee estimate */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.85rem 1rem', background: 'rgba(75,29,143,0.06)', border: '1px solid rgba(75,29,143,0.15)', borderRadius: '10px' }}>
+                  <div className="transfers-fee-row">
                     <div>
                       <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>Estimated Fee</span>
                       <strong style={{ fontSize: '0.9rem' }}>~$1.50</strong>
@@ -633,7 +633,7 @@ const Transfers = () => {
                     );
                   })()}
 
-                  <div style={{ display: 'flex', gap: '0.75rem', position: 'sticky', bottom: '1rem', padding: '1rem', margin: '1rem 0 0', background: 'var(--surface)', borderRadius: '16px', border: '1px solid var(--border)', zIndex: 10, boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.05)' }}>
+                  <div className="transfers-btn-group">
                     <button className="btn-secondary" style={{ flex: 1 }} onClick={() => setRiskResult(null)}>← Edit</button>
                     {chainId !== 11155111 ? (
                       <button
@@ -662,7 +662,7 @@ const Transfers = () => {
             </div>
 
             {/* ── RIGHT: History ── */}
-            <div style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '100px', height: 'fit-content' }}>
+            <div className="transfers-right-col">
 
               {/* Wallet quick-pick */}
               {allWallets.length > 0 && (

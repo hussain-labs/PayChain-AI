@@ -212,6 +212,17 @@ const Escrow = () => {
 
   return (
     <div className="dashboard-layout">
+      <style>{`
+        .escrow-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+        .escrow-status-badge { padding: 0.4rem 1rem; border-radius: 50px; background: var(--primary); color: white; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; white-space: nowrap; }
+        
+        @media (max-width: 768px) {
+          .dashboard-grid { grid-template-columns: 1fr !important; gap: 1.5rem; min-width: 0; max-width: 100vw; }
+          .glass-panel { padding: 1.5rem !important; min-width: 0; max-width: 100%; }
+          .escrow-card-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+          .dashboard-content-wrapper { overflow-x: hidden; width: 100%; max-width: 100vw; }
+        }
+      `}</style>
       <AppSidebar 
         activeRoute="/escrow" 
         user={user} 
@@ -228,7 +239,6 @@ const Escrow = () => {
             </div>
             <div className="header-greeting">
               <h1>High-Ticket Escrow</h1>
-              <p>Secure decentralized locking for high-value sales.</p>
             </div>
             <div className="header-actions">
               <button className="icon-btn" onClick={toggleTheme}><i className={`bx ${theme === 'dark' ? 'bx-sun' : 'bx-moon'}`} /></button>
@@ -236,6 +246,10 @@ const Escrow = () => {
               <UserProfilePopup user={user} />
             </div>
           </header>
+
+          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+            <p style={{ margin: 0 }}>Secure decentralized locking for high-value sales.</p>
+          </div>
 
           <div className="dashboard-grid">
             
@@ -330,12 +344,12 @@ const Escrow = () => {
 
                       return (
                       <div key={escrow._id} style={{ padding: '1.5rem', background: 'var(--background)', borderRadius: '12px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+                        <div className="escrow-card-header">
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <h3 style={{ fontSize: '1.1rem', fontWeight: 600 }}>{escrow.title}</h3>
                             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', wordBreak: 'break-all' }}>Smart Contract: <span style={{ fontFamily: 'monospace' }}>{escrow.contractAddress}</span></p>
                           </div>
-                          <div style={{ padding: '0.4rem 1rem', borderRadius: '50px', background: 'var(--primary)', color: 'white', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase' }}>
+                          <div className="escrow-status-badge">
                             {escrow.status.replace('_', ' ')}
                           </div>
                         </div>

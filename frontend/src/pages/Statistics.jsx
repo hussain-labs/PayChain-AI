@@ -125,6 +125,35 @@ const Statistics = () => {
         .stat-alloc-name { font-weight: 700; color: var(--text-color); margin: 0 0 0.2rem; }
         .stat-alloc-pct { font-size: 0.8rem; color: var(--text-muted); margin: 0; }
         .stat-alloc-val { font-weight: 700; color: var(--text-color); font-size: 1.1rem; }
+        
+        .splits-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .vip-table-container { background: var(--glass-bg); border: 1px solid var(--border); border-radius: 20px; padding: 1.5rem 2rem; margin-bottom: 3rem; overflow-x: auto; }
+        .stat-kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; width: 100%; }
+
+        @media (max-width: 768px) {
+          .dashboard-content-wrapper { overflow-x: hidden; width: 100%; max-width: 100vw; }
+          .quick-actions { min-width: 0; max-width: 100%; }
+          .stat-kpi-grid { grid-template-columns: 1fr !important; }
+          .stat-kpi-row {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            padding-bottom: 1rem;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            width: 100%;
+          }
+          .stat-kpi-row::-webkit-scrollbar { display: none; }
+          .stat-kpi-row > div { flex: 0 0 240px !important; scroll-snap-align: start; }
+          
+          .stat-chart-container { padding: 1.5rem 1rem !important; height: 300px !important; }
+          .stat-chart-area { padding: 1rem 0.5rem 0 !important; }
+          .splits-grid { grid-template-columns: 1fr !important; }
+          .vip-table-container { padding: 1.5rem 1rem !important; }
+          .stat-alloc-card { padding: 1rem; }
+        }
       `}</style>
 
       <AppSidebar activeRoute="/statistics" user={user} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} onLogout={handleLogout} />
@@ -155,7 +184,7 @@ const Statistics = () => {
 
             {/* KPI Cards */}
             <div className="quick-actions glass-panel" style={{ gridColumn: '1 / -1' }}>
-              <div className="action-buttons" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', width: '100%' }}>
+              <div className="stat-kpi-row">
                 <div className="action-btn" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '1.5rem', background: 'rgba(255,255,255,0.5)' }}>
                   <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Total Volume</span>
                   <h3 style={{ fontSize: '1.5rem', color: 'var(--primary-dark)', margin: 0 }}>$2.4M</h3>
@@ -206,7 +235,7 @@ const Statistics = () => {
               </div>
 
               {/* Analytics Splits */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
+              <div className="splits-grid">
                 {/* Asset Allocation */}
                 <div>
                   <h3 style={{ marginBottom: '1rem', color: 'var(--text-color)', fontSize: '1.2rem' }}>Asset Breakdown</h3>
@@ -254,7 +283,7 @@ const Statistics = () => {
               </div>
 
               {/* VIP Transactions */}
-              <div style={{ background: 'var(--glass-bg)', border: '1px solid var(--border)', borderRadius: '20px', padding: '1.5rem 2rem', marginBottom: '3rem', overflowX: 'auto' }}>
+              <div className="vip-table-container">
                 <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--text-color)', fontSize: '1.2rem' }}>Top VIP Transactions (Whales)</h3>
                 {stats?.topTransactions?.length > 0 ? (
                   <table className="vip-table">

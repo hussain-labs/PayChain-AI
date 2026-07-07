@@ -148,10 +148,10 @@ const POSMode = () => {
             <p>Turn your device into a Web3 cash register.</p>
           </div>
 
-          <div style={{ padding: '2rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem', alignItems: 'stretch' }}>
+          <div className="dashboard-grid pos-grid" style={{ alignItems: 'stretch' }}>
             
             {/* Payment Details Panel */}
-            <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '24px', background: theme === 'dark' ? 'var(--glass-bg, rgba(255,255,255,0.05))' : '#FFFFFF', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column' }}>
+            <div className="glass-panel pos-panel" style={{ borderRadius: '24px', background: theme === 'dark' ? 'var(--glass-bg, rgba(255,255,255,0.05))' : '#FFFFFF', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column' }}>
               <h2 style={{ textAlign: 'center', margin: '0 0 2rem 0', fontSize: '1.5rem', fontWeight: 700 }}>Payment Details</h2>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1 }}>
@@ -200,7 +200,8 @@ const POSMode = () => {
                         background: 'var(--glass-bg, rgba(255,255,255,0.05))',
                         color: 'var(--text-color)',
                         fontSize: '2rem',
-                        fontWeight: 700
+                        fontWeight: 700,
+                        minWidth: 0
                       }}
                     />
                   </div>
@@ -231,7 +232,7 @@ const POSMode = () => {
             </div>
 
             {/* QR Code Panel */}
-            <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '24px', background: theme === 'dark' ? 'var(--glass-bg, rgba(255,255,255,0.05))' : '#FFFFFF', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '500px' }}>
+            <div className="glass-panel pos-panel" style={{ borderRadius: '24px', background: theme === 'dark' ? 'var(--glass-bg, rgba(255,255,255,0.05))' : '#FFFFFF', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '500px' }}>
               
               <div style={{ background: '#FFFFFF', padding: '1.5rem', borderRadius: '24px', marginBottom: '2rem' }}>
                 {paymentUri ? (
