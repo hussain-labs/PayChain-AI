@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { notifyUser, notifyAdmins } from '../utils/notify.js';
+import { sendPasswordResetEmail } from '../utils/email.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -96,6 +97,91 @@ export const loginUser = async (req, res) => {
 
   } catch (error) {
     console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// @desc    Forgot Password (Generate and send code)
+// @route   POST /api/auth/forgot-password
+// @access  Public
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email is required' });
+
+  try {
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    user.resetPasswordCode = code;
+    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+    await user.save();
+
+    await sendPasswordResetEmail(user.email, code);
+
+    res.status(200).json({ message: 'Verification code sent to your email.' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// @desc    Verify Reset Code
+// @route   POST /api/auth/verify-reset-code
+// @access  Public
+export const verifyResetCode = async (req, res) => {
+  const { email, code } = req.body;
+  if (!email || !code) return res.status(400).json({ error: 'Email and code are required' });
+
+  try {
+    const user = await User.findOne({ 
+      email: email.toLowerCase().trim(),
+      resetPasswordCode: code,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid or expired verification code' });
+    }
+
+    res.status(200).json({ message: 'Code verified successfully' });
+  } catch (error) {
+    console.error('Verify reset code error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// @desc    Reset Password
+// @route   POST /api/auth/reset-password
+// @access  Public
+export const resetPassword = async (req, res) => {
+  const { email, code, newPassword } = req.body;
+  if (!email || !code || !newPassword) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  try {
+    const user = await User.findOne({ 
+      email: email.toLowerCase().trim(),
+      resetPasswordCode: code,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid or expired verification code' });
+    }
+
+    const saltRounds = 10;
+    user.password = await bcrypt.hash(newPassword, saltRounds);
+    user.resetPasswordCode = null;
+    user.resetPasswordExpires = null;
+    user.lastResetAt = Date.now();
+    await user.save();
+
+    res.status(200).json({ message: 'Password reset successful. You can now log in.' });
+  } catch (error) {
+    console.error('Reset password error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
