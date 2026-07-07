@@ -59,7 +59,7 @@ const Upgrade = () => {
           </div>
 
           <div style={{ padding: '0 0 2rem 0', marginTop: '-2rem' }}>
-            <Pricing />
+            <Pricing alignLeft={true} />
           </div>
         </div>
       </main>

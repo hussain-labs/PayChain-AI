@@ -114,7 +114,7 @@ const AdminSupport = () => {
             </div>
           </header>
 
-          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+          <div className="page-header-description" style={{ margin: "-1rem 0 0.5rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
             <p>{filtered.length} tickets</p>
           </div>
 

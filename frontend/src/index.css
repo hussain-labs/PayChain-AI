@@ -1385,11 +1385,13 @@ footer {
 .header-greeting h1 {
   font-size: 1.8rem;
   color: var(--primary-dark);
+  margin: 0;
 }
 
 .header-greeting p {
   color: var(--text);
   opacity: 0.8;
+  margin: 0;
 }
 
 .header-actions {
@@ -1431,7 +1433,7 @@ footer {
   gap: 2rem;
 }
 
-.dashboard-grid > * {
+.dashboard-grid>* {
   min-width: 0;
 }
 
@@ -3899,11 +3901,11 @@ footer {
   }
 
   .section-header h2 {
-    font-size: clamp(1.5rem, 5vw, 2rem);
+    font-size: clamp(1.2rem, 5vw, 1.8rem);
   }
 
   .section-header p {
-    font-size: 0.9375rem;
+    font-size: 0.85rem;
   }
 
   .journey-section,
@@ -4170,11 +4172,13 @@ footer {
 .header-greeting h1 {
   font-size: 1.8rem;
   color: var(--primary-dark);
+  margin: 0;
 }
 
 .header-greeting p {
   color: var(--text);
   opacity: 0.8;
+  margin: 0;
 }
 
 .header-actions {
@@ -4532,7 +4536,8 @@ footer {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
-  .dashboard-grid > * {
+
+  .dashboard-grid>* {
     min-width: 0;
   }
 }
@@ -4555,7 +4560,8 @@ footer {
     gap: 0.5rem;
     margin-left: auto;
   }
-  .header-actions > button.icon-btn:first-child {
+
+  .header-actions>button.icon-btn:first-child {
     display: none;
   }
 }
@@ -4563,6 +4569,7 @@ footer {
 .mobile-theme-toggle {
   display: none;
 }
+
 @media (max-width: 768px) {
   .mobile-theme-toggle {
     display: flex !important;
@@ -4684,38 +4691,47 @@ footer {
   .pricing-card {
     padding: 1.5rem 1rem !important;
   }
+
   .pricing-header h3 {
     font-size: 1.25rem !important;
   }
+
   .pricing-header p {
     font-size: 0.85rem !important;
     margin-bottom: 0.5rem !important;
   }
+
   .price-val {
     font-size: 2rem !important;
   }
+
   .price-period {
     font-size: 0.8rem !important;
   }
+
   .pricing-features {
     margin-bottom: 1rem !important;
   }
+
   .pricing-features li {
     font-size: 0.8rem !important;
     margin-bottom: 0.5rem !important;
     gap: 0.5rem !important;
   }
+
   .pricing-badge {
     font-size: 0.6rem !important;
     padding: 0.2rem 0.4rem !important;
     top: 1rem !important;
     right: 1rem !important;
   }
+
   .pricing-card .btn-primary,
   .pricing-card .btn-secondary {
     padding: 0.6rem !important;
     font-size: 0.85rem !important;
   }
+
   .pricing-card input[type="number"] {
     padding: 0.5rem !important;
     font-size: 0.85rem !important;
@@ -4843,10 +4859,12 @@ footer {
   .ai-advisor-footer {
     padding: 1rem;
   }
+
   .ai-advisor-input {
     padding: 0.8rem 1rem;
     font-size: 0.9rem;
   }
+
   .ai-advisor-btn {
     padding: 0 1rem;
   }
@@ -7106,7 +7124,7 @@ body.menu-open .theme-switcher {
 
 .close-btn {
   font-size: 2rem;
-  color: #ffffff;
+  color: var(--text-color);
   cursor: pointer;
   background: none;
   border: none;
@@ -7204,6 +7222,7 @@ body.menu-open .theme-switcher {
     display: block;
     align-self: flex-start;
     margin-top: 0.2rem;
+    margin-right: 0.2rem;
   }
 
   .sidebar-toggle-btn {
@@ -7238,8 +7257,8 @@ body.menu-open .theme-switcher {
   .dashboard-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    justify-content: flex-start;
+    gap: 0;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -7249,8 +7268,12 @@ body.menu-open .theme-switcher {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
   }
 
+  .dashboard-header .header-actions {
+    margin-left: auto;
+  }
+
   .header-greeting h1 {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
   }
 
   .header-greeting p {
@@ -7510,7 +7533,12 @@ body.menu-open .theme-switcher {
   }
 
   .section-header h2 {
-    font-size: 1.75rem !important;
+    font-size: 1.2rem !important;
+    letter-spacing: -0.5px;
+  }
+
+  .section-header p {
+    font-size: 0.8rem !important;
   }
 
   .faq-question {
@@ -7747,7 +7775,7 @@ body.menu-open .theme-switcher {
     }
 
     .header-greeting h1 {
-      font-size: 1.4rem !important;
+      font-size: 1.1rem !important;
     }
 
     .header-greeting p {
@@ -7756,29 +7784,6 @@ body.menu-open .theme-switcher {
   }
 }
 
-.action-buttons {
-  grid-template-columns: repeat(2, 1fr) !important;
-}
-
-.dashboard-balance-card h2 {
-  font-size: 2.2rem !important;
-}
-
-.header-greeting h1 {
-  font-size: 1.4rem !important;
-}
-
-.header-greeting p {
-  font-size: 0.85rem !important;
-}
-
-.header-greeting h1 {
-  font-size: 1.4rem !important;
-}
-
-.header-greeting p {
-  font-size: 0.85rem !important;
-}
 
 /* ═══════════════════════════════════════════════════════
    ADMIN PANEL — Completely separate design system
@@ -9431,8 +9436,8 @@ select.form-input {
   display: flex;
   justify-content: space-between;
   padding: 0.85rem 1rem;
-  background: rgba(75,29,143,0.06);
-  border: 1px solid rgba(75,29,143,0.15);
+  background: rgba(75, 29, 143, 0.06);
+  border: 1px solid rgba(75, 29, 143, 0.15);
   border-radius: 10px;
 }
 
@@ -9447,29 +9452,42 @@ select.form-input {
   .transfers-btn-group {
     flex-direction: column;
   }
+
   .transfers-amount-row {
     flex-direction: column;
   }
+
+  .transfers-amount-row button {
+    width: 40% !important;
+    align-self: flex-end;
+    padding: 0.5rem 1.2rem !important;
+  }
+
   .transfers-amount-label {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .transfers-amount-label span {
     margin-bottom: 0.2rem;
   }
+
   .transfers-fee-row {
     flex-direction: column;
     gap: 0.5rem;
   }
-  .transfers-fee-row > div {
+
+  .transfers-fee-row>div {
     text-align: left !important;
   }
+
   .dashboard-header {
-    margin: -1rem -1rem 0 -1rem !important;
-    padding: 0.75rem 1rem !important;
+    margin: 0 -1rem 1rem -1rem !important;
+    padding: 0.5rem 1rem !important;
   }
+
   .dashboard-content-wrapper {
-    padding: 1rem !important;
+    padding: 0 1rem 1rem 1rem !important;
     max-width: 100vw;
     overflow-x: hidden;
   }
@@ -9514,14 +9532,8 @@ select {
 
 .wallets-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.25rem;
-}
-
-@media (max-width: 1200px) {
-  .wallets-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 @media (max-width: 768px) {

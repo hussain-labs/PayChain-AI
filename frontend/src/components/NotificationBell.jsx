@@ -36,18 +36,18 @@ const NotificationBell = ({ user }) => {
   const markAsRead = async (index) => {
     if (!notifications[index]) return;
     const notif = notifications[index];
-    
+
     // Optimistic update
     const newNotifs = [...notifications];
     newNotifs[index].isRead = true;
     setNotifications(newNotifs);
-    
+
     // We update localstorage as well to persist without extra fetch
     if (user) {
       const u = { ...user, notifications: newNotifs };
       localStorage.setItem('user', JSON.stringify(u));
     }
-    
+
     // Navigate if there is a link
     if (notif.link) {
       setIsOpen(false);
@@ -66,8 +66,8 @@ const NotificationBell = ({ user }) => {
 
   return (
     <div ref={wrapperRef} style={{ position: 'relative' }}>
-      <button 
-        className="icon-btn" 
+      <button
+        className="icon-btn"
         onClick={() => setIsOpen(!isOpen)}
         style={{ position: 'relative' }}
       >
@@ -108,7 +108,7 @@ const NotificationBell = ({ user }) => {
               </button>
             )}
           </div>
-          
+
           <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
             {notifications.length === 0 ? (
               <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
@@ -119,12 +119,12 @@ const NotificationBell = ({ user }) => {
               [...notifications].reverse().map((n, i) => {
                 const originalIndex = notifications.length - 1 - i;
                 return (
-                  <div 
-                    key={i} 
+                  <div
+                    key={i}
                     onClick={() => markAsRead(originalIndex)}
-                    style={{ 
-                      padding: '1rem', 
-                      borderBottom: '1px solid var(--border)', 
+                    style={{
+                      padding: '1rem',
+                      borderBottom: '1px solid var(--border)',
                       background: n.isRead ? 'transparent' : 'rgba(99,102,241,0.05)',
                       cursor: n.isRead ? 'default' : 'pointer',
                       transition: 'background 0.2s'
