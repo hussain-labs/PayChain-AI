@@ -51,8 +51,10 @@ async function startServer() {
     await connectDb();
     startDailyResetScheduler(); // Reset free users' transaction count at 6 AM daily
     app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
+
+    // Trigger restart to load new env vars & email.js
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
