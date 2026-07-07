@@ -89,7 +89,7 @@ const Notifications = () => {
             </div>
           </header>
 
-          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+          <div className="page-header-description" style={{ margin: "-1rem 0 0.5rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
             <p>Your recent activity and system updates</p>
           </div>
 

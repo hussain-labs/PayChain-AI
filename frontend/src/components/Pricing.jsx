@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const API = 'http://localhost:5000';
 
-const Pricing = () => {
+const Pricing = ({ alignLeft = false }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [extraWallets, setExtraWallets] = useState(parseInt(searchParams.get('wallets')) || 0);
@@ -123,7 +123,7 @@ const Pricing = () => {
   return (
     <section className="pricing" id="pricing">
       <div className="container">
-        <div className="section-header">
+        <div className="section-header" style={{ textAlign: alignLeft ? 'left' : 'center', margin: alignLeft ? '0 0 3rem 0' : '0 auto 3rem', maxWidth: alignLeft ? '100%' : '600px' }}>
           <h2>Simple, Transparent Pricing</h2>
           <p>Choose the plan that fits your business needs. No hidden setup fees or surprise charges.</p>
         </div>

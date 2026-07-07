@@ -130,10 +130,7 @@ const Statistics = () => {
         .vip-table-container { background: var(--glass-bg); border: 1px solid var(--border); border-radius: 20px; padding: 1.5rem 2rem; margin-bottom: 3rem; overflow-x: auto; }
         .stat-kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; width: 100%; }
 
-        @media (max-width: 768px) {
-          .dashboard-content-wrapper { overflow-x: hidden; width: 100%; max-width: 100vw; }
-          .quick-actions { min-width: 0; max-width: 100%; }
-          .stat-kpi-grid { grid-template-columns: 1fr !important; }
+        @media (max-width: 1260px) {
           .stat-kpi-row {
             display: flex !important;
             flex-direction: row !important;
@@ -141,12 +138,30 @@ const Statistics = () => {
             overflow-x: auto !important;
             padding-bottom: 1rem;
             scroll-snap-type: x mandatory;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
             width: 100%;
           }
+          .stat-kpi-row::-webkit-scrollbar {
+            height: 6px;
+          }
+          .stat-kpi-row::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          .stat-kpi-row::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+          }
+          .stat-kpi-row > div { 
+            flex: 0 0 280px !important; 
+            scroll-snap-align: start; 
+          }
+        }
+
+        @media (max-width: 768px) {
+          .dashboard-content-wrapper { overflow-x: hidden; width: 100%; max-width: 100vw; }
+          .quick-actions { min-width: 0; max-width: 100%; }
+          .stat-kpi-grid { grid-template-columns: 1fr !important; }
           .stat-kpi-row::-webkit-scrollbar { display: none; }
-          .stat-kpi-row > div { flex: 0 0 240px !important; scroll-snap-align: start; }
+          .stat-kpi-row > div { flex: 0 0 260px !important; }
           
           .stat-chart-container { padding: 1.5rem 1rem !important; height: 300px !important; }
           .stat-chart-area { padding: 1rem 0.5rem 0 !important; }
@@ -175,7 +190,7 @@ const Statistics = () => {
             </div>
           </header>
 
-          <div className="page-header-description" style={{ margin: "-1rem 0 2rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
+          <div className="page-header-description" style={{ margin: "-1rem 0 0.5rem 0", color: "var(--text-muted)", padding: "0 1rem" }}>
             <p>Analyze your transaction history and portfolio growth.</p>
           </div>
 
@@ -185,9 +200,9 @@ const Statistics = () => {
             {/* KPI Cards */}
             <div className="quick-actions glass-panel" style={{ gridColumn: '1 / -1' }}>
               <div className="stat-kpi-row">
-                <div className="action-btn" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '1.5rem', background: 'rgba(255,255,255,0.5)' }}>
+                <div className="stat-card">
                   <span style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>Total Volume</span>
-                  <h3 style={{ fontSize: '1.5rem', color: 'var(--primary-dark)', margin: 0 }}>$2.4M</h3>
+                  <h3 className="stat-card-val">$2.4M</h3>
                   <span style={{ color: '#10B981', fontSize: '0.75rem', marginTop: '0.5rem' }}><i className='bx bx-trending-up'></i> +12.5%</span>
                 </div>
                 <div className="stat-card">

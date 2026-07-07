@@ -115,3 +115,9 @@ export const changePassword = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+res.status(200).json(updatedUser ? updatedUser.notifications : []);
+  } catch (error) {
+  console.error('Mark notifications read error:', error);
+  res.status(500).json({ error: 'Server error' });
+}
+};
