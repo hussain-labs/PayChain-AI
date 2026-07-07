@@ -115,9 +115,28 @@ export const changePassword = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
-res.status(200).json(updatedUser ? updatedUser.notifications : []);
+export const markNotificationsRead = async (req, res) => {
+  try {
+    const { notificationId } = req.body;
+    let query = { _id: req.userId };
+    let update = {};
+
+    if (notificationId) {
+      query['notifications._id'] = notificationId;
+      update = { $set: { 'notifications.$.isRead': true } };
+    } else {
+      update = { $set: { 'notifications.$[].isRead': true } };
+    }
+
+    const updatedUser = await User.findOneAndUpdate(
+      query,
+      update,
+      { new: true }
+    );
+
+    res.status(200).json(updatedUser ? updatedUser.notifications : []);
   } catch (error) {
-  console.error('Mark notifications read error:', error);
-  res.status(500).json({ error: 'Server error' });
-}
+    console.error('Mark notifications read error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
 };

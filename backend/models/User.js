@@ -31,6 +31,8 @@ const userSchema = new mongoose.Schema({
   transactionCount: { type: Number, default: 0 },
   historyLookups: { type: Number, default: 0 },
   lastResetAt: { type: Date, default: null },
+  resetPasswordCode: { type: String, default: null },
+  resetPasswordExpires: { type: Date, default: null },
   stripeCustomerId: { type: String, default: null },
   stripeSubscriptionId: { type: String, default: null },
   createdAt: {

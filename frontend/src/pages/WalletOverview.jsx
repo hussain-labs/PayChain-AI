@@ -54,7 +54,7 @@ const WalletOverview = () => {
   const [assets, setAssets] = useState(null);
   const [history, setHistory] = useState([]);
   const [escrows, setEscrows] = useState([]);
-  const [visibleEscrowsCount, setVisibleEscrowsCount] = useState(3);
+  const [visibleEscrowsCount, setVisibleEscrowsCount] = useState(2);
   const [loading, setLoading] = useState(true);
   const [loadingOnChain, setLoadingOnChain] = useState(false);
   const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
@@ -265,11 +265,26 @@ const WalletOverview = () => {
         .wo-activity-list { display: flex; flex-direction: column; gap: 1rem; }
         .wo-activity-item { display: flex; align-items: center; justify-content: space-between; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
         .wo-activity-item:last-child { border-bottom: none; padding-bottom: 0; }
-        .wo-activity-info { display: flex; align-items: center; gap: 1rem; }
-        .wo-activity-icon { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #fff; }
-        .wo-activity-details h4 { margin: 0 0 0.25rem; font-size: 0.95rem; color: var(--text-color); }
-        .wo-activity-details p { margin: 0; font-size: 0.8rem; color: var(--text-muted); }
-        .wo-activity-amount { font-weight: 700; font-size: 1rem; }
+        .wo-activity-info { display: flex; align-items: center; gap: 1rem; min-width: 0; }
+        .wo-activity-icon { width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #fff; flex-shrink: 0; }
+        .wo-activity-details { min-width: 0; }
+        .wo-activity-details h4 { margin: 0 0 0.25rem; font-size: 0.95rem; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .wo-activity-details p { margin: 0; font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .wo-activity-amount { font-weight: 700; font-size: 1rem; white-space: nowrap; flex-shrink: 0; padding-left: 1rem; }
+
+        @media (max-width: 768px) {
+          .wo-grid { gap: 1rem; }
+          .wo-balance-card { padding: 1.5rem; min-height: 200px; }
+          .wo-bc-amount { font-size: clamp(1.8rem, 8vw, 2.5rem); margin-bottom: 1rem; }
+          .wo-bc-footer { flex-direction: column; align-items: stretch; gap: 0.75rem; }
+          .wo-disconnect { width: 100%; text-align: center; }
+          .wo-actions-card { padding: 1.5rem; }
+          .wo-activity-card { padding: 1.25rem; }
+          .wo-activity-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+          .wo-activity-header > div { flex-wrap: wrap; }
+          .wo-activity-item { flex-direction: column; align-items: flex-start; gap: 0.8rem; }
+          .wo-activity-amount { align-self: flex-start; padding-left: calc(45px + 1rem); padding-top: 0.2rem; }
+        }
       `}</style>
 
       <AppSidebar
@@ -358,7 +373,7 @@ const WalletOverview = () => {
                 <h3 style={{ fontSize: '1.2rem', fontWeight: 600 }}>Active Escrow Contracts</h3>
                 <Link to="/escrow" style={{ color: 'var(--primary)', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none' }}>Manage Escrows</Link>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: '1rem' }}>
                 {escrows.slice(0, visibleEscrowsCount).map(escrow => {
                   const isBuyer = escrow.buyerWallet?.toLowerCase() === address.toLowerCase();
                   return (
@@ -402,7 +417,7 @@ const WalletOverview = () => {
               <div style={{ textAlign: 'center', marginTop: '1.5rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                 {visibleEscrowsCount < escrows.length && (
                   <button 
-                    onClick={() => setVisibleEscrowsCount(prev => prev + 3)}
+                    onClick={() => setVisibleEscrowsCount(prev => prev + 2)}
                     style={{ background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', padding: '0.5rem 1.5rem', borderRadius: '50px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s ease' }}
                     onMouseOver={(e) => { e.target.style.background = 'var(--primary)'; e.target.style.color = '#fff'; }}
                     onMouseOut={(e) => { e.target.style.background = 'transparent'; e.target.style.color = 'var(--primary)'; }}
@@ -410,9 +425,9 @@ const WalletOverview = () => {
                     View More Escrows
                   </button>
                 )}
-                {visibleEscrowsCount > 3 && (
+                {visibleEscrowsCount > 2 && (
                   <button 
-                    onClick={() => setVisibleEscrowsCount(3)}
+                    onClick={() => setVisibleEscrowsCount(2)}
                     style={{ background: 'transparent', border: '1px solid var(--text-muted)', color: 'var(--text-muted)', padding: '0.5rem 1.5rem', borderRadius: '50px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s ease' }}
                     onMouseOver={(e) => { e.target.style.background = 'var(--text-muted)'; e.target.style.color = '#fff'; }}
                     onMouseOut={(e) => { e.target.style.background = 'transparent'; e.target.style.color = 'var(--text-muted)'; }}
