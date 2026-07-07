@@ -115,7 +115,6 @@ export const changePassword = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
-<<<<<<< Updated upstream
 export const markNotificationsRead = async (req, res) => {
   try {
     const { notificationId } = req.body;
@@ -141,5 +140,3 @@ export const markNotificationsRead = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
-=======
->>>>>>> Stashed changes
