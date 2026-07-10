@@ -170,3 +170,28 @@ export const updateEscrowStatus = async (req, res) => {
     res.status(500).json({ error: 'Failed to update Escrow status' });
   }
 };
+
+// DELETE /api/escrows/:id
+// Delete an escrow if funds are not issued (status is awaiting_funds)
+export const deleteEscrow = async (req, res) => {
+  try {
+    const escrowId = req.params.id;
+    const escrow = await Escrow.findById(escrowId);
+    if (!escrow) return res.status(404).json({ error: 'Escrow not found' });
+    
+    // Check if the user is authorized (must be the creator or involved)
+    if (escrow.user.toString() !== req.userId && escrow.buyerUserId?.toString() !== req.userId && escrow.sellerUserId?.toString() !== req.userId) {
+      return res.status(403).json({ error: 'Not authorized to delete this escrow' });
+    }
+
+    if (escrow.status !== 'awaiting_funds') {
+      return res.status(400).json({ error: 'Cannot delete escrow after funds are locked.' });
+    }
+
+    await Escrow.findByIdAndDelete(escrowId);
+    res.json({ message: 'Escrow deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting escrow:', error);
+    res.status(500).json({ error: 'Failed to delete Escrow' });
+  }
+};

@@ -102,7 +102,8 @@ const Escrow = () => {
       toast.error('Please fill all fields');
       return;
     }
-    try {
+
+    const deployCall = async () => {
       const token = localStorage.getItem('token');
       const res = await fetch(`${API}/api/escrows`, {
         method: 'POST',
@@ -111,72 +112,103 @@ const Escrow = () => {
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ 
-          title: title.trim(), 
-          description: description.trim(), 
-          amount, 
-          asset, 
-          buyerWallet: finalBuyerWallet.trim(), 
-          sellerWallet: finalSellerWallet.trim(), 
-          role 
+          title: title.trim(), description: description.trim(), amount, asset, 
+          buyerWallet: finalBuyerWallet.trim(), sellerWallet: finalSellerWallet.trim(), role 
         })
       });
       if (res.ok) {
         setTitle(''); setDescription(''); setAmount(''); setBuyerWallet(''); setSellerWallet('');
-        toast.success('Escrow Smart Contract Deployed!');
         fetchEscrows();
+        return res.json();
       } else {
         const data = await res.json();
-        toast.error(`Error: ${data.error || 'Failed to deploy'}`);
+        throw new Error(data.error || 'Failed to deploy');
       }
-    } catch (err) {
-      console.error('Failed to deploy', err);
-      toast.error('Network error occurred.');
-    }
+    };
+
+    toast.promise(deployCall(), {
+      loading: 'Compiling & Deploying Trustless Escrow...',
+      success: 'Smart Contract Successfully Deployed!',
+      error: (err) => `Error: ${err.message}`
+    });
   };
 
-  const updateStatus = async (id, status) => {
-    try {
+  const updateStatus = async (id, status, showToast = true) => {
+    const apiCall = async () => {
       const token = localStorage.getItem('token');
       const res = await fetch(`${API}/api/escrows/${id}/status`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ status })
       });
       if (res.ok) {
         fetchEscrows();
+        return res.json();
       } else {
         const data = await res.json();
-        toast.error(`Error: ${data.error || 'Failed to update escrow status'}`);
+        throw new Error(data.error || 'Failed to update escrow status');
       }
-    } catch (err) {
-      console.error('Failed to update status', err);
-      toast.error('Network error occurred.');
+    };
+
+    if (showToast) {
+      toast.promise(apiCall(), {
+        loading: 'Connecting to Blockchain to update state...',
+        success: `Smart Contract status updated to ${status.toUpperCase()}`,
+        error: (err) => err.message
+      });
+    } else {
+      await apiCall().catch(console.error);
     }
   };
 
   const handleFund = async (escrow) => {
-    try {
-      if (web3Address && escrow.buyerWallet && web3Address.toLowerCase() !== escrow.buyerWallet.toLowerCase()) {
-        const matchedWallet = savedWallets.find(w => w.address.toLowerCase() === escrow.buyerWallet.toLowerCase());
-        const walletName = matchedWallet ? matchedWallet.nickname : escrow.buyerWallet.slice(0, 6) + '...';
-        toast.error(`You selected ${walletName} as the Buyer, but your active MetaMask account is ${web3Address.slice(0,6)}... Please open your MetaMask extension and switch to the correct account to proceed.`);
-        return;
-      }
+    if (web3Address && escrow.buyerWallet && web3Address.toLowerCase() !== escrow.buyerWallet.toLowerCase()) {
+      const matchedWallet = savedWallets.find(w => w.address.toLowerCase() === escrow.buyerWallet.toLowerCase());
+      const walletName = matchedWallet ? matchedWallet.nickname : escrow.buyerWallet.slice(0, 6) + '...';
+      toast.error(`You selected ${walletName} as the Buyer, but your active MetaMask account is ${web3Address.slice(0,6)}... Please open your MetaMask extension and switch to the correct account to proceed.`);
+      return;
+    }
 
-      // Trigger MetaMask to actually transfer the amount to the contract address
+    const fundApiCall = async () => {
       const txHash = await sendTransactionAsync({
         to: escrow.contractAddress,
         value: parseEther(escrow.amount.toString()),
       });
       console.log('Transaction sent:', txHash);
-      // Once the user approves and the tx is sent, update backend state
-      updateStatus(escrow._id, 'funded');
-    } catch (err) {
-      console.error('User rejected transaction or it failed', err);
-    }
+      await updateStatus(escrow._id, 'funded', false);
+      return txHash;
+    };
+
+    toast.promise(fundApiCall(), {
+      loading: 'Awaiting MetaMask Signature & Blockchain Confirmation...',
+      success: 'Funds securely locked in Smart Contract!',
+      error: 'Transaction rejected or failed.'
+    });
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to completely delete this Escrow contract? This action cannot be undone.")) return;
+
+    const deleteCall = async () => {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API}/api/escrows/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        fetchEscrows();
+        return res.json();
+      } else {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete escrow');
+      }
+    };
+
+    toast.promise(deleteCall(), {
+      loading: 'Deleting Escrow contract...',
+      success: 'Escrow successfully deleted!',
+      error: (err) => err.message
+    });
   };
 
   const toggleTheme = () => {
@@ -366,6 +398,9 @@ const Escrow = () => {
                         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                           {escrow.status === 'awaiting_funds' && displayRole === 'buyer' && (
                             <button className="btn-primary" onClick={() => handleFund(escrow)}>Fund Escrow</button>
+                          )}
+                          {escrow.status === 'awaiting_funds' && (
+                            <button className="btn-secondary" style={{ color: '#ef4444', borderColor: '#ef4444' }} onClick={() => handleDelete(escrow._id)}><i className='bx bx-trash' style={{ marginRight: '4px' }}></i> Delete</button>
                           )}
                           {escrow.status === 'funded' && displayRole === 'seller' && (
                             <button className="btn-primary" onClick={() => updateStatus(escrow._id, 'delivered')}>Mark as Delivered</button>
